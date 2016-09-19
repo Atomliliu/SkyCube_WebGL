@@ -213,6 +213,87 @@ function getCubeTexturesFromLatLong( atlasImgUrl ) {
 function getCubeTexturesFromLP( atlasImgUrl ) {
 
 	var textures = [];
+	//var tilesNum = tileArray.length;
+
+	for ( var i = 0; i < tilesNum; i ++ ) {
+		textures[ i ] = new THREE.Texture();
+	}
+
+	var imageObj = new Image();
+
+	imageObj.onload = function() {
+
+		var canvas, context;
+		var tileWidth = imageObj.width;
+		var tileHeight = imageObj.height;
+
+		//Get LP image in
+		canvas = document.createElement( 'canvas' );
+		context = canvas.getContext( '2d' );
+		canvas.height = tileWidth;
+		canvas.width = tileWidth;
+		context.drawImage( imageObj, 0, 0);
+		//Get image data for each pixel
+		var imgData = ctx.getImageData(0, 0, c.width, c.height); 
+
+		//
+		var canvCube, ctxCube;
+		canvCube = document.createElement( 'canvasCube' );
+		ctxCube = canvas.getContext( '2d' );
+		canvas.height = canvas.width = tileWidth/2;
+
+		//Direction for 6 faces
+		var cubeDir = [
+		  [NUM_0D6, 0, NUM_1D6, 1],
+		  [NUM_1D6, 0, NUM_1D6, 1],
+		  [NUM_2D6, 0, NUM_1D6, 1],
+		  [NUM_3D6, 0, NUM_1D6, 1],
+		  [NUM_4D6, 0, NUM_1D6, 1],
+		  [NUM_5D6, 0, NUM_1D6, 1]
+		];
+		
+		for (var f = 0; f < 6; f += 1){
+
+			//Cube face pixel pos to LP image UV
+		}
+
+
+
+		textures[ i ].image = canvas;
+		textures[ i ].needsUpdate = true;
+
+
+	};
+
+	imageObj.src = atlasImgUrl;
+
+	return textures;
+
+}
+
+
+document.getElementById("scream").onload = function() {
+    var c = document.getElementById("myCanvas");
+    var ctx = c.getContext("2d");
+    var img = document.getElementById("scream");
+    ctx.drawImage(img, 0, 0);
+    var imgData = ctx.getImageData(0, 0, c.width, c.height);
+    // invert colors
+    var i;
+    for (i = 0; i < imgData.data.length; i += 4) {
+        imgData.data[i] = 255 - imgData.data[i];
+        imgData.data[i+1] = 255 - imgData.data[i+1];
+        imgData.data[i+2] = 255 - imgData.data[i+2];
+        imgData.data[i+3] = 255;
+    }
+    ctx.putImageData(imgData, 0, 0);
+};
+
+
+
+function RasterByShader( imgUrl, shaderMaterial, matMap, sX, sY ) {
+
+	var textures = [];
 	var tilesNum = tileArray.length;
 
 	for ( var i = 0; i < tilesNum; i ++ ) {
