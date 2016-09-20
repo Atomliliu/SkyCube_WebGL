@@ -232,6 +232,26 @@ function getCubeTexturesFromLatLong( atlasImgUrl ) {
 
 }
 
+function _Col8bitToFloat( nCol ){
+	return nCol/255.0;
+}
+
+function _ColFloatTo8bit( fCol ){
+	return Math.round(fCol*255.0);
+}
+
+function _getCarteDir( face, texU, texV ) {
+
+}
+
+function _CarteToLP( dirX, dirY, dirZ ) {
+
+}
+
+function _CarteToLatLong( dirX, dirY, dirZ ) {
+
+}
+
 function getCubeTexturesFromLP( atlasImgUrl ) {
 
 	var textures = [];
@@ -256,13 +276,17 @@ function getCubeTexturesFromLP( atlasImgUrl ) {
 		canvas.width = tileWidth;
 		context.drawImage( imageObj, 0, 0);
 		//Get image data for each pixel
-		var imgData = ctx.getImageData(0, 0, c.width, c.height); 
+		var imgData = context.getImageData(0, 0, canvas.width, canvas.height); 
+
+
 
 		//
 		var canvCube, ctxCube;
 		canvCube = document.createElement( 'canvasCube' );
-		ctxCube = canvas.getContext( '2d' );
-		canvas.height = canvas.width = tileWidth/2;
+		ctxCube = canvCube.getContext( '2d' );
+		canvCube.height = canvCube.width = tileWidth/2;
+
+		var imgFace = ctxCube.getImageData(0, 0, canvCube.width, canvCube.height); 
 
 		//Direction for 6 faces
 		var cubeDir = [
@@ -273,13 +297,25 @@ function getCubeTexturesFromLP( atlasImgUrl ) {
 		  [NUM_4D6, 0, NUM_1D6, 1],
 		  [NUM_5D6, 0, NUM_1D6, 1]
 		];
+
 		
-		for (var f = 0; f < 6; f += 1){
+		for (var f = 0; f < cubeDir.length; f += 1){
+
+			for (i = 0; i < imgData.data.length; i += 4) {
+			}
 
 			//Cube face pixel pos to LP image UV
+			var dirRay = _getCarteDir(f,)
+			if cubeDir[f]
+			_CarteToLP()
 		}
 
-
+		for (i = 0; i < imgData.data.length; i += 4) {
+	        imgData.data[i] = 255 - imgData.data[i];
+	        imgData.data[i+1] = 255 - imgData.data[i+1];
+	        imgData.data[i+2] = 255 - imgData.data[i+2];
+	        imgData.data[i+3] = 255;
+	    }
 
 		textures[ i ].image = canvas;
 		textures[ i ].needsUpdate = true;
