@@ -155,9 +155,31 @@ function getTexturesFromAtlasFile( atlasImgUrl, tileArray ) {
 			context = canvas.getContext( '2d' );
 			canvas.height = tileWidth;
 			canvas.width = tileWidth;
-			context.drawImage( imageObj, 
-				Math.round(tileArray[i][1]*tileWidth), Math.round(tileArray[i][2]*tileHeight), 
-				Math.round(tileArray[i][3]*tileWidth), Math.round(tileArray[i][4]*tileHeight), 0, 0, tileWidth, tileWidth );
+			if tileArray[i][4] == 0 {
+				context.drawImage( imageObj, 
+					Math.round(tileArray[i][0]*tileWidth), Math.round(tileArray[i][1]*tileHeight), 
+					Math.round(tileArray[i][2]*tileWidth), Math.round(tileArray[i][3]*tileHeight), 0, 0, tileWidth, tileWidth );
+
+			}
+			else // 180 degree
+			{
+				canvas2 = document.createElement( 'canvas' );
+				context2 = canvas2.getContext( '2d' );
+				canvas2.height = tileWidth;
+				canvas2.width = tileWidth;
+				context2.drawImage( imageObj, 
+					Math.round(tileArray[i][0]*tileWidth), Math.round(tileArray[i][1]*tileHeight), 
+					Math.round(tileArray[i][2]*tileWidth), Math.round(tileArray[i][3]*tileHeight), 0, 0, tileWidth, tileWidth );
+
+				context.translate(canvas.width/2,canvas.height/2);
+				context.rotate(180*Math.PI/180);
+				context.drawImage( context2, -context2.width/2, -context2.height/2);
+
+			}
+			
+
+
+
 			textures[ i ].image = canvas;
 			textures[ i ].needsUpdate = true;
 
