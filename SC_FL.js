@@ -303,12 +303,12 @@ function getCubeTexturesFromLP( atlasImgUrl ) {
 			        imgFace.data[index+2] = imgData.data[indexLP+2]; //B
 			        imgFace.data[index+3] = imgData.data[indexLP+3]; //A
 				}
-			}	
+			}
+			canvas.putImageData(imgFace, 0, 0);
+
+			textures[ i ].image = canvas;
+			textures[ i ].needsUpdate = true;	
 		}
-
-		textures[ i ].image = canvas;
-		textures[ i ].needsUpdate = true;
-
 
 	};
 
