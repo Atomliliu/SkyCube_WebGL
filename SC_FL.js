@@ -171,44 +171,7 @@ function getTexturesFromAtlasFile( atlasImgUrl, tileArray ) {
 
 }
 
-function getCubeTexturesFromLatLong( atlasImgUrl ) {
 
-	var textures = [];
-	var tilesNum = tileArray.length;
-
-	for ( var i = 0; i < tilesNum; i ++ ) {
-		textures[ i ] = new THREE.Texture();
-	}
-
-	var imageObj = new Image();
-
-	imageObj.onload = function() {
-
-		var canvas, context;
-		var tileWidth = imageObj.width;
-		var tileHeight = imageObj.height;
-
-		for ( var i = 0; i < textures.length; i ++ ) {
-
-			canvas = document.createElement( 'canvas' );
-			context = canvas.getContext( '2d' );
-			canvas.height = tileWidth;
-			canvas.width = tileWidth;
-			context.drawImage( imageObj, 
-				Math.round(tileArray[i][1]*tileWidth), Math.round(tileArray[i][2]*tileHeight), 
-				Math.round(tileArray[i][3]*tileWidth), Math.round(tileArray[i][4]*tileHeight), 0, 0, tileWidth, tileWidth );
-			textures[ i ].image = canvas;
-			textures[ i ].needsUpdate = true;
-
-		}
-
-	};
-
-	imageObj.src = atlasImgUrl;
-
-	return textures;
-
-}
 
 function _Col8bitToFloat( nCol ){
 	return nCol/255.0;
@@ -221,6 +184,11 @@ function _ColFloatTo8bit( fCol ){
 function _getCarteDir( face, texX, texY ) {
 	return dir;
 }
+
+function _getLatLongUV( vDir ){
+	return ;
+}
+
 
 function _getLPUV( vDir ) {
 	return ;
@@ -319,22 +287,90 @@ function getCubeTexturesFromLP( atlasImgUrl ) {
 }
 
 
-document.getElementById("scream").onload = function() {
-    var c = document.getElementById("myCanvas");
-    var ctx = c.getContext("2d");
-    var img = document.getElementById("scream");
-    ctx.drawImage(img, 0, 0);
-    var imgData = ctx.getImageData(0, 0, c.width, c.height);
-    // invert colors
-    var i;
-    for (i = 0; i < imgData.data.length; i += 4) {
-        imgData.data[i] = 255 - imgData.data[i];
-        imgData.data[i+1] = 255 - imgData.data[i+1];
-        imgData.data[i+2] = 255 - imgData.data[i+2];
-        imgData.data[i+3] = 255;
-    }
-    ctx.putImageData(imgData, 0, 0);
-};
+function getCubeTexturesFromLatLong( atlasImgUrl ) {
+
+	var textures = [];
+	//var tilesNum = tileArray.length;
+
+	for ( var i = 0; i < tilesNum; i ++ ) {
+		textures[ i ] = new THREE.Texture();
+	}
+
+	var imageObj = new Image();
+
+	imageObj.onload = function() {
+
+		var canvas, context;
+		var tileWidth = imageObj.width;
+		var tileHeight = imageObj.height;
+
+		//Get LP image in
+		canvas = document.createElement( 'canvas' );
+		context = canvas.getContext( '2d' );
+		canvas.height = tileWidth;
+		canvas.width = tileWidth;
+		context.drawImage( imageObj, 0, 0);
+		//Get image data for each pixel
+		var imgData = context.getImageData(0, 0, canvas.width, canvas.height); 
+
+
+
+		//
+		var canvCube, ctxCube;
+		canvCube = document.createElement( 'canvasCube' );
+		ctxCube = canvCube.getContext( '2d' );
+		canvCube.height = canvCube.width = tileWidth/2;
+
+		var imgFace = ctxCube.getImageData(0, 0, canvCube.width, canvCube.height); 
+
+		//Direction for 6 faces
+		var cubeDir = [
+		  [NUM_0D6, 0, NUM_1D6, 1],
+		  [NUM_1D6, 0, NUM_1D6, 1],
+		  [NUM_2D6, 0, NUM_1D6, 1],
+		  [NUM_3D6, 0, NUM_1D6, 1],
+		  [NUM_4D6, 0, NUM_1D6, 1],
+		  [NUM_5D6, 0, NUM_1D6, 1]
+		];
+
+		
+		for (var f = 0; f < cubeDir.length; f += 1){
+			var index = 0;
+			for (var h = 0; h < canvCube.height; h++) {
+				for (var w = 0; w < canvCube.width; w++) {
+					index = 4 * (h * canvCube.width + w);
+
+					var sizeFace = [(canvCube.width-1), (canvCube.height-1)];
+					var xyFace = [((w/sizeFace[0])*2)-1, ((h/sizeFace[1])*2)-1];
+
+
+					var xyLL = _getLatLongUV(_getCarteDir(f,xyFace[0],xyFace[1]));
+					var uvLL = [(xyLL[0]+1)*0.5, (xyLL[1]+1)*0.5];// -1 to 1 convert to 0 to 1
+					uvLL = [uvLL[0]*(canvas.width-1), uvLL[1]*(canvas.height-1)];// 0 to 1 transfer reslution
+
+					var indexLL = 4 * (uvLL[1] * canvas.width + uvLL[0]);// index pixels in image data
+					//
+
+					imgFace.data[index] = imgData.data[indexLL]; //R
+			        imgFace.data[index+1] = imgData.data[indexLL+1]; //G
+			        imgFace.data[index+2] = imgData.data[indexLL+2]; //B
+			        imgFace.data[index+3] = imgData.data[indexLL+3]; //A
+				}
+			}
+			canvas.putImageData(imgFace, 0, 0);
+
+			textures[ i ].image = canvas;
+			textures[ i ].needsUpdate = true;	
+		}
+
+	};
+
+	imageObj.src = atlasImgUrl;
+
+	return textures;
+
+}
+
 
 
 
