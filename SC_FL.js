@@ -155,31 +155,9 @@ function getTexturesFromAtlasFile( atlasImgUrl, tileArray ) {
 			context = canvas.getContext( '2d' );
 			canvas.height = tileWidth;
 			canvas.width = tileWidth;
-			if tileArray[i][4] == 0 {
-				context.drawImage( imageObj, 
-					Math.round(tileArray[i][0]*tileWidth), Math.round(tileArray[i][1]*tileHeight), 
-					Math.round(tileArray[i][2]*tileWidth), Math.round(tileArray[i][3]*tileHeight), 0, 0, tileWidth, tileWidth );
-
-			}
-			else // 180 degree
-			{
-				canvas2 = document.createElement( 'canvas' );
-				context2 = canvas2.getContext( '2d' );
-				canvas2.height = tileWidth;
-				canvas2.width = tileWidth;
-				context2.drawImage( imageObj, 
-					Math.round(tileArray[i][0]*tileWidth), Math.round(tileArray[i][1]*tileHeight), 
-					Math.round(tileArray[i][2]*tileWidth), Math.round(tileArray[i][3]*tileHeight), 0, 0, tileWidth, tileWidth );
-
-				context.translate(canvas.width/2,canvas.height/2);
-				context.rotate(180*Math.PI/180);
-				context.drawImage( context2, -context2.width/2, -context2.height/2);
-
-			}
-			
-
-
-
+			context.drawImage( imageObj, 
+				Math.round(tileArray[i][1]*tileWidth), Math.round(tileArray[i][2]*tileHeight), 
+				Math.round(tileArray[i][3]*tileWidth), Math.round(tileArray[i][4]*tileHeight), 0, 0, tileWidth, tileWidth );
 			textures[ i ].image = canvas;
 			textures[ i ].needsUpdate = true;
 
@@ -240,12 +218,16 @@ function _ColFloatTo8bit( fCol ){
 	return Math.round(fCol*255.0);
 }
 
-function _getCarteDir( face, texU, texV ) {
+function _getCarteDir( face, texX, texY ) {
+	return dir;
+}
 
+function _getLPUV( vDir ) {
+	return ;
 }
 
 function _CarteToLP( dirX, dirY, dirZ ) {
-
+	return uv;
 }
 
 function _CarteToLatLong( dirX, dirY, dirZ ) {
@@ -300,22 +282,29 @@ function getCubeTexturesFromLP( atlasImgUrl ) {
 
 		
 		for (var f = 0; f < cubeDir.length; f += 1){
+			var index = 0;
+			for (var h = 0; h < canvCube.height; h++) {
+				for (var w = 0; w < canvCube.width; w++) {
+					index = 4 * (h * canvCube.width + w);
 
-			for (i = 0; i < imgData.data.length; i += 4) {
-			}
+					var sizeFace = [(canvCube.width-1), (canvCube.height-1)];
+					var xyFace = [((w/sizeFace[0])*2)-1, ((h/sizeFace[1])*2)-1];
 
-			//Cube face pixel pos to LP image UV
-			var dirRay = _getCarteDir(f,)
-			if cubeDir[f]
-			_CarteToLP()
+
+					var xyLP = _getLPUV(_getCarteDir(f,xyFace[0],xyFace[1]));
+					var uvLP = [(xyLP[0]+1)*0.5, (xyLP[1]+1)*0.5];// -1 to 1 convert to 0 to 1
+					uvLP = [uvLP[0]*(canvas.width-1), uvLP[1]*(canvas.height-1)];// 0 to 1 transfer reslution
+
+					var indexLP = 4 * (uvLP[1] * canvas.width + uvLP[0]);// index pixels in image data
+					//
+
+					imgFace.data[index] = imgData.data[indexLP]; //R
+			        imgFace.data[index+1] = imgData.data[indexLP+1]; //G
+			        imgFace.data[index+2] = imgData.data[indexLP+2]; //B
+			        imgFace.data[index+3] = imgData.data[indexLP+3]; //A
+				}
+			}	
 		}
-
-		for (i = 0; i < imgData.data.length; i += 4) {
-	        imgData.data[i] = 255 - imgData.data[i];
-	        imgData.data[i+1] = 255 - imgData.data[i+1];
-	        imgData.data[i+2] = 255 - imgData.data[i+2];
-	        imgData.data[i+3] = 255;
-	    }
 
 		textures[ i ].image = canvas;
 		textures[ i ].needsUpdate = true;
