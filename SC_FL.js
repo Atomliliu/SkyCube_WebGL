@@ -181,17 +181,79 @@ function _ColFloatTo8bit( fCol ){
 	return Math.round(fCol*255.0);
 }
 
-function _getCarteDir( face, texX, texY ) {
+function normalize(point, scale) {
+  var norm = Math.sqrt(point.x * point.x + point.y * point.y);
+  if (norm != 0) { // as3 return 0,0 for a point of zero length
+    point.x = scale * point.x / norm;
+    point.y = scale * point.y / norm;
+  }
+}
+
+function _getCarteDir( face, texU, texV ) {
+
+	var dir = [0,0,0];
+	// Range to -1 to 1
+   	texU = texU * 2.0 - 1.0;
+   	texV = texV * 2.0 - 1.0; 
+
+
+	switch( face ) {
+    	case 0 : //PositiveX   Right facing side (+x).
+			dir[0] = -1.0;
+			dir[1] = texV;
+			dir[2] = -texU;
+		break;
+
+		case 1 : //NegativeX   Left facing side (-x).
+			dir[0] = 1.0;
+			dir[1] = texV;
+			dir[2] = texU;
+		break;
+
+		case 2 : //PositiveY   Upwards facing side (+y).
+			dir[0] = -texU;
+			dir[1] = -1.0;
+			dir[2] = texV;
+		break;
+
+		case 3 : //NegativeY   Downward facing side (-y).
+			dir[0] = -texU;
+			dir[1] = 1.0;
+			dir[2] = -texV;
+		break;
+
+		case 4 : //PositiveZ   Forward facing side (+z).
+			//VEC = new FLOAT3(-UV.x,UV.y,1.0f);
+			dir[0] = -texU;
+			dir[1] = texV;
+			dir[2] = 1.0;
+		break;
+
+		case 5 : //NegativeZ   Backward facing side (-z).
+			//VEC = new FLOAT3(UV.x,UV.y,-1.0f);
+			dir[0] = texU;
+			dir[1] = texV;
+			dir[2] = -1.0;
+
+		default : 
+			//VEC = new FLOAT3( 0.0f, 0.0f, 1.0f );
+			dir[0] = 0.0;
+			dir[1] = 0.0;
+			dir[2] = 1.0;
+		break;
+   	}   
+
+   
 	return dir;
 }
 
 function _getLatLongUV( vDir ){
-	return ;
+	return uv;
 }
 
 
 function _getLPUV( vDir ) {
-	return ;
+	return uv;
 }
 
 function _CarteToLP( dirX, dirY, dirZ ) {
@@ -256,11 +318,11 @@ function getCubeTexturesFromLP( atlasImgUrl ) {
 					index = 4 * (h * canvCube.width + w);
 
 					var sizeFace = [(canvCube.width-1), (canvCube.height-1)];
-					var xyFace = [((w/sizeFace[0])*2)-1, ((h/sizeFace[1])*2)-1];
+					var xyFace = [w/sizeFace[0], h/sizeFace[1]];
 
 
-					var xyLP = _getLPUV(_getCarteDir(f,xyFace[0],xyFace[1]));
-					var uvLP = [(xyLP[0]+1)*0.5, (xyLP[1]+1)*0.5];// -1 to 1 convert to 0 to 1
+					var uvLP = _getLPUV(_getCarteDir(f,xyFace[0],xyFace[1]));
+					//var uvLP = [(xyLP[0]+1)*0.5, (xyLP[1]+1)*0.5];// -1 to 1 convert to 0 to 1
 					uvLP = [uvLP[0]*(canvas.width-1), uvLP[1]*(canvas.height-1)];// 0 to 1 transfer reslution
 
 					var indexLP = 4 * (uvLP[1] * canvas.width + uvLP[0]);// index pixels in image data
@@ -341,11 +403,11 @@ function getCubeTexturesFromLatLong( atlasImgUrl ) {
 					index = 4 * (h * canvCube.width + w);
 
 					var sizeFace = [(canvCube.width-1), (canvCube.height-1)];
-					var xyFace = [((w/sizeFace[0])*2)-1, ((h/sizeFace[1])*2)-1];
+					var xyFace = [w/sizeFace[0], h/sizeFace[1]];
 
 
-					var xyLL = _getLatLongUV(_getCarteDir(f,xyFace[0],xyFace[1]));
-					var uvLL = [(xyLL[0]+1)*0.5, (xyLL[1]+1)*0.5];// -1 to 1 convert to 0 to 1
+					var uvLL = _getLatLongUV(_getCarteDir(f,xyFace[0],xyFace[1]));
+					//var uvLL = [(xyLL[0]+1)*0.5, (xyLL[1]+1)*0.5];// -1 to 1 convert to 0 to 1
 					uvLL = [uvLL[0]*(canvas.width-1), uvLL[1]*(canvas.height-1)];// 0 to 1 transfer reslution
 
 					var indexLL = 4 * (uvLL[1] * canvas.width + uvLL[0]);// index pixels in image data
