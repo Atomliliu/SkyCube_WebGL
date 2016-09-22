@@ -92,6 +92,11 @@ const NUM_6D6 = 1;
 const NUM_1D3 = 0.33333333333333333333333333333333;
 const NUM_2D3 = 0.66666666666666666666666666666667;
 
+const A_PI		3.14159265358//3.1415926535897932384626433832795
+const A_1D_PI	0.31830988618//0.31830988618379067153776752674503
+const A_HalfPI	1.57079632679//1.5707963267948966192313216916398
+const A_SIN45	0.70710678119//0.7071067811865475244008443621048490392848359376884740
+
 //[x,y,width,height,rotated]
 var CubeArrayHStrip = [
   [NUM_0D6, 0, NUM_1D6, 1, 0],
@@ -181,12 +186,16 @@ function _ColFloatTo8bit( fCol ){
 	return Math.round(fCol*255.0);
 }
 
-function normalize(point, scale) {
-  var norm = Math.sqrt(point.x * point.x + point.y * point.y);
-  if (norm != 0) { // as3 return 0,0 for a point of zero length
-    point.x = scale * point.x / norm;
-    point.y = scale * point.y / norm;
+function _Normalize(vX, vY, vZ, scale = 1) {
+  var norm = Math.sqrt(vX * vX + vY * vY + vZ * vZ);
+  var result = [vX,vY,vZ];
+  if (norm != 0) {
+    result[0] = scale * vX / norm;
+    result[1] = scale * vY / norm;
+    result[2] = scale * vZ / norm;
   }
+
+  return result;
 }
 
 function _getCarteDir( face, texU, texV ) {
@@ -241,28 +250,122 @@ function _getCarteDir( face, texU, texV ) {
 			dir[1] = 0.0;
 			dir[2] = 1.0;
 		break;
-   	}   
+   	}
 
-   
-	return dir;
+	return _Normalize(dir[0],dir[1],dir[2]);
 }
 
 function _getLatLongUV( vDir ){
+	
+	var uv = [0,0];
+
+	uv[1] = Math.acos(-vDir[1]) * A_1D_PI; // y = 1 to -1, v = 0 to PI
+	float P = Math.abs(vDir[0]/vDir[2]);
+
+	if(vDir[0] >= 0) {
+		if(vDir[2] == 0.0) {
+			vDir[0] = 0.5;
+		}
+		else if(vDir[2] < 0) {
+			uv[0] = (A_PI - Math.atan(P)) * A_1D_PI;
+		}
+		else {
+			uv[0] = Math.atan(P) * A_1D_PI;
+		}
+
+	}
+	else { // X < 0  //phase
+		if(vDir[2] == 0.0) {
+			uv[0] = -0.5;
+		}
+		else if(vDir[2] < 0) {
+			uv[0] = -(A_PI - Math.atan(P)) * A_1D_PI;
+		}
+		else {
+			uv[0] = -Math.atan(P) * A_1D_PI;
+		}
+	}
+
+	uv[0] = (uv[0] + 1.0) * 0.5;
+
 	return uv;
 }
 
 
 function _getLPUV( vDir ) {
+	float th, la, lr, L, P;
+	var uv = [0,0];
+	if(vDir[2] == 1.0f){
+		uv[0] = uv[1] = 0.0;
+	}
+
+	else {
+		th = Math.sqrt(vDir[0] * vDir[0] + vDir[1] * vDir[1]);
+		if(vDir[2] < 0.0) {
+			la = Math.asin(th);
+			lr = (A_PI - la) * A_1D_PI;
+			UV.y = lr * (vDir[1] / th);
+			UV.x = lr * (vDir[0] / th);
+		}
+
+		else{
+			la = Math.asin(th);
+			lr = la * A_1D_PI;
+			UV.y = lr * (vDir[1] / th);
+			UV.x = lr * (vDir[0] / th);
+		}
+		
+		//lr = pow(L * L + P * P, 0.5f); 
+	}
+
+	//From -1 to 1 move to 0 to 1 range
+	uv[0] = (uv[1] + 1.0) * 0.5;
+	uv[1] = (uv[1] + 1.0) * 0.5;
 	return uv;
 }
 
-function _CarteToLP( dirX, dirY, dirZ ) {
-	return uv;
+function _getLPDir( texU, texV ) {
+	var vDir = [0,0,0];
+
+	// Range to -1 to 1
+   	texU = texU * 2.0 - 1.0;
+   	texV = texV * 2.0 - 1.0; 
+
+   	float lr = Math.sqrt(texU * texU + texV * texV);
+	if(lr == 0.0){
+		vDir[0] = 0.0;
+		vDir[1] = 0.0;
+		vDir[2] = 1.0;
+	}
+
+	else if(lr <= 1.0){
+		float la = A_PI * lr; // 0-1 to range 0-Pi
+		float th = Math.sin(la);
+		vDir[0] = (texU/lr)*th;
+		vDir[1] = (texV/lr)*th;
+		vDir[2] = Math.cos(la);
+	}
+	else{//Back
+		vDir[0] = 0.0;
+		vDir[1] = 0.0;
+		vDir[2] = -1.0;
+	}
+
+	return vDir;
+
 }
 
-function _CarteToLatLong( dirX, dirY, dirZ ) {
 
-}
+
+
+
+//function _CarteToLP( dirX, dirY, dirZ ) {
+//	return uv;
+//}
+
+//function _CarteToLatLong( dirX, dirY, dirZ ) {
+
+//}
 
 function getCubeTexturesFromLP( atlasImgUrl ) {
 
@@ -323,7 +426,7 @@ function getCubeTexturesFromLP( atlasImgUrl ) {
 
 					var uvLP = _getLPUV(_getCarteDir(f,xyFace[0],xyFace[1]));
 					//var uvLP = [(xyLP[0]+1)*0.5, (xyLP[1]+1)*0.5];// -1 to 1 convert to 0 to 1
-					uvLP = [uvLP[0]*(canvas.width-1), uvLP[1]*(canvas.height-1)];// 0 to 1 transfer reslution
+					uvLP = [Math.round(uvLP[0]*(canvas.width-1)), Math.round(uvLP[1]*(canvas.height-1))];// 0 to 1 transfer reslution
 
 					var indexLP = 4 * (uvLP[1] * canvas.width + uvLP[0]);// index pixels in image data
 					//
@@ -408,7 +511,7 @@ function getCubeTexturesFromLatLong( atlasImgUrl ) {
 
 					var uvLL = _getLatLongUV(_getCarteDir(f,xyFace[0],xyFace[1]));
 					//var uvLL = [(xyLL[0]+1)*0.5, (xyLL[1]+1)*0.5];// -1 to 1 convert to 0 to 1
-					uvLL = [uvLL[0]*(canvas.width-1), uvLL[1]*(canvas.height-1)];// 0 to 1 transfer reslution
+					uvLL = [Math.round(uvLL[0]*(canvas.width-1)), Math.round(uvLL[1]*(canvas.height-1))];// 0 to 1 transfer reslution
 
 					var indexLL = 4 * (uvLL[1] * canvas.width + uvLL[0]);// index pixels in image data
 					//
