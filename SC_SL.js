@@ -28,7 +28,7 @@ THREE.SL_RGBM_ENCODE = {
 			"vWorldPosition = worldPosition.xyz;",
 			"vUv = uv;",
 
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+			//"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
 		"}",
 
@@ -111,7 +111,7 @@ THREE.SL_RGBM_DECODE = {
 			"vWorldPosition = worldPosition.xyz;",
 			"vUv = uv;",
 
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+			//"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
 		"}",
 
@@ -167,7 +167,7 @@ THREE.SL_RGBM_DECODE = {
 
 };
 
-THREE.SL_SP2CUBE = {
+THREE.SL_LP2CUBE = {
 	uniforms: {
 
 		tSampler: 	 { type: "t", value: null },
@@ -188,7 +188,7 @@ THREE.SL_SP2CUBE = {
 			"vWorldPosition = worldPosition.xyz;",
 			"vUv = uv;",
 
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+			//"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
 		"}",
 
@@ -253,50 +253,123 @@ THREE.SCSL_LatLong2Cube = {
 
 		tSampler: 	 { type: "t", value: null },
 		face:	 { type: "f", value: 0 },
-
-
 	},
 
 
 	vertexShader: [
 
-		"uniform float mRefractionRatio;",
-		"uniform float mFresnelBias;",
-		"uniform float mFresnelScale;",
-		"uniform float mFresnelPower;",
-
-		"varying vec3 vReflect;",
-		"varying vec3 vRefract[3];",
-		"varying float vReflectionFactor;",
+		"varying vec3 vWorldPosition;",
+		"varying vec2 vUv;",
 
 		"void main() {",
 
-			"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
 			"vec4 worldPosition = modelMatrix * vec4( position, 1.0 );",
+			"vWorldPosition = worldPosition.xyz;",
+			"vUv = uv;",
+			//"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+		"}",
 
-			"vec3 worldNormal = normalize( mat3( modelMatrix[0].xyz, modelMatrix[1].xyz, modelMatrix[2].xyz ) * normal );",
-
-			"vec3 I = worldPosition.xyz - cameraPosition;",
-
-			"vReflect = reflect( I, worldNormal );",
-			"vRefract[0] = refract( normalize( I ), worldNormal, mRefractionRatio );",
-			"vRefract[1] = refract( normalize( I ), worldNormal, mRefractionRatio * 0.99 );",
-			"vRefract[2] = refract( normalize( I ), worldNormal, mRefractionRatio * 0.98 );",
-			"vReflectionFactor = mFresnelBias + mFresnelScale * pow( 1.0 + dot( normalize( I ), worldNormal ), mFresnelPower );",
-
-			"gl_Position = projectionMatrix * mvPosition;",
-
-		"}"
 
 	].join( "\n" ),
 
 	fragmentShader: [
 
-		"uniform samplerCube tCube;",
+		"uniform sampler2D tSampler;",
+		"varying vec3 vWorldPosition;",
+		"varying vec2 vUv;",
 
-		"varying vec3 vReflect;",
-		"varying vec3 vRefract[3];",
-		"varying float vReflectionFactor;",
+		"uniform float face;",
+
+		"#define A_PI		3.14159265358 //3.1415926535897932384626433832795"
+		"#define A_1D_PI		0.31830988618 //0.31830988618379067153776752674503"
+
+
+	    "vec3 GetVec(vec2 UV, float face){"
+
+	        "vec3 VEC;"
+	        "UV = UV * 2 - 1; // Range to -1 to 1"
+
+	        "if(face == 0.0){ //PositiveX	 Right facing side (+x)."
+				"VEC = vec3(1.0,UV.y,UV.x);"
+			"}"
+
+			"else if(face == 1.0){ //NegativeX	 Left facing side (-x)."
+				"VEC = vec3(-1.0,UV.y,-UV.x);"
+			"}"
+
+			"else if(face == 2.0){ //PositiveY	 Upwards facing side (+y)."
+				"VEC = vec3(-UV.x,1.0,-UV.y);"
+			"}"
+
+			"else if(face == 3.0){ //NegativeY	 Downward facing side (-y)."
+				"VEC = vec3(-UV.x,-1.0,UV.y);"
+			"}"
+
+			"else if(face == 4.0){ //PositiveZ	 Forward facing side (+z)."
+				"VEC = vec3(-UV.x,UV.y,1.0);"
+			"}"
+
+			"else if(face == 5.0){ //NegativeZ	 Backward facing side (-z)."
+				"VEC = vec3(UV.x,UV.y,-1.0);"
+			"}"
+
+			"else{"
+				"VEC = vec3(0.0,0.0,1.0);"
+			"}"
+
+	        "return normalize(VEC);"
+
+	    "}"
+
+
+	    "fixed2 GetSphericalMapping_VEC2UV(float3 vec, float mode) //Use for create LP map"
+		"{"
+			"fixed2 UV;"
+
+			"UV.y = acos(-vec.y) * A_1D_PI; // y = 1 to -1, v = 0 to PI"
+
+			"float P = abs(vec.x/vec.z);"
+			//float O = 0.0f;
+
+			"if(vec.x >= 0) {"
+				"if(vec.z == 0.0f) {"
+					"UV.x = 0.5f;"
+				"}"
+				"else if(vec.z < 0) {"
+					"UV.x = (A_PI - atan(P)) * A_1D_PI;"
+				"}"
+				"else {"
+					"UV.x = atan(P) * A_1D_PI;"
+				"}"
+
+			"}"
+			"else { // X < 0  //phase"
+				"if(vec.z == 0.0f) {"
+					"UV.x = -0.5f;"
+				"}"
+				"else if(vec.z < 0) {"
+					"UV.x = -(A_PI - atan(P)) * A_1D_PI;"
+				"}"
+				"else {"
+					"UV.x = -atan(P) * A_1D_PI;"
+				"}"
+			"}"
+
+			"UV.x = (UV.x + 1.0f) * 0.5f;"
+
+			
+			"if(mode > 0.9f){ //sky to cube"
+				"UV.x = (1.0f - UV.x);"
+			"}"
+
+			
+			//{r}=\sqrt{x^2 + y^2 + z^2} 、
+			//{\theta}=\arctan \left( \frac{\sqrt{x^2 + y^2}}{z} \right)=\arccos \left( {\frac{z}{\sqrt{x^2 + y^2 + z^2}}} \right) 、
+			//{\phi}=\arctan \left( {\frac{y}{x}} \right) 
+
+			"return UV;"
+		"}"
+
 
 		"void main() {",
 
@@ -352,7 +425,6 @@ Shader "Hidden/Skycube/INT/SC_Spherical2Cube" {
 
 		        float3 VEC;
 		        UV = UV * 2 - 1; // Range to -1 to 1
-
 
 		        if(face == 0.0f){ //PositiveX	 Right facing side (+x).
 					VEC = float3(1.0,UV.y,UV.x);
@@ -443,13 +515,7 @@ Shader "Hidden/Skycube/INT/SC_Spherical2Cube" {
 
 			
 
-			v2f vert( appdata_img v ) 
-			{
-				v2f o;
-				o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
-				o.uv =  v.texcoord.xy;	
-				return o;
-			} 
+
 
 			float4 frag(v2f i) : COLOR 
 			{
