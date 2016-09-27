@@ -28,7 +28,7 @@ THREE.SL_RGBM_ENCODE = {
 			"vWorldPosition = worldPosition.xyz;",
 			"vUv = uv;",
 
-			//"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
 		"}",
 
@@ -111,7 +111,7 @@ THREE.SL_RGBM_DECODE = {
 			"vWorldPosition = worldPosition.xyz;",
 			"vUv = uv;",
 
-			//"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
 		"}",
 
@@ -188,7 +188,7 @@ THREE.SL_LP2CUBE = {
 			"vWorldPosition = worldPosition.xyz;",
 			"vUv = uv;",
 
-			//"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
 		"}",
 
@@ -266,7 +266,7 @@ THREE.SCSL_LatLong2Cube = {
 			"vec4 worldPosition = modelMatrix * vec4( position, 1.0 );",
 			"vWorldPosition = worldPosition.xyz;",
 			"vUv = uv;",
-			//"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 		"}",
 
 
@@ -322,9 +322,356 @@ THREE.SCSL_LatLong2Cube = {
 	    "}",
 
 
-	    "fixed2 getSphericalMapping_VEC2UV(float3 vec) //Use for create LP map",
+	    "vec2 getSphericalMapping_VEC2UV(vec3 vec) //Use for create LP map",
 		"{",
-			"fixed2 UV;",
+			"vec2 UV;",
+
+			"UV.y = acos(-vec.y) * A_1D_PI; // y = 1 to -1, v = 0 to PI",
+
+			"float P = abs(vec.x/vec.z);",
+			//float O = 0.0f;
+
+			"if(vec.x >= 0) {",
+				"if(vec.z == 0.0f) {",
+					"UV.x = 0.5f;",
+				"}",
+				"else if(vec.z < 0) {",
+					"UV.x = (A_PI - atan(P)) * A_1D_PI;",
+				"}",
+				"else {",
+					"UV.x = atan(P) * A_1D_PI;",
+				"}",
+
+			"}",
+			"else { // X < 0  //phase",
+				"if(vec.z == 0.0f) {",
+					"UV.x = -0.5f;",
+				"}",
+				"else if(vec.z < 0) {",
+					"UV.x = -(A_PI - atan(P)) * A_1D_PI;",
+				"}",
+				"else {",
+					"UV.x = -atan(P) * A_1D_PI;",
+				"}",
+			"}",
+
+			"UV.x = (UV.x + 1.0f) * 0.5f;",
+
+			
+			//"if(mode > 0.9f){ //sky to cube",
+			//	"UV.x = (1.0f - UV.x);",
+			//"}",
+
+			
+			//{r}=\sqrt{x^2 + y^2 + z^2} 、
+			//{\theta}=\arctan \left( \frac{\sqrt{x^2 + y^2}}{z} \right)=\arccos \left( {\frac{z}{\sqrt{x^2 + y^2 + z^2}}} \right) 、
+			//{\phi}=\arctan \left( {\frac{y}{x}} \right) 
+
+			"return UV;",
+		"}",
+
+
+		"void main() {",
+
+			//"vec4 frag(v2f i) : COLOR ",
+			"{",
+				//"vec2 UV = vUv;",
+				"vec4 result = tex2D( tSampler,  getSphericalMapping_VEC2UV( getVec(vUv, face) ) );",
+
+				//"if(_Gamma !=1.0f)",
+				//"{",
+				//	"result.rgb = pow(result.rgb, _Gamma);",
+				//"}",
+
+				"gl_FragColor = result;",
+
+			"}",
+
+		"}",
+
+	].join( "\n" )
+
+}
+
+
+THREE.SCSL_DP2Cube = {
+
+
+	uniforms: {
+		tSampler: 	 { type: "t", value: null },
+		face:	 { type: "i", value: 0 },
+	},
+
+
+	vertexShader: [
+
+		"varying vec3 vWorldPosition;",
+		"varying vec2 vUv;",
+
+		"void main() {",
+			"vec4 worldPosition = modelMatrix * vec4( position, 1.0 );",
+			"vWorldPosition = worldPosition.xyz;",
+			"vUv = uv;",
+			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+		"}",
+
+
+	].join( "\n" ),
+
+	fragmentShader: [
+
+		
+		"varying vec3 vWorldPosition;",
+		"varying vec2 vUv;",
+
+		"uniform sampler2D tSampler;",
+		"uniform int face;",
+
+		//"#define A_PI		3.14159265358 //3.1415926535897932384626433832795",
+		//"#define A_1D_PI		0.31830988618 //0.31830988618379067153776752674503",
+
+
+	    "vec3 getVec(vec2 UV, int face){",
+
+			// Move it to Libs
+			"vec3 VEC;",
+			"UV = -(UV * 2 - 1);",// Range from 0 to 1 to 1 to -1 (since in unity UV is invert by directX UV)
+
+
+   			"if(face == 0){", //PositiveX	 Right facing side (+x).
+				"VEC = vec3(1.0,UV.y,UV.x);",
+			"}",
+
+			"else if(face == 1){", //NegativeX	 Left facing side (-x).
+				"VEC = vec3(-1.0,UV.y,-UV.x);",
+			"}",
+
+			"else if(face == 2){", //PositiveY	 Upwards facing side (+y).
+				"VEC = vec3(-UV.x,1.0,-UV.y);",
+			"}",
+
+			"else if(face == 3){", //NegativeY	 Downward facing side (-y).
+				"VEC = vec3(-UV.x,-1.0,UV.y);",
+			"}",
+
+			"else if(face == 4){", //PositiveZ	 Forward facing side (+z).
+				"VEC = vec3(-UV.x,UV.y,1.0);",
+			"}",
+
+			"else if(face == 5){", //NegativeZ	 Backward facing side (-z).
+				"VEC = vec3(UV.x,UV.y,-1.0);",
+			"}",
+
+			"else{",
+				"VEC = vec3(0.0,0.0,1.0);",
+			"}",
+
+   			"return normalize(VEC);",
+
+	    "}",
+
+
+
+	    "vec2 getDPUVByVec(vec3 vec){",
+			"vec2 uv;",
+			"if(vec.z < 0){", // Front
+				"uv = vec.xy/(1 - vec.z);",
+				"uv = (uv + 1) * 0.5;", // Range from -1 to 1 to 0 to 1
+				"uv.x *= 0.5;", // Move to left in texture
+			"}",
+			"else{", // Back
+				"vec.y = -vec.y;",
+				"uv = - vec.xy/(1 + vec.z);",
+				"uv = (uv + 1) * 0.5;", // Range from -1 to 1 to 0 to 1
+				//uv.y = -uv.y;
+				"uv.x = (uv.x * 0.5) + 0.5;", // Move to right in texture
+			"}",
+
+			"return uv;",
+		"}",
+
+
+
+		"void main() {",
+			"{",
+				"vec4 result = tex2D( tSampler,  getDPUVByVec( getVec(vUv, face) ) );",
+				"gl_FragColor = result;",
+
+			"}",
+
+		"}",
+
+	].join( "\n" )
+
+};
+
+
+
+
+THREE.SCSL_Cube2DP = {
+
+
+	uniforms: {
+		tCubeSampler: 	 { type: "t", value: null },
+		face:	 { type: "i", value: 0 },
+	},
+
+
+	vertexShader: [
+
+		"varying vec3 vWorldPosition;",
+		"varying vec2 vUv;",
+		"varying vec3 vReflect;",
+
+		"void main() {",
+			"vec4 worldPosition = modelMatrix * vec4( position, 1.0 );",
+			"vWorldPosition = worldPosition.xyz;",
+			"vUv = uv;",
+
+			//"vReflect = reflect( I, worldNormal );",
+
+			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+		"}",
+
+
+	].join( "\n" ),
+
+	fragmentShader: [
+
+		
+		"varying vec3 vWorldPosition;",
+		"varying vec2 vUv;",
+		"varying vec3 vReflect;",
+
+		"uniform samplerCube tCubeSampler;",
+		"uniform int face;",
+
+		//"#define A_PI		3.14159265358 //3.1415926535897932384626433832795",
+		//"#define A_1D_PI		0.31830988618 //0.31830988618379067153776752674503",
+
+		// Move it to Libs
+		"vec3 getVecByDPUV(vec2 uv){",
+			"float A;",
+			"vec3 vec;",
+			"if(uv.x < 0.5){",
+				"uv.x = uv.x * 2.0;",
+				"uv = uv * 2 - 1;", // Range from 0 to 1 to 1 to -1 (since in unity UV is invert by directX UV)
+				"uv *= 1.2;",
+				"A = uv.x * uv.x + uv.y * uv.y + 1;",
+				"vec = vec3(2*uv.x,2*uv.y,(A-2));", // -1+s^2+t^2 = A-2
+				"return (vec/A);",
+			"}",
+			"else {",
+				"uv.x = uv.x * 2.0 - 1.0;",
+
+				"uv = uv * 2 - 1; ",// Range from 0 to 1 to 1 to -1 (since in unity UV is invert by directX UV)
+				"uv *= 1.2;",
+				"A = uv.x * uv.x + uv.y * uv.y + 1;",
+				"vec = vec3(2*uv.x,-2*uv.y,(A-2));", // -1+s^2+t^2 = A-2
+				"return (-vec/A);",
+			"}",
+		"}",
+
+
+		"void main() {",
+			"{",
+				"vec4 result = textureCube( tCubeSampler,  getVecByDPUV( vUv ) );",
+				"gl_FragColor = result;",
+			"}",
+
+		"}",
+
+	].join( "\n" )
+
+};
+
+
+
+
+
+
+
+
+
+THREE.SCSL_Cube2LatLong = {
+
+
+	uniforms: {
+
+		tSampler: 	 { type: "t", value: null },
+		face:	 { type: "f", value: 0 },
+	},
+
+
+	vertexShader: [
+
+		"varying vec3 vWorldPosition;",
+		"varying vec2 vUv;",
+
+		"void main() {",
+
+			"vec4 worldPosition = modelMatrix * vec4( position, 1.0 );",
+			"vWorldPosition = worldPosition.xyz;",
+			"vUv = uv;",
+			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+		"}",
+
+
+	].join( "\n" ),
+
+	fragmentShader: [
+
+		"uniform sampler2D tSampler;",
+		"varying vec3 vWorldPosition;",
+		"varying vec2 vUv;",
+
+		"uniform float face;",
+
+		"#define A_PI		3.14159265358 //3.1415926535897932384626433832795",
+		"#define A_1D_PI		0.31830988618 //0.31830988618379067153776752674503",
+
+
+	    "vec3 getVec(vec2 UV, float face){",
+
+	        "vec3 VEC;",
+	        "UV = UV * 2 - 1; // Range to -1 to 1",
+
+	        "if(face == 0.0){ //PositiveX	 Right facing side (+x).",
+				"VEC = vec3(1.0,UV.y,UV.x);",
+			"}",
+
+			"else if(face == 1.0){ //NegativeX	 Left facing side (-x).",
+				"VEC = vec3(-1.0,UV.y,-UV.x);",
+			"}",
+
+			"else if(face == 2.0){ //PositiveY	 Upwards facing side (+y).",
+				"VEC = vec3(-UV.x,1.0,-UV.y);",
+			"}",
+
+			"else if(face == 3.0){ //NegativeY	 Downward facing side (-y).",
+				"VEC = vec3(-UV.x,-1.0,UV.y);",
+			"}",
+
+			"else if(face == 4.0){ //PositiveZ	 Forward facing side (+z).",
+				"VEC = vec3(-UV.x,UV.y,1.0);",
+			"}",
+
+			"else if(face == 5.0){ //NegativeZ	 Backward facing side (-z).",
+				"VEC = vec3(UV.x,UV.y,-1.0);",
+			"}",
+
+			"else{",
+				"VEC = vec3(0.0,0.0,1.0);",
+			"}",
+
+	        "return normalize(VEC);",
+
+	    "}",
+
+
+	    "vec2 getSphericalMapping_VEC2UV(vec3 vec) //Use for create LP map",
+		"{",
+			"vec2 UV;",
 
 			"UV.y = acos(-vec.y) * A_1D_PI; // y = 1 to -1, v = 0 to PI",
 
@@ -392,5 +739,7 @@ THREE.SCSL_LatLong2Cube = {
 	].join( "\n" )
 
 };
+
+
 
 
