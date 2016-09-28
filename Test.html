@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - equirectangular panorama</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #ff0000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family:Monospace;
+				font-size:13px;
+				font-weight: bold;
+				text-align:center;
+			}
+
+			a {
+				color: #ffffff;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js webgl</a> - equirectangular panorama demo. photo by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank">Li Liu</a>.<br />
+			drag equirectangular texture into the page.
+		</div>
+
+		<script src="../build/three.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/SC_RGBM.js"></script>
+
+		<script src="../examples/js/libs/dat.gui.min.js"></script>
+
+		<script>
+
+			var effectController  = {
+				tRGBMSampler: null,
+				EV: 0,
+				maxRange: 6,
+				GammaIn: 1, 
+				GammaOut: 1 
+			};
+
+
+			var camera, scene, controls, renderer;
+
+			init();
+			animate();
+
+			function init() {
+
+				var container, mesh;
+
+				container = document.getElementById( 'container' );
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1100 );
+				camera.position.z = 100;
+				//camera.target = new THREE.Vector3( 0, 0, 0 );
+
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+				controls.dampingFactor = 0.3;
+				controls.enableZoom = true;
+				controls.enablePan = false;
+
+				scene = new THREE.Scene();
+
+				var geometry = new THREE.SphereGeometry( 500, 60, 40 );
+				geometry.scale( -1, 1, 1 );
+
+				var RGBMTex = new THREE.TextureLoader().load( 'textures/2294472375_24a3b8ef46_o.jpg');
+				var shader = THREE.ShaderLib[ "SC_RGBM" ];
+				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+
+				uniforms.tRGBMSampler.value = RGBMTex;
+
+				var material = new THREE.ShaderMaterial( {
+					uniforms: uniforms,
+					vertexShader: shader.vertexShader,
+					fragmentShader: shader.fragmentShader
+				} );
+
+
+				mesh = new THREE.Mesh( geometry, material );
+
+				scene.add( mesh );
+
+
+				/////////////////////////////////////////
+				//Drag Event
+
+				document.addEventListener( 'dragover', function ( event ) {
+
+					event.preventDefault();
+					event.dataTransfer.dropEffect = 'copy';
+
+				}, false );
+
+				document.addEventListener( 'dragenter', function ( event ) {
+
+					document.body.style.opacity = 0.5;
+
+				}, false );
+
+				document.addEventListener( 'dragleave', function ( event ) {
+
+					document.body.style.opacity = 1;
+
+				}, false );
+
+				document.addEventListener( 'drop', function ( event ) {
+
+					event.preventDefault();
+
+					var reader = new FileReader();
+					reader.addEventListener( 'load', function ( event ) {
+
+						uniforms.tRGBMSampler.value.image.src = event.target.result;
+
+					}, false );
+					reader.readAsDataURL( event.dataTransfer.files[ 0 ] );
+
+					document.body.style.opacity = 1;
+
+				}, false );
+
+				//
+				////////////////////////////////////////////////////
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				function guiChanged() {
+					//var uniforms = shader.uniforms;
+
+					//uniforms.tRGBMSampler.value = effectController.tRGBMSampler;
+					uniforms.luminance.value = Math.pow(2, effectController.EV);
+					uniforms.maxRange.value = effectController.maxRange;
+					//uniforms.luminance.value = effectController.luminance;
+					//uniforms.GammaIn.value = effectController.GammaIn;
+					//uniforms.GammaOut.value = effectController.GammaOut;
+					//console.log("here");
+					renderer.render( scene, camera );
+				}
+
+				var gui = new dat.GUI();
+
+				gui.add( effectController, "maxRange", 1.0, 8.0, 8.0 ).onChange( guiChanged );
+				gui.add( effectController, "EV", -8.0, 8.0, 0.0 ).onChange( guiChanged );
+
+
+				guiChanged();
+
+
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+				requestAnimationFrame( animate );
+				update();
+
+			}
+
+			function update() {
+				controls.update();
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>
+
+
+
