@@ -37,7 +37,8 @@
 
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/SC_RGBM.js"></script>
+		<script src="js/SC_FL.js"></script>
+		<script src="js/SC_SL.js"></script>
 
 		<script src="../examples/js/libs/dat.gui.min.js"></script>
 
@@ -83,8 +84,24 @@
 				geometry.scale( -1, 1, 1 );
 
 				var RGBMTex = new THREE.TextureLoader().load( 'textures/2294472375_24a3b8ef46_o.jpg');
-				var shader = THREE.ShaderLib[ "SC_RGBM" ];
+				var shader = THREE.SL_RGBM_DECODE;
 				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+
+
+				var textures = getTexturesFromAtlasFile( "textures/cube/sun_temple_stripe.jpg", 6 );
+				var materials = [];
+
+				for ( var i = 0; i < 6; i ++ ) {
+
+					materials.push( new THREE.MeshBasicMaterial( { map: textures[ i ] } ) );
+
+				}
+
+				var skyBox = new THREE.Mesh( new THREE.CubeGeometry( 1000, 1000, 1000 ), new THREE.MultiMaterial( materials ) );
+				skyBox.applyMatrix( new THREE.Matrix4().makeScale( 1, 1, - 1 ) );
+				scene.add( skyBox );
+
+
 
 				uniforms.tRGBMSampler.value = RGBMTex;
 
@@ -97,7 +114,7 @@
 
 				mesh = new THREE.Mesh( geometry, material );
 
-				scene.add( mesh );
+				//scene.add( mesh );
 
 
 				/////////////////////////////////////////
