@@ -92,10 +92,10 @@ const NUM_6D6 = 1;
 const NUM_1D3 = 0.33333333333333333333333333333333;
 const NUM_2D3 = 0.66666666666666666666666666666667;
 
-const A_PI		3.14159265358//3.1415926535897932384626433832795
-const A_1D_PI	0.31830988618//0.31830988618379067153776752674503
-const A_HalfPI	1.57079632679//1.5707963267948966192313216916398
-const A_SIN45	0.70710678119//0.7071067811865475244008443621048490392848359376884740
+const A_PI	=	3.14159265358//3.1415926535897932384626433832795
+const A_1D_PI =	0.31830988618//0.31830988618379067153776752674503
+const A_HalfPI = 1.57079632679//1.5707963267948966192313216916398
+const A_SIN45 =	0.70710678119//0.7071067811865475244008443621048490392848359376884740
 
 //[x,y,width,height,rotated]
 var CubeArrayHStrip = [
@@ -259,8 +259,9 @@ function _getLatLongUV( vDir ){
 	
 	var uv = [0,0];
 
-	uv[1] = Math.acos(-vDir[1]) * A_1D_PI; // y = 1 to -1, v = 0 to PI
-	float P = Math.abs(vDir[0]/vDir[2]);
+	uv[1] = Math.acos(-vDir[1]) * A_1D_PI;
+	// y = 1 to -1, v = 0 to PI
+	var P = Math.abs(vDir[0] / vDir[2]);
 
 	if(vDir[0] >= 0) {
 		if(vDir[2] == 0.0) {
@@ -293,9 +294,9 @@ function _getLatLongUV( vDir ){
 
 
 function _getLPUV( vDir ) {
-	float th, la, lr, L, P;
+	var th, la, lr, L, P;
 	var uv = [0,0];
-	if(vDir[2] == 1.0f){
+	if(vDir[2] == 1.0){
 		uv[0] = uv[1] = 0.0;
 	}
 
@@ -331,7 +332,7 @@ function _getLPDir( texU, texV ) {
    	texU = texU * 2.0 - 1.0;
    	texV = texV * 2.0 - 1.0; 
 
-   	float lr = Math.sqrt(texU * texU + texV * texV);
+   	var lr = Math.sqrt(texU * texU + texV * texV);
 	if(lr == 0.0){
 		vDir[0] = 0.0;
 		vDir[1] = 0.0;
@@ -339,8 +340,8 @@ function _getLPDir( texU, texV ) {
 	}
 
 	else if(lr <= 1.0){
-		float la = A_PI * lr; // 0-1 to range 0-Pi
-		float th = Math.sin(la);
+		var la = A_PI * lr; // 0-1 to range 0-Pi
+		var th = Math.sin(la);
 		vDir[0] = (texU/lr)*th;
 		vDir[1] = (texV/lr)*th;
 		vDir[2] = Math.cos(la);
