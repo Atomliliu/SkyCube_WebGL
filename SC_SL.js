@@ -458,7 +458,7 @@ THREE.SCSL_LL2CUBE = {
 };
 
 
-THREE.SCSL_DP2Cube = {
+THREE.SCSL_DP2CUBE = {
 
 
 	uniforms: {
@@ -572,7 +572,7 @@ THREE.SCSL_DP2Cube = {
 
 
 
-THREE.SCSL_Cube2DP = {
+THREE.SCSL_CUBE2DP = {
 
 
 	uniforms: {
@@ -657,7 +657,7 @@ THREE.SCSL_Cube2DP = {
 
 
 
-THREE.SCSL_Cube2LL = {
+THREE.SCSL_CUBE2LL = {
 
 
 	uniforms: {
