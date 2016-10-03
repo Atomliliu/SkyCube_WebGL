@@ -1,13 +1,41 @@
-var textures = getTexturesFromAtlasFile( "textures/cube/sun_temple_stripe.jpg", 6 );
 
-var materials = [];
+<script>
 
-for ( var i = 0; i < 6; i ++ ) {
+{
+	
 
-	materials.push( new THREE.MeshBasicMaterial( { map: textures[ i ] } ) );
+	cameraRTT = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
+	cameraRTT.position.z = 100;
 
+	sceneRTT = new THREE.Scene();
+	rtTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBFormat } );
+
+	material = new THREE.ShaderMaterial( {
+
+		uniforms: { time: { value: 0.0 } },
+		vertexShader: document.getElementById( 'vertexShader' ).textContent,
+		fragmentShader: document.getElementById( 'fragment_shader_pass_1' ).textContent
+
+	} );
+
+	var plane = new THREE.PlaneBufferGeometry( window.innerWidth, window.innerHeight );
+
+	quad = new THREE.Mesh( plane, material );
+	quad.position.z = -100;
+	sceneRTT.add( quad );
+
+
+
+	renderer = new THREE.WebGLRenderer();
+	renderer.setPixelRatio( window.devicePixelRatio );
+	renderer.setSize( window.innerWidth, window.innerHeight );
+
+	renderer.clear();
+
+	// Render first scene into texture
+
+	renderer.render( sceneRTT, cameraRTT, rtTexture, true );
 }
 
-var skyBox = new THREE.Mesh( new THREE.CubeGeometry( 1, 1, 1 ), new THREE.MultiMaterial( materials ) );
-skyBox.applyMatrix( new THREE.Matrix4().makeScale( 1, 1, - 1 ) );
-scene.add( skyBox );
+
+</script>
