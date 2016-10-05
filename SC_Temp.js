@@ -1,6 +1,39 @@
 
 <script>
 
+	
+	function RTT( matRTT ) {
+		camRTT = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
+		camRTT.position.z = 100;
+
+		sceneRTT = new THREE.Scene();
+		rtTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat } );
+
+
+		var uniforms = THREE.UniformsUtils.clone( shaderObj.uniforms );
+
+
+		var plane = new THREE.PlaneBufferGeometry( window.innerWidth, window.innerHeight );
+
+		quad = new THREE.Mesh( plane, matRTT );
+		quad.position.z = -100;
+		sceneRTT.add( quad );
+
+
+		renderer = new THREE.WebGLRenderer();
+		renderer.setPixelRatio( window.devicePixelRatio );
+		renderer.setSize( window.innerWidth, window.innerHeight );
+
+		renderer.clear();
+
+		// Render first scene into texture
+
+		renderer.render( sceneRTT, camRTT, rtTexture, true );
+
+		return rtTexture;
+
+	}
+
 {
 	
 
