@@ -1,0 +1,136 @@
+
+THREE.SCSL_LL2CUBE2 = {
+
+
+	uniforms: {
+
+		tSampler: 	 { type: "t", value: null },
+		face:	 { type: "i", value: 0 },
+	},
+
+
+	vertexShader: [
+
+		"varying vec3 vWorldPosition;",
+		"varying vec2 vUv;",
+
+		"void main() {",
+
+			"vec4 worldPosition = modelMatrix * vec4( position, 1.0 );",
+			"vWorldPosition = worldPosition.xyz;",
+			"vUv = uv;",
+			//"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+		"}",
+
+
+	].join( "\n" ),
+
+	fragmentShader: [
+
+		"uniform sampler2D tSampler;",
+		"varying vec3 vWorldPosition;",
+		"varying vec2 vUv;",
+
+		"uniform int face;",
+
+		"#define A_PI		3.14159265358", //3.1415926535897932384626433832795
+		"#define A_1D_PI		0.31830988618", //0.31830988618379067153776752674503
+
+		//"#include <packing>",
+
+		"vec3 getVec(vec2 UV, int face){",
+
+	        "vec3 VEC;",
+	        "UV.x = UV.x * 2.0 - 1.0;", // Range to -1 to 1
+	        "UV.y = UV.y * 2.0 - 1.0;", // Range to -1 to 1
+
+	        "if(face == 0){", //PositiveX	 Right facing side (+x).
+				"VEC = vec3(1.0,UV.y,UV.x);",
+			"}",
+
+			"else if(face == 1){", //NegativeX	 Left facing side (-x).
+				"VEC = vec3(-1.0,UV.y,-UV.x);",
+			"}",
+
+			"else if(face == 2){", //PositiveY	 Upwards facing side (+y).
+				"VEC = vec3(-UV.x,1.0,-UV.y);",
+			"}",
+
+			"else if(face == 3){", //NegativeY	 Downward facing side (-y).
+				"VEC = vec3(-UV.x,-1.0,UV.y);",
+			"}",
+
+			"else if(face == 4){", //PositiveZ	 Forward facing side (+z).
+				"VEC = vec3(-UV.x,UV.y,1.0);",
+			"}",
+
+			"else if(face == 5){", //NegativeZ	 Backward facing side (-z).
+				"VEC = vec3(UV.x,UV.y,-1.0);",
+			"}",
+
+			"else{",
+				"VEC = vec3(0.0,0.0,1.0);",
+			"}",
+
+	        "return normalize(VEC);",
+
+	    "}",
+
+
+	    "vec2 getLLMapping_VEC2UV(vec3 vec) //Use for create LP map",
+		"{",
+			"vec2 UV;",
+
+			"UV.y = acos(-vec.y) * A_1D_PI; // y = 1 to -1, v = 0 to PI",
+
+			"float P = abs(vec.x/vec.z);",
+			//float O = 0.0f;
+
+			"if (vec.x >= 0.0) {",
+				"if(vec.z == 0.0) {",
+					"UV.x = 0.5;",
+				"}",
+				"else if(vec.z < 0.0) {",
+					"UV.x = (A_PI - atan(P)) * A_1D_PI;",
+				"}",
+				"else {",
+					"UV.x = atan(P) * A_1D_PI;",
+				"}",
+
+			"}",
+			"else { // X < 0  //phase",
+				"if(vec.z == 0.0) {",
+					"UV.x = -0.5;",
+				"}",
+				"else if(vec.z < 0.0) {",
+					"UV.x = -(A_PI - atan(P)) * A_1D_PI;",
+				"}",
+				"else {",
+					"UV.x = -atan(P) * A_1D_PI;",
+				"}",
+			"}",
+
+			"UV.x = (UV.x + 1.0) * 0.5;",
+
+			"return UV;",
+		"}",
+
+
+		"void main() {",
+
+			//"vec4 frag(v2f i) : COLOR ",
+			"{",
+				//"vec2 UV = vUv;",
+				"vec4 result = texture2D( tSampler,  getLLMapping_VEC2UV( getVec(vUv, face) ) );",
+
+				"gl_FragColor = result;",
+
+			"}",
+
+		"}",
+
+	].join( "\n" )
+
+};
+
+
