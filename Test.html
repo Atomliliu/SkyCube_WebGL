@@ -54,9 +54,11 @@
 			};
 
 
-			var camera, scene, controls, renderer;
+			var camera, scene, controls, renderer, RTTex, rendererRTT, camRTT, sceneRTT;
+			var updateTex = false;
 
 			init();
+			//texupdate();
 			animate();
 
 			function getTexturesFromAtlasFile( atlasImgUrl, tilesNum ) {
@@ -96,11 +98,11 @@
 
 			}
 
-			function RTT( matRTT ) {
-				camRTT = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
+			/*function RTT( matRTT ) {
+				var camRTT = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
 				camRTT.position.z = 100;
 
-				sceneRTT = new THREE.Scene();
+				var sceneRTT = new THREE.Scene();
 				rtTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBFormat } );
 
 
@@ -109,24 +111,24 @@
 
 				var plane = new THREE.PlaneBufferGeometry( window.innerWidth, window.innerHeight );
 
-				quad = new THREE.Mesh( plane, matRTT );
+				var quad = new THREE.Mesh( plane, matRTT );
 				quad.position.z = -100;
 				sceneRTT.add( quad );
 
 
-				renderer = new THREE.WebGLRenderer();
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				var rendererRTT = new THREE.WebGLRenderer();
+				rendererRTT.setPixelRatio( window.devicePixelRatio );
+				rendererRTT.setSize( window.innerWidth, window.innerHeight );
 
-				renderer.clear();
+				rendererRTT.clear();
 
 				// Render first scene into texture
-
-				renderer.render( sceneRTT, camRTT, rtTexture, true );
+				console.log(rendererRTT.render( sceneRTT, camRTT, rtTexture, true ));
+				
 
 				return rtTexture;
 
-			}
+			}*/
 
 			function init() {
 
@@ -161,10 +163,11 @@
 				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
 				//RTT
-				var LLTex = new THREE.TextureLoader().load( 'textures/2294472375_24a3b8ef46_o.jpg');
+				var LLTex = new THREE.TextureLoader().load( 'textures/land_ocean_ice_cloud_2048.jpg');
 				var shaderRTT = THREE.SCSL_LL2CUBE2;
 				var uniformsRTT = THREE.UniformsUtils.clone( shaderRTT.uniforms );
 				uniformsRTT.tSampler.value = LLTex;
+				uniformsRTT.face.value = 1;
 				materialRTT = new THREE.ShaderMaterial( {
 
 					uniforms: uniformsRTT,
@@ -173,19 +176,57 @@
 
 				} );
 
-				var rtTex = RTT(materialRTT);
+				//materialRTT = new THREE.MeshBasicMaterial( { map: LLTex } ) 
+
+				//RTTex = RTT(materialRTT);
 				//////////////////////////////////////
 
 
+				camRTT = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
+				camRTT.position.z = 100;
+
+				sceneRTT = new THREE.Scene();
+				//RTTex = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat } );
+
+				RTTex = new THREE.WebGLRenderTarget( 512, 512, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBFormat } );
+				//var uniforms = THREE.UniformsUtils.clone( shaderObj.uniforms );
+
+
+				var plane = new THREE.PlaneBufferGeometry( window.innerWidth, window.innerHeight );
+
+				var quad = new THREE.Mesh( plane, materialRTT );
+				quad.position.z = -100;
+				sceneRTT.add( quad );
+
+				updateTex = true;
+
+
+				//rendererRTT = new THREE.WebGLRenderer();
+				//rendererRTT.setPixelRatio( window.devicePixelRatio );
+				//rendererRTT.setSize( window.innerWidth, window.innerHeight );
+
+				//rendererRTT.clear();
+
+				// Render first scene into texture
+				
+				//rendererRTT.render( sceneRTT, camRTT, RTTex, true );
+				//console.log(RTTex.texture);
+
+				
+
+				///////////////////////////////////
+				//RTTex.image = LLTex;
+
 				var textures = getTexturesFromAtlasFile( "textures/cube/sun_temple_stripe.jpg", 6 );
 				//var textures = getTexturesFromAtlasFile3(canvas, context, "textures/cube/sun_temple_stripe.jpg", 6 );
-				textures[0] = rtTex.texture;
+				//textures[0] = RTTex.texture; //size not same
 
 				var materials = [];
 
 				for ( var i = 0; i < 6; i ++ ) {
 
-					materials.push( new THREE.MeshBasicMaterial( { map: textures[ i ] } ) );
+					materials.push( new THREE.MeshBasicMaterial( { map: RTTex.texture} ) );
+					//materials.push(materialRTT);
 
 				}
 
@@ -238,7 +279,11 @@
 					var reader = new FileReader();
 					reader.addEventListener( 'load', function ( event ) {
 
-						uniforms.tRGBMSampler.value.image.src = event.target.result;
+						uniformsRTT.tSampler.value.image.src = event.target.result;
+						uniformsRTT.tSampler.needsUpdate = true;
+						updateTex = true;
+						console.log("New Tex");
+						update();
 
 					}, false );
 					reader.readAsDataURL( event.dataTransfer.files[ 0 ] );
@@ -262,7 +307,14 @@
 					//uniforms.GammaIn.value = effectController.GammaIn;
 					//uniforms.GammaOut.value = effectController.GammaOut;
 					//console.log("here");
-					renderer.render( scene, camera );
+					//updateTex = true;
+					//renderer.clear();
+
+					// Render first scene into texture
+				
+					//renderer.render( sceneRTT, camRTT, RTTex, true );
+					//renderer.render( scene, camera );
+					update();
 				}
 
 				var gui = new dat.GUI();
@@ -286,14 +338,31 @@
 
 			}
 
+
+
 			function animate() {
 				requestAnimationFrame( animate );
+				if (updateTex == true) update2();
 				update();
+
 
 			}
 
+			function update2() {
+				console.log("RTT");
+				renderer.clear();
+
+				// Render first scene into texture
+				
+				renderer.render( sceneRTT, camRTT, RTTex, true );
+				//RTTex.texture.needsUpdate = true;
+				updateTex = false;
+			}
+
+
 			function update() {
 				controls.update();
+				//console.log("Screen");
 				renderer.render( scene, camera );
 
 			}
