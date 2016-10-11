@@ -19,7 +19,7 @@ THREE.SCSL_LL2CUBE2 = {
 			"vec4 worldPosition = modelMatrix * vec4( position, 1.0 );",
 			"vWorldPosition = worldPosition.xyz;",
 			"vUv = uv;",
-			//"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 		"}",
 
 
@@ -133,4 +133,57 @@ THREE.SCSL_LL2CUBE2 = {
 
 };
 
+
+THREE.SCSL_LL2CUBE3 = {
+
+
+	uniforms: {
+
+		tSampler: 	 { type: "t", value: null },
+		face:	 { type: "i", value: 0 },
+	},
+
+
+	vertexShader: [
+
+		"varying vec3 vWorldPosition;",
+		"varying vec2 vUv;",
+
+		"void main() {",
+
+			"vec4 worldPosition = modelMatrix * vec4( position, 1.0 );",
+			"vWorldPosition = worldPosition.xyz;",
+			"vUv = uv;",
+			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+		"}",
+
+
+	].join( "\n" ),
+
+	fragmentShader: [
+
+		"uniform sampler2D tSampler;",
+		"varying vec3 vWorldPosition;",
+		"varying vec2 vUv;",
+
+		"uniform int face;",
+
+
+
+		"void main() {",
+
+			//"vec4 frag(v2f i) : COLOR ",
+			"{",
+				//"vec2 UV = vUv;",
+				"vec4 result = vec4(1.0,0.0,0.0,1.0);",
+
+				"gl_FragColor = result;",
+
+			"}",
+
+		"}",
+
+	].join( "\n" )
+
+};
 
