@@ -56,9 +56,11 @@
 
 			var camera, scene, controls, renderer, RTTex, rendererRTT, camRTT, sceneRTT;
 			var updateTex = false;
+			var materials = [];
 
 			init();
-			//texupdate();
+			//render();
+
 			animate();
 
 			function getTexturesFromAtlasFile( atlasImgUrl, tilesNum ) {
@@ -163,7 +165,8 @@
 				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
 				//RTT
-				var LLTex = new THREE.TextureLoader().load( 'textures/land_ocean_ice_cloud_2048.jpg');
+				var LLTex = new THREE.TextureLoader().load( 'textures/land_ocean_ice_cloud_2048.jpg', function() {
+					renderer.render( sceneRTT, camRTT, RTTex, true );});
 				var shaderRTT = THREE.SCSL_LL2CUBE2;
 				var uniformsRTT = THREE.UniformsUtils.clone( shaderRTT.uniforms );
 				uniformsRTT.tSampler.value = LLTex;
@@ -218,14 +221,16 @@
 				//RTTex.image = LLTex;
 
 				var textures = getTexturesFromAtlasFile( "textures/cube/sun_temple_stripe.jpg", 6 );
-				//var textures = getTexturesFromAtlasFile3(canvas, context, "textures/cube/sun_temple_stripe.jpg", 6 );
+				//var textures = getTexturesFromAtlasFile("textures/square-outline.png", 6 );
 				//textures[0] = RTTex.texture; //size not same
 
-				var materials = [];
+				
 
 				for ( var i = 0; i < 6; i ++ ) {
 
 					materials.push( new THREE.MeshBasicMaterial( { map: RTTex.texture} ) );
+					//materials.push( new THREE.MeshBasicMaterial( { map: textures[i]} ) );
+
 					//materials.push(materialRTT);
 
 				}
@@ -233,6 +238,9 @@
 				var skyBox = new THREE.Mesh( new THREE.CubeGeometry( 1000, 1000, 1000 ), new THREE.MeshFaceMaterial( materials ) );
 				skyBox.applyMatrix( new THREE.Matrix4().makeScale( 1, 1, - 1 ) );
 				scene.add( skyBox );
+
+
+				
 
 
 
@@ -281,9 +289,12 @@
 
 						uniformsRTT.tSampler.value.image.src = event.target.result;
 						uniformsRTT.tSampler.needsUpdate = true;
-						updateTex = true;
-						console.log("New Tex");
-						update();
+						update2();
+						//materials[0].map.needsUpdate = true;
+
+						//updateTex = true;
+						//console.log("New Tex");
+						//update();
 
 					}, false );
 					reader.readAsDataURL( event.dataTransfer.files[ 0 ] );
@@ -342,7 +353,7 @@
 
 			function animate() {
 				requestAnimationFrame( animate );
-				if (updateTex == true) update2();
+				//if (updateTex == true) update2();
 				update();
 
 
@@ -354,9 +365,13 @@
 
 				// Render first scene into texture
 				
-				renderer.render( sceneRTT, camRTT, RTTex, true );
+				
 				//RTTex.texture.needsUpdate = true;
-				updateTex = false;
+				if (updateTex == true) {
+					renderer.render( sceneRTT, camRTT, RTTex, true );
+					updateTex = false;
+				}
+				
 			}
 
 
@@ -365,6 +380,19 @@
 				//console.log("Screen");
 				renderer.render( scene, camera );
 
+			}
+
+			function render() {
+				console.log("R");
+				setTimeout(
+                    function(){
+                    	renderer.render( sceneRTT, camRTT, RTTex, true );
+                        renderer.render( scene, camera );
+                    },
+                    2000
+                );
+				
+				
 			}
 
 		</script>
