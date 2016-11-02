@@ -58,6 +58,7 @@
 			var updateTex = false;
 			var materials = [];
 			var RTTtextures = [];
+			var RTTSize = 512;
 
 			init();
 			//render();
@@ -101,6 +102,10 @@
 
 			}
 
+			//function getTexFromRTT() {
+
+			//}
+
 			/*function RTT( matRTT ) {
 				var camRTT = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
 				camRTT.position.z = 100;
@@ -142,7 +147,9 @@
 
 				for ( var i = 0; i < 6; i ++ ) {
 
-					RTTtextures[ i ] = new THREE.Texture();
+					//RTTtextures[ i ] = new THREE.Texture();
+					//RTTtextures[ i ] = THREE.ImageUtils.generateDataTexture(RTTSize,RTTSize,new THREE.Color( 1, 0, 0 ))
+					RTTtextures[ i ] = new THREE.WebGLRenderTarget( RTTSize, RTTSize, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBFormat } );
 
 				}
 
@@ -175,46 +182,30 @@
 				var textures = getTexturesFromAtlasFile( "textures/cube/sun_temple_stripe.jpg", 6 );
 
 				//RTT
-				var LLTex = new THREE.TextureLoader().load( 'textures/land_ocean_ice_cloud_2048.jpg', function() {
-					//materialRTT.uniforms.face.value = 0;
-					renderer.render( sceneRTT, camRTT, RTTex, true );
-					materials[0].map = RTTex.texture;
-					//materials[0].map.needsUpdate = true;
-					//textures = RTTex.texture;
-					//RTTtextures[0].needsUpdate = true;
-					//materials[0].map.needsUpdate = true;
+				var LLTex = new THREE.TextureLoader().load( 'textures/2294472375_24a3b8ef46_o.jpg', function() {
+					materialRTT.uniforms.face.value = 0;
+					renderer.render( sceneRTT, camRTT, RTTtextures[0], true );
+	
 
-					//renderer.clear();
+					materialRTT.uniforms.face.value = 1;
+					renderer.render( sceneRTT, camRTT, RTTtextures[1], true );
 
-					/*materialRTT.uniforms.face.value = 1;
-					renderer.render( sceneRTT, camRTT, RTTex, true );
-					RTTtextures[1] = RTTex.texture;
-					//materials[1].map = RTTex.texture;
-					//RTTtextures[1].needsUpdate = true;
 
 					uniformsRTT.face.value = 2;
-					renderer.render( sceneRTT, camRTT, RTTex, true );
-					//RTTtextures[2] = RTTex.texture;
-					materials[2].map = RTTex.texture;
-					//RTTtextures[2].needsUpdate = true;
+					renderer.render( sceneRTT, camRTT, RTTtextures[2], true );
+	
 
 					uniformsRTT.face.value = 3;
-					renderer.render( sceneRTT, camRTT, RTTex, true );
-					//RTTtextures[3] = RTTex.texture;
-					materials[3].map = RTTex.texture;
-					//RTTtextures[3].needsUpdate = true;
+					renderer.render( sceneRTT, camRTT, RTTtextures[3], true );
+
 
 					uniformsRTT.face.value = 4;
-					renderer.render( sceneRTT, camRTT, RTTex, true );
-					//RTTtextures[4] = RTTex.texture;
-					materials[4].map = RTTex.texture;
-					//RTTtextures[4].needsUpdate = true;
+					renderer.render( sceneRTT, camRTT, RTTtextures[4], true );
+
 
 					uniformsRTT.face.value = 5;
-					renderer.render( sceneRTT, camRTT, RTTex, true );
-					//RTTtextures[5] = RTTex.texture;
-					materials[5].map = RTTex.texture;
-					//RTTtextures[5].needsUpdate = true;*/
+					renderer.render( sceneRTT, camRTT, RTTtextures[5], true );
+
 				});
 				 shaderRTT = THREE.SCSL_LL2CUBE2;
 				 uniformsRTT = THREE.UniformsUtils.clone( shaderRTT.uniforms );
@@ -240,7 +231,7 @@
 				sceneRTT = new THREE.Scene();
 				//RTTex = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat } );
 
-				RTTex = new THREE.WebGLRenderTarget( 512, 512, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBFormat } );
+				RTTex = new THREE.WebGLRenderTarget( RTTSize, RTTSize, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBFormat } );
 				//var uniforms = THREE.UniformsUtils.clone( shaderObj.uniforms );
 
 
@@ -270,15 +261,15 @@
 				//RTTex.image = LLTex;
 
 				
-				//var textures = getTexturesFromAtlasFile("textures/square-outline.png", 6 );
+				var textures = getTexturesFromAtlasFile("textures/cube/sun_temple_stripe.jpg", 6 );
 				//textures[0] = RTTex.texture; //size not same
 
 				
 
 				for ( var i = 0; i < 6; i ++ ) {
 
-					materials.push( new THREE.MeshBasicMaterial( { map: textures[i]} ) );
-					//materials.push( new THREE.MeshBasicMaterial( { map: textures[i]} ) );
+					materials.push( new THREE.MeshBasicMaterial( { map:textures[i]} ) );
+					//materials.push( new THREE.MeshBasicMaterial( { map: RTTtextures[ i ]} ) );
 
 					//materials.push(materialRTT);
 
