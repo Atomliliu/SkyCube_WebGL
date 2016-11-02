@@ -54,9 +54,10 @@
 			};
 
 
-			var camera, scene, controls, renderer, RTTex, rendererRTT, camRTT, sceneRTT;
+			var camera, scene, controls, renderer, RTTex, rendererRTT, camRTT, sceneRTT,shaderRTT,uniformsRTT;
 			var updateTex = false;
 			var materials = [];
+			var RTTtextures = [];
 
 			init();
 			//render();
@@ -139,6 +140,14 @@
 				//canvas = document.createElement( 'canvas' );
 				//context = canvas.getContext( '2d' );
 
+				for ( var i = 0; i < 6; i ++ ) {
+
+					RTTtextures[ i ] = new THREE.Texture();
+
+				}
+
+
+
 				container = document.getElementById( 'container' );
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -163,14 +172,54 @@
 				var RGBMTex = new THREE.TextureLoader().load( 'textures/2294472375_24a3b8ef46_o.jpg');
 				var shader = THREE.SL_RGBM_DECODE;
 				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+				var textures = getTexturesFromAtlasFile( "textures/cube/sun_temple_stripe.jpg", 6 );
 
 				//RTT
 				var LLTex = new THREE.TextureLoader().load( 'textures/land_ocean_ice_cloud_2048.jpg', function() {
-					renderer.render( sceneRTT, camRTT, RTTex, true );});
-				var shaderRTT = THREE.SCSL_LL2CUBE2;
-				var uniformsRTT = THREE.UniformsUtils.clone( shaderRTT.uniforms );
+					//materialRTT.uniforms.face.value = 0;
+					renderer.render( sceneRTT, camRTT, RTTex, true );
+					materials[0].map = RTTex.texture;
+					//materials[0].map.needsUpdate = true;
+					//textures = RTTex.texture;
+					//RTTtextures[0].needsUpdate = true;
+					//materials[0].map.needsUpdate = true;
+
+					//renderer.clear();
+
+					/*materialRTT.uniforms.face.value = 1;
+					renderer.render( sceneRTT, camRTT, RTTex, true );
+					RTTtextures[1] = RTTex.texture;
+					//materials[1].map = RTTex.texture;
+					//RTTtextures[1].needsUpdate = true;
+
+					uniformsRTT.face.value = 2;
+					renderer.render( sceneRTT, camRTT, RTTex, true );
+					//RTTtextures[2] = RTTex.texture;
+					materials[2].map = RTTex.texture;
+					//RTTtextures[2].needsUpdate = true;
+
+					uniformsRTT.face.value = 3;
+					renderer.render( sceneRTT, camRTT, RTTex, true );
+					//RTTtextures[3] = RTTex.texture;
+					materials[3].map = RTTex.texture;
+					//RTTtextures[3].needsUpdate = true;
+
+					uniformsRTT.face.value = 4;
+					renderer.render( sceneRTT, camRTT, RTTex, true );
+					//RTTtextures[4] = RTTex.texture;
+					materials[4].map = RTTex.texture;
+					//RTTtextures[4].needsUpdate = true;
+
+					uniformsRTT.face.value = 5;
+					renderer.render( sceneRTT, camRTT, RTTex, true );
+					//RTTtextures[5] = RTTex.texture;
+					materials[5].map = RTTex.texture;
+					//RTTtextures[5].needsUpdate = true;*/
+				});
+				 shaderRTT = THREE.SCSL_LL2CUBE2;
+				 uniformsRTT = THREE.UniformsUtils.clone( shaderRTT.uniforms );
 				uniformsRTT.tSampler.value = LLTex;
-				uniformsRTT.face.value = 1;
+				uniformsRTT.face.value = 0;
 				materialRTT = new THREE.ShaderMaterial( {
 
 					uniforms: uniformsRTT,
@@ -220,7 +269,7 @@
 				///////////////////////////////////
 				//RTTex.image = LLTex;
 
-				var textures = getTexturesFromAtlasFile( "textures/cube/sun_temple_stripe.jpg", 6 );
+				
 				//var textures = getTexturesFromAtlasFile("textures/square-outline.png", 6 );
 				//textures[0] = RTTex.texture; //size not same
 
@@ -228,7 +277,7 @@
 
 				for ( var i = 0; i < 6; i ++ ) {
 
-					materials.push( new THREE.MeshBasicMaterial( { map: RTTex.texture} ) );
+					materials.push( new THREE.MeshBasicMaterial( { map: textures[i]} ) );
 					//materials.push( new THREE.MeshBasicMaterial( { map: textures[i]} ) );
 
 					//materials.push(materialRTT);
@@ -289,7 +338,7 @@
 
 						uniformsRTT.tSampler.value.image.src = event.target.result;
 						uniformsRTT.tSampler.needsUpdate = true;
-						update2();
+						//update2();
 						//materials[0].map.needsUpdate = true;
 
 						//updateTex = true;
@@ -368,7 +417,35 @@
 				
 				//RTTex.texture.needsUpdate = true;
 				if (updateTex == true) {
+					uniformsRTT.face.value = 0;
 					renderer.render( sceneRTT, camRTT, RTTex, true );
+					RTTtextures[0] = RTTex.texture;
+					RTTtextures[0].needsUpdate = true;
+
+					uniformsRTT.face.value = 1;
+					renderer.render( sceneRTT, camRTT, RTTex, true );
+					RTTtextures[1] = RTTex.texture;
+					RTTtextures[1].needsUpdate = true;
+
+					uniformsRTT.face.value = 2;
+					renderer.render( sceneRTT, camRTT, RTTex, true );
+					RTTtextures[2] = RTTex.texture;
+					RTTtextures[2].needsUpdate = true;
+
+					uniformsRTT.face.value = 3;
+					renderer.render( sceneRTT, camRTT, RTTex, true );
+					RTTtextures[3] = RTTex.texture;
+					RTTtextures[3].needsUpdate = true;
+
+					uniformsRTT.face.value = 4;
+					renderer.render( sceneRTT, camRTT, RTTex, true );
+					RTTtextures[4] = RTTex.texture;
+					RTTtextures[4].needsUpdate = true;
+
+					uniformsRTT.face.value = 5;
+					renderer.render( sceneRTT, camRTT, RTTex, true );
+					RTTtextures[5] = RTTex.texture;
+					RTTtextures[5].needsUpdate = true;
 					updateTex = false;
 				}
 				
