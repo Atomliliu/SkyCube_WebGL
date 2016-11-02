@@ -35,8 +35,11 @@ THREE.SCSL_LL2CUBE2 = {
 
 		"#define A_PI		3.14159265358", //3.1415926535897932384626433832795
 		"#define A_1D_PI		0.31830988618", //0.31830988618379067153776752674503
+		"#define A_1D6		0.166666666667", //0.16666666666666666666666666666667
 
 		//"#include <packing>",
+
+		
 
 		"vec3 getVec(vec2 UV, int face){",
 
@@ -75,6 +78,42 @@ THREE.SCSL_LL2CUBE2 = {
 	        "return normalize(VEC);",
 
 	    "}",
+
+	    "vec3 getVec2(vec2 UV){",
+			"if (UV.x>=0.0 && UV.x<A_1D6){",
+				"vec2 UV2 = UV;",
+				"UV2.x = UV2.x * 6.0;",
+				"return getVec(UV2,0);",
+			"}",
+			"else if (UV.x>=A_1D6 && UV.x<(A_1D6*2.0)){",
+				"vec2 UV2 = UV;",
+				"UV2.x = (UV2.x-A_1D6) * 6.0;",
+				"return getVec(UV2,1);",
+			"} ",
+			"else if (UV.x>=(A_1D6*2.0) && UV.x<(A_1D6*3.0)){",
+				"vec2 UV2 = UV;",
+				"UV2.x = (UV2.x-(A_1D6*2.0)) * 6.0;",
+				"return getVec(UV2,2);",
+			"} ",
+			"else if (UV.x>=(A_1D6*3.0) && UV.x<(A_1D6*4.0)){",
+				"vec2 UV2 = UV;",
+				"UV2.x = (UV2.x-(A_1D6*3.0)) * 6.0;",
+				"return getVec(UV2,3);",
+			"} ",
+			"else if (UV.x>=(A_1D6*4.0) && UV.x<(A_1D6*5.0)){",
+				"vec2 UV2 = UV;",
+				"UV2.x = (UV2.x-(A_1D6*4.0)) * 6.0;",
+				"return getVec(UV2,4);",
+			"} ",
+			"else if (UV.x>=(A_1D6*5.0) && UV.x<=1.0){",
+				"vec2 UV2 = UV;",
+				"UV2.x = (UV2.x-(A_1D6*5.0)) * 6.0;",
+				"return getVec(UV2,5);",
+			"} ",
+
+			"return vec3(0);",
+			
+		"}",
 
 
 	    "vec2 getLLMapping_VEC2UV(vec3 vec) //Use for create LP map",
@@ -121,7 +160,7 @@ THREE.SCSL_LL2CUBE2 = {
 			//"vec4 frag(v2f i) : COLOR ",
 			"{",
 				//"vec2 UV = vUv;",
-				"vec4 result = texture2D( tSampler,  getLLMapping_VEC2UV( getVec(vUv, face) ) );",
+				"vec4 result = texture2D( tSampler,  getLLMapping_VEC2UV( getVec2(vUv) ) );",
 
 				"gl_FragColor = result;",
 
