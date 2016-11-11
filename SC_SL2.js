@@ -39,7 +39,7 @@ THREE.SCSL_LL2CUBE2 = {
 
 		//"#include <packing>",
 
-		
+		//Invead X axis from Unity shader
 
 		"vec3 getVec(vec2 UV, int face){",
 
@@ -48,27 +48,27 @@ THREE.SCSL_LL2CUBE2 = {
 	        "UV.y = UV.y * 2.0 - 1.0;", // Range to -1 to 1
 
 	        "if(face == 0){", //PositiveX	 Right facing side (+x).
-				"VEC = vec3(1.0,UV.y,UV.x);",
+				"VEC = vec3(1.0,UV.y,-UV.x);",
 			"}",
 
 			"else if(face == 1){", //NegativeX	 Left facing side (-x).
-				"VEC = vec3(-1.0,UV.y,-UV.x);",
+				"VEC = vec3(-1.0,UV.y,UV.x);",
 			"}",
 
 			"else if(face == 2){", //PositiveY	 Upwards facing side (+y).
-				"VEC = vec3(-UV.x,1.0,-UV.y);",
+				"VEC = vec3(UV.x,1.0,-UV.y);",
 			"}",
 
 			"else if(face == 3){", //NegativeY	 Downward facing side (-y).
-				"VEC = vec3(-UV.x,-1.0,UV.y);",
+				"VEC = vec3(UV.x,-1.0,UV.y);",
 			"}",
 
 			"else if(face == 4){", //PositiveZ	 Forward facing side (+z).
-				"VEC = vec3(-UV.x,UV.y,1.0);",
+				"VEC = vec3(UV.x,UV.y,1.0);",
 			"}",
 
 			"else if(face == 5){", //NegativeZ	 Backward facing side (-z).
-				"VEC = vec3(UV.x,UV.y,-1.0);",
+				"VEC = vec3(-UV.x,UV.y,-1.0);",
 			"}",
 
 			"else{",
@@ -160,7 +160,7 @@ THREE.SCSL_LL2CUBE2 = {
 			//"vec4 frag(v2f i) : COLOR ",
 			"{",
 				//"vec2 UV = vUv;",
-				"vec4 result = texture2D( tSampler,  getLLMapping_VEC2UV( getVec2(vUv) ) );",
+				"vec4 result = texture2D( tSampler,  getLLMapping_VEC2UV( getVec(vUv,face) ) );",
 
 				"gl_FragColor = result;",
 
