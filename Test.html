@@ -58,7 +58,7 @@
 			var updateTex = false;
 			var materials = [];
 			var RTTtextures = [];
-			var RTTSize = 512;
+			var RTTSize = 1024;
 
 			init();
 			//render();
@@ -137,6 +137,33 @@
 				return rtTexture;
 
 			}*/
+
+			function UpdateRTT(){
+
+				materialRTT.uniforms.face.value = 0;
+				renderer.render( sceneRTT, camRTT, RTTtextures[0], true );
+
+
+				materialRTT.uniforms.face.value = 1;
+				renderer.render( sceneRTT, camRTT, RTTtextures[1], true );
+
+
+				uniformsRTT.face.value = 2;
+				renderer.render( sceneRTT, camRTT, RTTtextures[2], true );
+
+
+				uniformsRTT.face.value = 3;
+				renderer.render( sceneRTT, camRTT, RTTtextures[3], true );
+
+
+				uniformsRTT.face.value = 4;
+				renderer.render( sceneRTT, camRTT, RTTtextures[4], true );
+
+
+				uniformsRTT.face.value = 5;
+				renderer.render( sceneRTT, camRTT, RTTtextures[5], true );
+
+			}
 
 			function init() {
 
@@ -268,8 +295,8 @@
 
 				for ( var i = 0; i < 6; i ++ ) {
 
-					materials.push( new THREE.MeshBasicMaterial( { map:textures[i]} ) );
-					//materials.push( new THREE.MeshBasicMaterial( { map: RTTtextures[ i ]} ) );
+					//materials.push( new THREE.MeshBasicMaterial( { map:textures[i]} ) );
+					materials.push( new THREE.MeshBasicMaterial( { map: RTTtextures[ i ]} ) );
 
 					//materials.push(materialRTT);
 
