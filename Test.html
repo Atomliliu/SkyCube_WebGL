@@ -234,8 +234,8 @@
 					renderer.render( sceneRTT, camRTT, RTTtextures[5], true );
 
 				});
-				 shaderRTT = THREE.SCSL_LL2CUBE2;
-				 uniformsRTT = THREE.UniformsUtils.clone( shaderRTT.uniforms );
+				shaderRTT = THREE.SCSL_LL2CUBE2;
+				uniformsRTT = THREE.UniformsUtils.clone( shaderRTT.uniforms );
 				uniformsRTT.tSampler.value = LLTex;
 				uniformsRTT.face.value = 0;
 				materialRTT = new THREE.ShaderMaterial( {
@@ -249,6 +249,20 @@
 				//materialRTT = new THREE.MeshBasicMaterial( { map: LLTex } ) 
 
 				//RTTex = RTT(materialRTT);
+				//////////////////////////////////////
+				//UI
+				var RGBMTexUI = new THREE.TextureLoader().load( 'textures/2294472375_24a3b8ef46_o.jpg');
+				var shaderUI = THREE.SCSL_LL2CUBE_UI;
+				var uniformsUI = THREE.UniformsUtils.clone( shaderUI.uniforms );
+				uniformsUI.tSampler.value = RGBMTexUI;
+
+				var materialUI = new THREE.ShaderMaterial( {
+					uniforms: uniformsUI,
+					vertexShader: shaderUI.vertexShader,
+					fragmentShader: shaderUI.fragmentShader
+				} );
+
+
 				//////////////////////////////////////
 
 
@@ -304,12 +318,12 @@
 
 				var skyBox = new THREE.Mesh( new THREE.CubeGeometry( 1000, 1000, 1000 ), new THREE.MeshFaceMaterial( materials ) );
 				skyBox.applyMatrix( new THREE.Matrix4().makeScale( 1, 1, - 1 ) );
-				scene.add( skyBox );
+				//scene.add( skyBox );
 
 
 				
 
-
+				//////////////////////////////Test
 
 				uniforms.tRGBMSampler.value = RGBMTex;
 
@@ -320,9 +334,11 @@
 				} );
 
 
-				mesh = new THREE.Mesh( geometry, material );
+				mesh = new THREE.Mesh( geometry, materialUI );
 
-				//scene.add( mesh );
+				scene.add( mesh );
+
+				//////////////////////////////Test
 
 
 				/////////////////////////////////////////
@@ -356,6 +372,7 @@
 
 						uniformsRTT.tSampler.value.image.src = event.target.result;
 						uniformsRTT.tSampler.needsUpdate = true;
+
 						//update2();
 						//materials[0].map.needsUpdate = true;
 
