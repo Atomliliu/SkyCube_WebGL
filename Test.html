@@ -251,7 +251,9 @@
 				//RTTex = RTT(materialRTT);
 				//////////////////////////////////////
 				//UI
-				var RGBMTexUI = new THREE.TextureLoader().load( 'textures/land_ocean_ice_cloud_2048.jpg');
+				var RGBMTexUI = new THREE.TextureLoader().load( 'textures/gradient.jpg');
+				//RGBMTexUI.wrapS = THREE.RepeatWrapping;
+				//RGBMTexUI.wrapT = THREE.RepeatWrapping;
 				var shaderUI = THREE.SCSL_LL2CUBE_UI;
 				var uniformsUI = THREE.UniformsUtils.clone( shaderUI.uniforms );
 				uniformsUI.tSampler.value = RGBMTexUI;
@@ -262,6 +264,15 @@
 					fragmentShader: shaderUI.fragmentShader
 				} );
 
+				//////////////////////////////////////
+				var shaderLib = THREE.ShaderLib[ "basic2" ];
+				var uniformsLib = THREE.UniformsUtils.clone( ShaderLib.basic2.uniforms );
+
+				var materialLib = new THREE.ShaderMaterial( {
+					uniforms: uniformsLib,
+					vertexShader: THREE.ShaderLib.basic2.vertexShader,
+					fragmentShader: THREE.ShaderLib.basic2.fragmentShader
+				} );
 
 				//////////////////////////////////////
 
@@ -334,7 +345,7 @@
 				} );
 
 
-				mesh = new THREE.Mesh( geometry, materialUI );
+				mesh = new THREE.Mesh( geometry, materialLib );
 
 				scene.add( mesh );
 
