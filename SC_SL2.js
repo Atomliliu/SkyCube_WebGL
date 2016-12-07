@@ -323,6 +323,16 @@ THREE.SCSL_LL2CUBE_UI = {
 
 	    "vec3 getVec2(vec2 UV){",
 	    	"vec2 UV2 = UV;",
+	    	//"UV2.x = clamp(UV2.x,0.0,1.0);",
+	    	//"UV2.y = clamp(UV2.y,0.0,1.0);",
+	    	"UV2 = clamp(UV2,0.0,1.0);",
+	    	"UV2.x *= 6.0;",
+	    	"float face = floor(UV.x*6.0);",
+
+	    	"UV2.x = clamp(UV2.x - face,0.0,1.0);",
+	    	"return getVec(UV2,int(face));",
+
+/*
 			"if (UV.x>=0.0 && UV.x<A_1D6){",
 				
 				"UV2.x = clamp(UV2.x * 6.0,0.0,1.0);",
@@ -354,19 +364,27 @@ THREE.SCSL_LL2CUBE_UI = {
 				"return getVec(UV2,5);",
 			"} ",
 
-			"return vec3(0.0,0.0,1.0);",
+			"return vec3(0.0,0.0,1.0);",*/
 			
 		"}",
 
 		"vec3 getVec3(vec2 UV){",
-			"if (UV.x>=0.0 && UV.x<A_1D6){",
+			"vec2 UV2 = UV;",
+
+	    	"UV2 = clamp(UV2,0.0,1.0);",
+	    	"UV2.x *= 6.0;",
+	    	"float face = floor(UV.x*6.0);",
+
+	    	"UV2.x = clamp(UV2.x - face,0.0,1.0);",
+	    	"return vec3(UV2,1.0);",
+			/*"if (UV.x>=0.0 && UV.x<A_1D6){",
 				"return vec3(0.0,0.0,0.0);",
 			"}",
 			"else if (UV.x>=A_1D6 && UV.x<A_2D6){",
 				"return vec3(0.0,0.0,0.0);",
 			"} ",
 			"else if (UV.x>=A_2D6 && UV.x<A_3D6){",
-				"return vec3(0.0,0.0,1.0);",
+				"return vec3(0.0,0.0,0.0);",
 			"} ",
 			"else if (UV.x>=A_3D6 && UV.x<A_4D6){",
 				"return vec3(0.0,0.0,0.0);",
@@ -376,9 +394,9 @@ THREE.SCSL_LL2CUBE_UI = {
 			"} ",
 			"else if (UV.x>=A_5D6 && UV.x<=1.0){",
 				"return vec3(0.0,0.0,0.0);",
-			"} ",
+			"} ",*/
 
-			"return vec3(1.0,1.0,1.0);",
+
 			
 		"}",
 
@@ -387,7 +405,7 @@ THREE.SCSL_LL2CUBE_UI = {
 		"{",
 			"vec2 UV;",
 
-			"UV.y = acos(-vec.y) * A_1D_PI; // y = 1 to -1, v = 0 to PI",
+			"UV.y = acos(-vec.y) * A_1D_PI;", // y = 1 to -1, v = 0 to PI,
 
 			"float P = abs(vec.x/vec.z);",
 			//float O = 0.0f;
@@ -428,8 +446,8 @@ THREE.SCSL_LL2CUBE_UI = {
 			"{",
 				//"vec2 UV = vUv;",
 				"vec4 result = texture2D( tSampler,  getLLMapping_VEC2UV( getVec2(vUv) ) );",
-				"result.rgb = getVec3(vUv);",
-				//"result = texture2D( tSampler,  getVec3(vUv).xy );",
+				//"result.rgb = getVec3(vUv).yyy;",
+				//"result = texture2D( tSampler,  vec2(getVec3(vUv).x,getVec3(vUv).y));",
 				"gl_FragColor = result;",
 
 			"}",
