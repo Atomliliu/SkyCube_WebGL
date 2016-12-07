@@ -251,9 +251,12 @@
 				//RTTex = RTT(materialRTT);
 				//////////////////////////////////////
 				//UI
-				var RGBMTexUI = new THREE.TextureLoader().load( 'textures/gradient.jpg');
+				var RGBMTexUI = new THREE.TextureLoader().load( 'textures/2294472375_24a3b8ef46_o.jpg');
 				//RGBMTexUI.wrapS = THREE.RepeatWrapping;
 				//RGBMTexUI.wrapT = THREE.RepeatWrapping;
+				RGBMTexUI.magFilter = THREE.NearestFilter;
+				RGBMTexUI.minFilter = THREE.NearestFilter;
+
 				var shaderUI = THREE.SCSL_LL2CUBE_UI;
 				var uniformsUI = THREE.UniformsUtils.clone( shaderUI.uniforms );
 				uniformsUI.tSampler.value = RGBMTexUI;
@@ -265,13 +268,13 @@
 				} );
 
 				//////////////////////////////////////
-				var shaderLib = THREE.ShaderLib[ "basic2" ];
-				var uniformsLib = THREE.UniformsUtils.clone( ShaderLib.basic2.uniforms );
+				var shaderL = THREE.ShaderLib[ "basic" ];
+				var uniformsLib = THREE.UniformsUtils.clone( shaderL.uniforms );
 
 				var materialLib = new THREE.ShaderMaterial( {
 					uniforms: uniformsLib,
-					vertexShader: THREE.ShaderLib.basic2.vertexShader,
-					fragmentShader: THREE.ShaderLib.basic2.fragmentShader
+					vertexShader: shaderL.vertexShader,
+					fragmentShader: shaderL.fragmentShader
 				} );
 
 				//////////////////////////////////////
@@ -345,7 +348,7 @@
 				} );
 
 
-				mesh = new THREE.Mesh( geometry, materialLib );
+				mesh = new THREE.Mesh( geometry, materialUI );
 
 				scene.add( mesh );
 
