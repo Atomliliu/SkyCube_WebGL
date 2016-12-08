@@ -54,7 +54,7 @@
 			};
 
 
-			var camera, scene, controls, renderer, RTTex, rendererRTT, camRTT, sceneRTT,shaderRTT,uniformsRTT;
+			var camera, scene, controls, renderer, RTTex, rendererRTT, camRTT, sceneRTT,shaderRTT,uniformsRTT,cameraHUD,sceneHUD;
 			var updateTex = false;
 			var materials = [];
 			var RTTtextures = [];
@@ -182,8 +182,106 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+				/////////////////////HUD////////////////////////////
+				var width = window.innerWidth;
+  				var height = window.innerHeight;
+				var hudWidth = 240;
+				var hudHeight = 40;
+				// We will use 2D canvas element to render our HUD.  
+				var hudCanvas = document.createElement('canvas');
+				// Again, set dimensions to fit the screen.
+  				hudCanvas.width = hudWidth;
+  				hudCanvas.height = hudHeight;
+
+  				// Create the camera and set the viewport to match the screen dimensions.
+  				cameraHUD = new THREE.OrthographicCamera(-width/2, width/2, height/2, -height/2, 0, 30 );
+
+  				// Create also a custom scene for HUD.
+  				sceneHUD = new THREE.Scene();
+
+
+  				// Create texture from rendered graphics.
+  				var RTTHUD = new THREE.WebGLRenderTarget( hudWidth, hudHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat } );
+				//var hudTexture = new THREE.Texture(hudCanvas);
+				//RTTHUD.texture.needsUpdate = true;
+  
+				
+
+
+  				//////////////////////////////////////
+				//UI
+				var RGBMTexUI = new THREE.TextureLoader().load( 'textures/sprite.png');
+				//RGBMTexUI.wrapS = THREE.RepeatWrapping;
+				//RGBMTexUI.wrapT = THREE.RepeatWrapping;
+				RGBMTexUI.magFilter = THREE.NearestFilter;
+				RGBMTexUI.minFilter = THREE.NearestFilter;
+
+				var shaderUI = THREE.SCSL_LL2CUBE_UI;
+				var uniformsUI = THREE.UniformsUtils.clone( shaderUI.uniforms );
+				uniformsUI.tSampler.value = RGBMTexUI;
+
+				var materialUI = new THREE.ShaderMaterial( {
+					uniforms: uniformsUI,
+					vertexShader: shaderUI.vertexShader,
+					fragmentShader: shaderUI.fragmentShader
+				} );
+
+				//////////////////////////////////////
+				var shaderL = THREE.ShaderLib[ "basic" ];
+				var uniformsLib = THREE.UniformsUtils.clone( shaderL.uniforms );
+
+				var materialLib = new THREE.ShaderMaterial( {
+					uniforms: uniformsLib,
+					vertexShader: shaderL.vertexShader,
+					fragmentShader: shaderL.fragmentShader
+				} );
+
+
+
+
+				// Create HUD material.
+				var materialHUD = new THREE.MeshBasicMaterial( {map: RGBMTexUI} );
+				materialHUD.transparent = true;
+				materialHUD.opacity = 1.0;
+
+
+				// Create plane to render the HUD. This plane fill the whole screen.
+				var HUDplaneGeometry = new THREE.PlaneGeometry( hudWidth, hudHeight );
+  				var HUDplane = new THREE.Mesh( HUDplaneGeometry, materialHUD );
+  				sceneHUD.add( HUDplane );
+
+
+				//////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 				container = document.getElementById( 'container' );
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer({ alpha: true });
+				renderer.autoClear = false;//MUst turn it off if you want add multi renders in same buffer
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -210,6 +308,7 @@
 
 				//RTT
 				var LLTex = new THREE.TextureLoader().load( 'textures/2294472375_24a3b8ef46_o.jpg', function() {
+					renderer.clear();
 					materialRTT.uniforms.face.value = 0;
 					renderer.render( sceneRTT, camRTT, RTTtextures[0], true );
 	
@@ -249,35 +348,7 @@
 				//materialRTT = new THREE.MeshBasicMaterial( { map: LLTex } ) 
 
 				//RTTex = RTT(materialRTT);
-				//////////////////////////////////////
-				//UI
-				var RGBMTexUI = new THREE.TextureLoader().load( 'textures/2294472375_24a3b8ef46_o.jpg');
-				//RGBMTexUI.wrapS = THREE.RepeatWrapping;
-				//RGBMTexUI.wrapT = THREE.RepeatWrapping;
-				RGBMTexUI.magFilter = THREE.NearestFilter;
-				RGBMTexUI.minFilter = THREE.NearestFilter;
-
-				var shaderUI = THREE.SCSL_LL2CUBE_UI;
-				var uniformsUI = THREE.UniformsUtils.clone( shaderUI.uniforms );
-				uniformsUI.tSampler.value = RGBMTexUI;
-
-				var materialUI = new THREE.ShaderMaterial( {
-					uniforms: uniformsUI,
-					vertexShader: shaderUI.vertexShader,
-					fragmentShader: shaderUI.fragmentShader
-				} );
-
-				//////////////////////////////////////
-				var shaderL = THREE.ShaderLib[ "basic" ];
-				var uniformsLib = THREE.UniformsUtils.clone( shaderL.uniforms );
-
-				var materialLib = new THREE.ShaderMaterial( {
-					uniforms: uniformsLib,
-					vertexShader: shaderL.vertexShader,
-					fragmentShader: shaderL.fragmentShader
-				} );
-
-				//////////////////////////////////////
+				
 
 
 				camRTT = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
@@ -332,7 +403,7 @@
 
 				var skyBox = new THREE.Mesh( new THREE.CubeGeometry( 1000, 1000, 1000 ), new THREE.MeshFaceMaterial( materials ) );
 				skyBox.applyMatrix( new THREE.Matrix4().makeScale( 1, 1, - 1 ) );
-				//scene.add( skyBox );
+				scene.add( skyBox );
 
 
 				
@@ -348,9 +419,9 @@
 				} );
 
 
-				mesh = new THREE.Mesh( geometry, materialUI );
+				mesh = new THREE.Mesh( geometry, material );
 
-				scene.add( mesh );
+				//scene.add( mesh );
 
 				//////////////////////////////Test
 
@@ -505,6 +576,8 @@
 				controls.update();
 				//console.log("Screen");
 				renderer.render( scene, camera );
+				//renderer.setClearColor( 0x000000, 0 ); // the default
+				renderer.render( sceneHUD, cameraHUD );
 
 			}
 
