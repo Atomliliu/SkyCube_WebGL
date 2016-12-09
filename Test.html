@@ -222,7 +222,7 @@
 
   				//////////////////////////////////////
 				//UI
-				var RGBMTexUI = new THREE.TextureLoader().load( 'textures/sprite.png');
+				var RGBMTexUI = new THREE.TextureLoader().load( 'textures/2294472375_24a3b8ef46_o.jpg');
 				//RGBMTexUI.wrapS = THREE.RepeatWrapping;
 				//RGBMTexUI.wrapT = THREE.RepeatWrapping;
 				RGBMTexUI.magFilter = THREE.NearestFilter;
@@ -239,6 +239,7 @@
 				} );
 
 				//////////////////////////////////////
+				/*
 				var shaderL = THREE.ShaderLib[ "basic" ];
 				var uniformsLib = THREE.UniformsUtils.clone( shaderL.uniforms );
 
@@ -248,6 +249,9 @@
 					fragmentShader: shaderL.fragmentShader
 				} );
 
+				materialLib.transparent = true;
+				materialLib.opacity = 1.0;
+
 
 
 
@@ -255,11 +259,12 @@
 				var materialHUD = new THREE.MeshBasicMaterial( {map: RGBMTexUI} );
 				materialHUD.transparent = true;
 				materialHUD.opacity = 1.0;
+				*/
 
 
 				// Create plane to render the HUD. This plane fill the whole screen.
 				var HUDplaneGeometry = new THREE.PlaneGeometry( hudWidth, hudHeight );
-  				var HUDplane = new THREE.Mesh( HUDplaneGeometry, materialHUD );
+  				var HUDplane = new THREE.Mesh( HUDplaneGeometry, materialUI );
   				sceneHUD.add( HUDplane );
 
 
