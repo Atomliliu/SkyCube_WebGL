@@ -140,27 +140,27 @@
 
 			function UpdateRTT(){
 
-				materialRTT.uniforms.face.value = 0;
+				materialRTT.uniforms.nFace.value = 0;
 				renderer.render( sceneRTT, camRTT, RTTtextures[0], true );
 
 
-				materialRTT.uniforms.face.value = 1;
+				materialRTT.uniforms.nFace.value = 1;
 				renderer.render( sceneRTT, camRTT, RTTtextures[1], true );
 
 
-				uniformsRTT.face.value = 2;
+				uniformsRTT.nFace.value = 2;
 				renderer.render( sceneRTT, camRTT, RTTtextures[2], true );
 
 
-				uniformsRTT.face.value = 3;
+				uniformsRTT.nFace.value = 3;
 				renderer.render( sceneRTT, camRTT, RTTtextures[3], true );
 
 
-				uniformsRTT.face.value = 4;
+				uniformsRTT.nFace.value = 4;
 				renderer.render( sceneRTT, camRTT, RTTtextures[4], true );
 
 
-				uniformsRTT.face.value = 5;
+				uniformsRTT.nFace.value = 5;
 				renderer.render( sceneRTT, camRTT, RTTtextures[5], true );
 
 			}
@@ -314,34 +314,35 @@
 				//RTT
 				var LLTex = new THREE.TextureLoader().load( 'textures/2294472375_24a3b8ef46_o.jpg', function() {
 					renderer.clear();
-					materialRTT.uniforms.face.value = 0;
+					materialRTT.uniforms.nFace.value = 0;
 					renderer.render( sceneRTT, camRTT, RTTtextures[0], true );
 	
 
-					materialRTT.uniforms.face.value = 1;
+					uniformsRTT.nFace.value = 1;
 					renderer.render( sceneRTT, camRTT, RTTtextures[1], true );
 
 
-					uniformsRTT.face.value = 2;
+					uniformsRTT.nFace.value = 2;
 					renderer.render( sceneRTT, camRTT, RTTtextures[2], true );
 	
 
-					uniformsRTT.face.value = 3;
+					uniformsRTT.nFace.value = 3;
 					renderer.render( sceneRTT, camRTT, RTTtextures[3], true );
 
 
-					uniformsRTT.face.value = 4;
+					uniformsRTT.nFace.value = 4;
 					renderer.render( sceneRTT, camRTT, RTTtextures[4], true );
 
 
-					uniformsRTT.face.value = 5;
+					uniformsRTT.nFace.value = 5;
 					renderer.render( sceneRTT, camRTT, RTTtextures[5], true );
 
 				});
 				shaderRTT = THREE.SCSL_LL2CUBE2;
+				//shaderRTT = THREE.SC_ShaderLib[ "LL2CUBE" ];
 				uniformsRTT = THREE.UniformsUtils.clone( shaderRTT.uniforms );
 				uniformsRTT.tSampler.value = LLTex;
-				uniformsRTT.face.value = 0;
+				uniformsRTT.nFace.value = 0;
 				materialRTT = new THREE.ShaderMaterial( {
 
 					uniforms: uniformsRTT,
@@ -542,32 +543,32 @@
 				
 				//RTTex.texture.needsUpdate = true;
 				if (updateTex == true) {
-					uniformsRTT.face.value = 0;
+					uniformsRTT.nFace.value = 0;
 					renderer.render( sceneRTT, camRTT, RTTex, true );
 					RTTtextures[0] = RTTex.texture;
 					RTTtextures[0].needsUpdate = true;
 
-					uniformsRTT.face.value = 1;
+					uniformsRTT.nFace.value = 1;
 					renderer.render( sceneRTT, camRTT, RTTex, true );
 					RTTtextures[1] = RTTex.texture;
 					RTTtextures[1].needsUpdate = true;
 
-					uniformsRTT.face.value = 2;
+					uniformsRTT.nFace.value = 2;
 					renderer.render( sceneRTT, camRTT, RTTex, true );
 					RTTtextures[2] = RTTex.texture;
 					RTTtextures[2].needsUpdate = true;
 
-					uniformsRTT.face.value = 3;
+					uniformsRTT.nFace.value = 3;
 					renderer.render( sceneRTT, camRTT, RTTex, true );
 					RTTtextures[3] = RTTex.texture;
 					RTTtextures[3].needsUpdate = true;
 
-					uniformsRTT.face.value = 4;
+					uniformsRTT.nFace.value = 4;
 					renderer.render( sceneRTT, camRTT, RTTex, true );
 					RTTtextures[4] = RTTex.texture;
 					RTTtextures[4].needsUpdate = true;
 
-					uniformsRTT.face.value = 5;
+					uniformsRTT.nFace.value = 5;
 					renderer.render( sceneRTT, camRTT, RTTex, true );
 					RTTtextures[5] = RTTex.texture;
 					RTTtextures[5].needsUpdate = true;
