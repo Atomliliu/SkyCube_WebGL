@@ -5,7 +5,7 @@ THREE.SCSL_LL2CUBE2 = {
 	uniforms: {
 
 		tSampler: 	 { type: "t", value: null },
-		face:	 { type: "i", value: 0 },
+		nFace:	 { type: "i", value: 0 },
 	},
 
 
@@ -31,7 +31,7 @@ THREE.SCSL_LL2CUBE2 = {
 		"varying vec3 vWorldPosition;",
 		"varying vec2 vUv;",
 
-		"uniform int face;",
+		"uniform int nFace;",
 
 		"#define A_PI		3.14159265358", //3.1415926535897932384626433832795
 		"#define A_1D_PI		0.31830988618", //0.31830988618379067153776752674503
@@ -164,7 +164,7 @@ THREE.SCSL_LL2CUBE2 = {
 			//"vec4 frag(v2f i) : COLOR ",
 			"{",
 				//"vec2 UV = vUv;",
-				"vec4 result = texture2D( tSampler,  getLLMapping_VEC2UV( getVec(vUv,face) ) );",
+				"vec4 result = texture2D( tSampler,  getLLMapping_VEC2UV( getVec(vUv,nFace) ) );",
 
 				"gl_FragColor = result;",
 
@@ -183,7 +183,7 @@ THREE.SCSL_LL2CUBE3 = {
 	uniforms: {
 
 		tSampler: 	 { type: "t", value: null },
-		face:	 { type: "i", value: 0 },
+		nFace:	 { type: "i", value: 0 },
 	},
 
 
@@ -209,7 +209,7 @@ THREE.SCSL_LL2CUBE3 = {
 		"varying vec3 vWorldPosition;",
 		"varying vec2 vUv;",
 
-		"uniform int face;",
+		"uniform int nFace;",
 
 
 
@@ -239,7 +239,7 @@ THREE.SCSL_LL2CUBE_UI = {
 	uniforms: {
 
 		tSampler: 	 { type: "t", value: null },
-		face:	 { type: "i", value: 0 },
+		nFace:	 { type: "i", value: 0 },
 	},
 
 
@@ -269,7 +269,7 @@ THREE.SCSL_LL2CUBE_UI = {
 		"varying vec3 vWorldPosition;",
 		"varying vec2 vUv;",
 
-		"uniform int face;",
+		"uniform int nFace;",
 
 		"#define A_PI		3.14159265358", //3.1415926535897932384626433832795
 		"#define A_1D_PI		0.31830988618", //0.31830988618379067153776752674503
