@@ -1,10 +1,10 @@
-#define A_PI		3.14159265358 //3.1415926535897932384626433832795
-#define A_1D_PI		0.31830988618 //0.31830988618379067153776752674503
-#define A_1D6		0.166666666667 //0.16666666666666666666666666666667
-#define A_2D6		0.333333333333 //0.33333333333333333333333333333333
-#define A_3D6		0.5
-#define A_4D6		0.666666666667 //0.66666666666666666666666666666667
-#define A_5D6		0.833333333333 //0.83333333333333333333333333333333
+#define SC_PI		3.14159265358 
+#define SC_1D_PI		0.31830988618 
+#define SC_1D6		0.166666666667 
+#define SC_2D6		0.333333333333 
+#define SC_3D6		0.5
+#define SC_4D6		0.666666666667
+#define SC_5D6		0.833333333333
 
 
 
@@ -67,7 +67,7 @@ vec2 getLLMapping_VEC2UV(vec3 vec) //Use for create LP map",
 {
 	vec2 UV;
 
-	UV.y = acos(-vec.y) * A_1D_PI; // y = 1 to -1, v = 0 to PI,
+	UV.y = acos(-vec.y) * SC_1D_PI; // y = 1 to -1, v = 0 to PI,
 
 	float P = abs(vec.x/vec.z);
 	//float O = 0.0f;
@@ -77,10 +77,10 @@ vec2 getLLMapping_VEC2UV(vec3 vec) //Use for create LP map",
 			UV.x = 0.5;
 		}
 		else if(vec.z < 0.0) {
-			UV.x = (A_PI - atan(P)) * A_1D_PI;
+			UV.x = (SC_PI - atan(P)) * SC_1D_PI;
 		}
 		else {
-			UV.x = atan(P) * A_1D_PI;
+			UV.x = atan(P) * SC_1D_PI;
 		}
 
 	}
@@ -89,10 +89,10 @@ vec2 getLLMapping_VEC2UV(vec3 vec) //Use for create LP map",
 			UV.x = -0.5;
 		}
 		else if(vec.z < 0.0) {
-			UV.x = -(A_PI - atan(P)) * A_1D_PI;
+			UV.x = -(SC_PI - atan(P)) * SC_1D_PI;
 		}
 		else {
-			UV.x = -atan(P) * A_1D_PI;
+			UV.x = -atan(P) * SC_1D_PI;
 		}
 	}
 
