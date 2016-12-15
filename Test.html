@@ -240,8 +240,8 @@
 
 				//////////////////////////////////////
 
-				var shaderL = THREE.SC_ShaderLib[ "LL2CUBE" ];
-				var uniformsLib = THREE.UniformsUtils.clone( shaderL.uniforms );
+				//var shaderL = THREE.SC_ShaderLib[ "LL2CUBE" ];
+				//var uniformsLib = THREE.UniformsUtils.clone( shaderL.uniforms );
 /*
 				var materialLib = new THREE.ShaderMaterial( {
 					uniforms: uniformsLib,
@@ -338,8 +338,8 @@
 					renderer.render( sceneRTT, camRTT, RTTtextures[5], true );
 
 				});
-				shaderRTT = THREE.SCSL_LL2CUBE2;
-				//shaderRTT = THREE.SC_ShaderLib[ "LL2CUBE" ];
+				//shaderRTT = THREE.SCSL_LL2CUBE2;
+				shaderRTT = THREE.ShaderLib[ "LL2CUBE" ];
 				uniformsRTT = THREE.UniformsUtils.clone( shaderRTT.uniforms );
 				uniformsRTT.tSampler.value = LLTex;
 				uniformsRTT.nFace.value = 0;
