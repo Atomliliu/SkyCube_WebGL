@@ -1,459 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - equirectangular panorama</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+			}
 
-THREE.SCSL_LL2CUBE2 = {
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family:Monospace;
+				font-size:13px;
+				font-weight: bold;
+				text-align:center;
+			}
 
+			a {
+				color: #ffffff;
+			}
+		</style>
+	</head>
+	<body>
 
-	uniforms: {
+		<div id="container"></div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js webgl</a> - equirectangular panorama demo. photo by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank">Li Liu</a>.<br />
+			drag equirectangular texture into the page.
+		</div>
 
-		tSampler: 	 { type: "t", value: null },
-		nFace:	 { type: "i", value: 0 },
-	},
+		<script src="../build/three.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+		
+		<script src="js/SC_SL.js"></script>
+		<script src="js/SC_SL2.js"></script>
 
+		<script src="../examples/js/libs/dat.gui.min.js"></script>
 
-	vertexShader: [
+		<script>
 
-		"varying vec3 vWorldPosition;",
-		"varying vec2 vUv;",
+			var effectController  = {
+				tRGBMSampler: null,
+				EV: 0,
+				maxRange: 6,
+				GammaIn: 1, 
+				GammaOut: 1 
+			};
 
-		"void main() {",
 
-			"vec4 worldPosition = modelMatrix * vec4( position, 1.0 );",
-			"vWorldPosition = worldPosition.xyz;",
-			"vUv = uv;",
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
-		"}",
+			var camera, scene, controls, renderer, RTTex, rendererRTT, camRTT, sceneRTT,shaderRTT,uniformsRTT,cameraHUD,sceneHUD;
+			var updateTex = false;
+			var materials = [];
+			var RTTtextures = [];
+			var RTTSize = 1024;
 
+			init();
+			//render();
 
-	].join( "\n" ),
+			animate();
 
-	fragmentShader: [
+			function getTexturesFromAtlasFile( atlasImgUrl, tilesNum ) {
 
-		"uniform sampler2D tSampler;",
-		"varying vec3 vWorldPosition;",
-		"varying vec2 vUv;",
+				var textures = [];
 
-		"uniform int nFace;",
+				for ( var i = 0; i < tilesNum; i ++ ) {
 
-		"#define A_PI		3.14159265358", //3.1415926535897932384626433832795
-		"#define A_1D_PI		0.31830988618", //0.31830988618379067153776752674503
-		"#define A_1D6		0.166666666667", //0.16666666666666666666666666666667
-		"#define A_2D6		0.333333333333", //0.33333333333333333333333333333333
-		"#define A_3D6		0.5",
-		"#define A_4D6		0.666666666667", //0.66666666666666666666666666666667
-		"#define A_5D6		0.833333333333", //0.83333333333333333333333333333333
+					textures[ i ] = new THREE.Texture();
 
-		//"#include <packing>",
+				}
 
-		//Invead X axis from Unity shader
-
-		"vec3 getVec(vec2 UV, int face){",
-
-	        "vec3 VEC;",
-	        "UV.x = UV.x * 2.0 - 1.0;", // Range to -1 to 1
-	        "UV.y = UV.y * 2.0 - 1.0;", // Range to -1 to 1
-
-	        "if(face == 0){", //PositiveX	 Right facing side (+x).
-				"VEC = vec3(1.0,UV.y,-UV.x);",
-			"}",
-
-			"else if(face == 1){", //NegativeX	 Left facing side (-x).
-				"VEC = vec3(-1.0,UV.y,UV.x);",
-			"}",
-
-			"else if(face == 2){", //PositiveY	 Upwards facing side (+y).
-				"VEC = vec3(UV.x,1.0,-UV.y);",
-			"}",
+				var imageObj = new Image();
 
-			"else if(face == 3){", //NegativeY	 Downward facing side (-y).
-				"VEC = vec3(UV.x,-1.0,UV.y);",
-			"}",
+				imageObj.onload = function() {
 
-			"else if(face == 4){", //PositiveZ	 Forward facing side (+z).
-				"VEC = vec3(UV.x,UV.y,1.0);",
-			"}",
+					var canvas, context;
+					var tileWidth = imageObj.height;
 
-			"else if(face == 5){", //NegativeZ	 Backward facing side (-z).
-				"VEC = vec3(-UV.x,UV.y,-1.0);",
-			"}",
+					for ( var i = 0; i < textures.length; i ++ ) {
 
-			"else{",
-				"VEC = vec3(0.0,0.0,1.0);",
-			"}",
+						canvas = document.createElement( 'canvas' );
+						context = canvas.getContext( '2d' );
+						canvas.height = tileWidth;
+						canvas.width = tileWidth;
+						context.drawImage( imageObj, tileWidth * i, 0, tileWidth, tileWidth, 0, 0, tileWidth, tileWidth );
+						textures[ i ].image = canvas
+						textures[ i ].needsUpdate = true;
 
-	        "return normalize(VEC);",
+					}
 
-	    "}",
+				};
 
-	    "vec3 getVec2(vec2 UV){",
-			"if (UV.x>=0.0 && UV.x<A_1D6){",
-				"vec2 UV2 = UV;",
-				"UV2.x = clamp(UV2.x * 6.0,0.0,1.0);",
-				"return getVec(UV2,0);",
-			"}",
-			"else if (UV.x>=A_1D6 && UV.x<A_2D6){",
-				"vec2 UV2 = UV;",
-				"UV2.x = clamp((UV2.x-A_1D6) * 6.0,0.0,1.0);",
-				"return getVec(UV2,1);",
-			"} ",
-			"else if (UV.x>=A_2D6 && UV.x<A_3D6){",
-				"vec2 UV2 = UV;",
-				"UV2.x = (UV2.x-A_2D6) * 6.0;",
-				"return getVec(UV2,2);",
-			"} ",
-			"else if (UV.x>=A_3D6 && UV.x<A_4D6){",
-				"vec2 UV2 = UV;",
-				"UV2.x = (UV2.x-A_3D6) * 6.0;",
-				"return getVec(UV2,3);",
-			"} ",
-			"else if (UV.x>=A_4D6 && UV.x<A_5D6){",
-				"vec2 UV2 = UV;",
-				"UV2.x = (UV2.x-A_4D6) * 6.0;",
-				"return getVec(UV2,4);",
-			"} ",
-			"else if (UV.x>=A_5D6 && UV.x<=1.0){",
-				"vec2 UV2 = UV;",
-				"UV2.x = (UV2.x-A_5D6) * 6.0;",
-				"return getVec(UV2,5);",
-			"} ",
+				imageObj.src = atlasImgUrl;
 
-			"return vec3(0.0,0.0,1.0);",
-			
-		"}",
+				return textures;
 
+			}
 
-	    "vec2 getLLMapping_VEC2UV(vec3 vec) //Use for create LP map",
-		"{",
-			"vec2 UV;",
+			//function getTexFromRTT() {
 
-			"UV.y = acos(-vec.y) * A_1D_PI; // y = 1 to -1, v = 0 to PI",
+			//}
 
-			"float P = abs(vec.x/vec.z);",
-			//float O = 0.0f;
+			/*function RTT( matRTT ) {
+				var camRTT = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
+				camRTT.position.z = 100;
 
-			"if (vec.x >= 0.0) {",
-				"if(vec.z == 0.0) {",
-					"UV.x = 0.5;",
-				"}",
-				"else if(vec.z < 0.0) {",
-					"UV.x = (A_PI - atan(P)) * A_1D_PI;",
-				"}",
-				"else {",
-					"UV.x = atan(P) * A_1D_PI;",
-				"}",
+				var sceneRTT = new THREE.Scene();
+				rtTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBFormat } );
 
-			"}",
-			"else { // X < 0  //phase",
-				"if(vec.z == 0.0) {",
-					"UV.x = -0.5;",
-				"}",
-				"else if(vec.z < 0.0) {",
-					"UV.x = -(A_PI - atan(P)) * A_1D_PI;",
-				"}",
-				"else {",
-					"UV.x = -atan(P) * A_1D_PI;",
-				"}",
-			"}",
 
-			"UV.x = (UV.x + 1.0) * 0.5;",
+				//var uniforms = THREE.UniformsUtils.clone( shaderObj.uniforms );
 
-			"return UV;",
-		"}",
 
+				var plane = new THREE.PlaneBufferGeometry( window.innerWidth, window.innerHeight );
 
-		"void main() {",
+				var quad = new THREE.Mesh( plane, matRTT );
+				quad.position.z = -100;
+				sceneRTT.add( quad );
 
-			//"vec4 frag(v2f i) : COLOR ",
-			"{",
-				//"vec2 UV = vUv;",
-				"vec4 result = texture2D( tSampler,  getLLMapping_VEC2UV( getVec(vUv,nFace) ) );",
 
-				"gl_FragColor = result;",
+				var rendererRTT = new THREE.WebGLRenderer();
+				rendererRTT.setPixelRatio( window.devicePixelRatio );
+				rendererRTT.setSize( window.innerWidth, window.innerHeight );
 
-			"}",
+				rendererRTT.clear();
 
-		"}",
-
-	].join( "\n" )
-
-};
-
-
-THREE.SCSL_LL2CUBE3 = {
-
-
-	uniforms: {
-
-		tSampler: 	 { type: "t", value: null },
-		nFace:	 { type: "i", value: 0 },
-	},
-
-
-	vertexShader: [
-
-		"varying vec3 vWorldPosition;",
-		"varying vec2 vUv;",
-
-		"void main() {",
-
-			"vec4 worldPosition = modelMatrix * vec4( position, 1.0 );",
-			"vWorldPosition = worldPosition.xyz;",
-			"vUv = uv;",
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
-		"}",
-
-
-	].join( "\n" ),
-
-	fragmentShader: [
-
-		"uniform sampler2D tSampler;",
-		"varying vec3 vWorldPosition;",
-		"varying vec2 vUv;",
-
-		"uniform int nFace;",
-
-
-
-		"void main() {",
-
-			//"vec4 frag(v2f i) : COLOR ",
-			"{",
-				//"vec2 UV = vUv;",
-				"vec4 result = vec4(1.0,0.0,0.0,1.0);",
-
-				"gl_FragColor = result;",
-
-			"}",
-
-		"}",
-
-	].join( "\n" )
-
-};
-
-
-
-
-THREE.SCSL_LL2CUBE_UI = {
-
-
-	uniforms: {
-
-		tSampler: 	 { type: "t", value: null },
-		nFace:	 { type: "i", value: 0 },
-	},
-
-
-	vertexShader: [
-
-		"varying vec3 vWorldPosition;",
-		"varying vec2 vUv;",
-
-		"void main() {",
-
-			"vec4 worldPosition = modelMatrix * vec4( position, 1.0 );",
-			"vWorldPosition = worldPosition.xyz;",
-			"vUv = uv;",
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
-		"}",
-
-
-	].join( "\n" ),
-
-	fragmentShader: [
-
-		//"precision highp float;",
-		//"precision highp vec2;",
-		//"precision highp vec3;",
-
-		"uniform sampler2D tSampler;",
-		"varying vec3 vWorldPosition;",
-		"varying vec2 vUv;",
-
-		"uniform int nFace;",
-
-		"#define A_PI		3.14159265358", //3.1415926535897932384626433832795
-		"#define A_1D_PI		0.31830988618", //0.31830988618379067153776752674503
-		"#define A_1D6		0.16666666666666666666666666", //0.16666666666666666666666666666667
-		"#define A_2D6		0.33333333333333333333333333", //0.33333333333333333333333333333333
-		"#define A_3D6		0.5",
-		"#define A_4D6		0.66666666666666666666666666", //0.66666666666666666666666666666667
-		"#define A_5D6		0.83333333333333333333333333", //0.83333333333333333333333333333333
-
-		//"#include <packing>",
-
-		//Invead X axis from Unity shader
-
-		"vec3 getVec(vec2 UV, int face){",
-
-	        "highp vec3 VEC;",
-	        "UV.x = UV.x * 2.0 - 1.0;", // Range to -1 to 1
-	        "UV.y = UV.y * 2.0 - 1.0;", // Range to -1 to 1
-
-	        "if(face == 0){", //PositiveX	 Right facing side (+x).
-				"VEC = vec3(1.0,UV.y,-UV.x);",
-			"}",
-
-			"else if(face == 1){", //NegativeX	 Left facing side (-x).
-				"VEC = vec3(-1.0,UV.y,UV.x);",
-			"}",
-
-			"else if(face == 2){", //PositiveY	 Upwards facing side (+y).
-				"VEC = vec3(UV.x,1.0,-UV.y);",
-			"}",
-
-			"else if(face == 3){", //NegativeY	 Downward facing side (-y).
-				"VEC = vec3(UV.x,-1.0,UV.y);",
-			"}",
-
-			"else if(face == 4){", //PositiveZ	 Forward facing side (+z).
-				"VEC = vec3(UV.x,UV.y,1.0);",
-			"}",
-
-			"else if(face == 5){", //NegativeZ	 Backward facing side (-z).
-				"VEC = vec3(-UV.x,UV.y,-1.0);",
-			"}",
-
-			"else{",
-				"VEC = vec3(0.0,0.0,1.0);",
-			"}",
-
-	        "return normalize(VEC);",
-
-	    "}",
-
-	    "vec3 getVec2(vec2 UV){",
-	    	"vec2 UV2 = UV;",
-	    	//"UV2.x = clamp(UV2.x,0.0,1.0);",
-	    	//"UV2.y = clamp(UV2.y,0.0,1.0);",
-	    	"UV2 = clamp(UV2,0.0,1.0);",
-	    	"UV2.x *= 6.0;",
-	    	"float face = floor(UV.x*6.0);",
-
-	    	"UV2.x = clamp(UV2.x - face,0.0,1.0);",
-	    	"return getVec(UV2,int(face));",
-
-/*
-			"if (UV.x>=0.0 && UV.x<A_1D6){",
+				// Render first scene into texture
+				console.log(rendererRTT.render( sceneRTT, camRTT, rtTexture, true ));
 				
-				"UV2.x = clamp(UV2.x * 6.0,0.0,1.0);",
-				"return getVec(UV2,0);",
-			"}",
-			"else if (UV.x>=A_1D6 && UV.x<A_2D6){",
-				//"vec2 UV2 = UV;",
-				"UV2.x = clamp(UV2.x * 6.0 - 1.0,0.0,1.0);",
-				"return getVec(UV2,1);",
-			"} ",
-			"else if (UV.x>=A_2D6 && UV.x<A_3D6){",
-				//"vec2 UV2 = UV;",
-				"UV2.x = clamp(UV2.x*6.0 - 2.0,0.0,1.0);",
-				"return getVec(UV2,2);",
-			"} ",
-			"else if (UV.x>=A_3D6 && UV.x<A_4D6){",
-				//"vec2 UV2 = UV;",
-				"UV2.x = clamp(UV2.x * 6.0 - 3.0,0.0,1.0);",
-				"return getVec(UV2,3);",
-			"} ",
-			"else if (UV.x>=A_4D6 && UV.x<A_5D6){",
-				//"vec2 UV2 = UV;",
-				"UV2.x = clamp(UV2.x*6.0 - 4.0,0.0,1.0);",
-				"return getVec(UV2,4);",
-			"} ",
-			"else if (UV.x>=A_5D6 && UV.x<=1.0){",
-				//"vec2 UV2 = UV;",
-				"UV2.x = clamp(UV2.x * 6.0 - 5.0,0.0,1.0);",
-				"return getVec(UV2,5);",
-			"} ",
 
-			"return vec3(0.0,0.0,1.0);",*/
-			
-		"}",
+				return rtTexture;
 
-		"vec3 getVec3(vec2 UV){",
-			"vec2 UV2 = UV;",
+			}*/
 
-	    	"UV2 = clamp(UV2,0.0,1.0);",
-	    	"UV2.x *= 6.0;",
-	    	"float face = floor(UV.x*6.0);",
+			function UpdateRTT(){
 
-	    	"UV2.x = clamp(UV2.x - face,0.0,1.0);",
-	    	"return vec3(UV2,1.0);",
-			/*"if (UV.x>=0.0 && UV.x<A_1D6){",
-				"return vec3(0.0,0.0,0.0);",
-			"}",
-			"else if (UV.x>=A_1D6 && UV.x<A_2D6){",
-				"return vec3(0.0,0.0,0.0);",
-			"} ",
-			"else if (UV.x>=A_2D6 && UV.x<A_3D6){",
-				"return vec3(0.0,0.0,0.0);",
-			"} ",
-			"else if (UV.x>=A_3D6 && UV.x<A_4D6){",
-				"return vec3(0.0,0.0,0.0);",
-			"} ",
-			"else if (UV.x>=A_4D6 && UV.x<A_5D6){",
-				"return vec3(0.0,0.0,0.0);",
-			"} ",
-			"else if (UV.x>=A_5D6 && UV.x<=1.0){",
-				"return vec3(0.0,0.0,0.0);",
-			"} ",*/
+				materialRTT.uniforms.nFace.value = 0;
+				renderer.render( sceneRTT, camRTT, RTTtextures[0], true );
 
 
-			
-		"}",
+				materialRTT.uniforms.nFace.value = 1;
+				renderer.render( sceneRTT, camRTT, RTTtextures[1], true );
 
 
-	    "vec2 getLLMapping_VEC2UV(vec3 vec) //Use for create LP map",
-		"{",
-			"vec2 UV;",
-
-			"UV.y = acos(-vec.y) * A_1D_PI;", // y = 1 to -1, v = 0 to PI,
-
-			"float P = abs(vec.x/vec.z);",
-			//float O = 0.0f;
-
-			"if (vec.x >= 0.0) {",
-				"if(vec.z == 0.0) {",
-					"UV.x = 0.5;",
-				"}",
-				"else if(vec.z < 0.0) {",
-					"UV.x = (A_PI - atan(P)) * A_1D_PI;",
-				"}",
-				"else {",
-					"UV.x = atan(P) * A_1D_PI;",
-				"}",
-
-			"}",
-			"else { // X < 0  //phase",
-				"if(vec.z == 0.0) {",
-					"UV.x = -0.5;",
-				"}",
-				"else if(vec.z < 0.0) {",
-					"UV.x = -(A_PI - atan(P)) * A_1D_PI;",
-				"}",
-				"else {",
-					"UV.x = -atan(P) * A_1D_PI;",
-				"}",
-			"}",
-
-			"UV.x = (UV.x + 1.0) * 0.5;",
-
-			"return vec2(UV);",
-		"}",
+				uniformsRTT.nFace.value = 2;
+				renderer.render( sceneRTT, camRTT, RTTtextures[2], true );
 
 
-		"void main() {",
+				uniformsRTT.nFace.value = 3;
+				renderer.render( sceneRTT, camRTT, RTTtextures[3], true );
 
-			//"vec4 frag(v2f i) : COLOR ",
-			"{",
-				//"vec2 UV = vUv;",
-				"vec4 result = texture2D( tSampler,  getLLMapping_VEC2UV( getVec2(vUv) ) );",
-				//"result.rgb = getVec3(vUv).yyy;",
-				//"result = texture2D( tSampler,  vec2(getVec3(vUv).x,getVec3(vUv).y));",
-				"gl_FragColor = result;",
 
-			"}",
+				uniformsRTT.nFace.value = 4;
+				renderer.render( sceneRTT, camRTT, RTTtextures[4], true );
 
-		"}",
 
-	].join( "\n" )
+				uniformsRTT.nFace.value = 5;
+				renderer.render( sceneRTT, camRTT, RTTtextures[5], true );
 
-};
+			}
+
+			function init() {
+
+				var container, mesh;
+				//var canvas, context;
+				//canvas = document.createElement( 'canvas' );
+				//context = canvas.getContext( '2d' );
+
+				for ( var i = 0; i < 6; i ++ ) {
+
+					//RTTtextures[ i ] = new THREE.Texture();
+					//RTTtextures[ i ] = THREE.ImageUtils.generateDataTexture(RTTSize,RTTSize,new THREE.Color( 1, 0, 0 ))
+					RTTtextures[ i ] = new THREE.WebGLRenderTarget( RTTSize, RTTSize, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBFormat } );
+
+				}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+				/////////////////////HUD////////////////////////////
+				var width = window.innerWidth;
+  				var height = window.innerHeight;
+				var hudWidth = 240;
+				var hudHeight = 40;
+				// We will use 2D canvas element to render our HUD.  
+				var hudCanvas = document.createElement('canvas');
+				// Again, set dimensions to fit the screen.
+  				hudCanvas.width = hudWidth;
+  				hudCanvas.height = hudHeight;
+
+  				// Create the camera and set the viewport to match the screen dimensions.
+  				cameraHUD = new THREE.OrthographicCamera(-width/2, width/2, height/2, -height/2, 0, 30 );
+
+  				// Create also a custom scene for HUD.
+  				sceneHUD = new THREE.Scene();
+
+
+  				// Create texture from rendered graphics.
+  				var RTTHUD = new THREE.WebGLRenderTarget( hudWidth, hudHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat } );
+				//var hudTexture = new THREE.Texture(hudCanvas);
+				//RTTHUD.texture.needsUpdate = true;
+  
+				
+
+
+  				//////////////////////////////////////
+				//UI
+				var RGBMTexUI = new THREE.TextureLoader().load( 'textures/2294472375_24a3b8ef46_o.jpg');
+				//RGBMTexUI.wrapS = THREE.RepeatWrapping;
+				//RGBMTexUI.wrapT = THREE.RepeatWrapping;
+				RGBMTexUI.magFilter = THREE.NearestFilter;
+				RGBMTexUI.minFilter = THREE.NearestFilter;
+
+				var shaderUI = THREE.SCSL_LL2CUBE_UI;
+				var uniformsUI = THREE.UniformsUtils.clone( shaderUI.uniforms );
+				uniformsUI.tSampler.value = RGBMTexUI;
+
+				var materialUI = new THREE.ShaderMaterial( {
+					uniforms: uniformsUI,
+					vertexShader: shaderUI.vertexShader,
+					fragmentShader: shaderUI.fragmentShader
+				} );
+
+				//////////////////////////////////////
+
+				//var shaderL = THREE.SC_ShaderLib[ "LL2CUBE" ];
+				//var uniformsLib = THREE.UniformsUtils.clone( shaderL.uniforms );
+/*
+				var materialLib = new THREE.ShaderMaterial( {
+					uniforms: uniformsLib,
+					vertexShader: shaderL.vertexShader,
+					fragmentShader: shaderL.fragmentShader
+				} );
+
+				materialLib.transparent = true;
+				materialLib.opacity = 1.0;
+
+
+
+
+				// Create HUD material.
+				var materialHUD = new THREE.MeshBasicMaterial( {map: RGBMTexUI} );
+				materialHUD.transparent = true;
+				materialHUD.opacity = 1.0;
+				*/
+
+
+				// Create plane to render the HUD. This plane fill the whole screen.
+				var HUDplaneGeometry = new THREE.PlaneGeometry( hudWidth, hudHeight );
+  				var HUDplane = new THREE.Mesh( HUDplaneGeometry, materialUI );
+  				sceneHUD.add( HUDplane );
+
+
+				//////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+				container = document.getElementById( 'container' );
+				renderer = new THREE.WebGLRenderer({ alpha: true });
+				renderer.autoClear = false;//MUst turn it off if you want add multi renders in same buffer
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1100 );
+				camera.position.z = 100;
+				//camera.target = new THREE.Vector3( 0, 0, 0 );
+
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+				controls.dampingFactor = 0.3;
+				controls.enableZoom = true;
+				controls.enablePan = false;
+
+				scene = new THREE.Scene();
+
+				var geometry = new THREE.SphereGeometry( 500, 60, 40 );
+				geometry.scale( -1, 1, 1 );
+
+				var RGBMTex = new THREE.TextureLoader().load( 'textures/2294472375_24a3b8ef46_o.jpg');
+				var shader = THREE.SL_RGBM_DECODE;
+				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+				var textures = getTexturesFromAtlasFile( "textures/cube/sun_temple_stripe.jpg", 6 );
+
+				//RTT
+				var LLTex = new THREE.TextureLoader().load( 'textures/2294472375_24a3b8ef46_o.jpg', function() {
+					renderer.clear();
+					materialRTT.uniforms.nFace.value = 0;
+					renderer.render( sceneRTT, camRTT, RTTtextures[0], true );
+	
+
+					uniformsRTT.nFace.value = 1;
+					renderer.render( sceneRTT, camRTT, RTTtextures[1], true );
+
+
+					uniformsRTT.nFace.value = 2;
+					renderer.render( sceneRTT, camRTT, RTTtextures[2], true );
+	
+
+					uniformsRTT.nFace.value = 3;
+					renderer.render( sceneRTT, camRTT, RTTtextures[3], true );
+
+
+					uniformsRTT.nFace.value = 4;
+					renderer.render( sceneRTT, camRTT, RTTtextures[4], true );
+
+
+					uniformsRTT.nFace.value = 5;
+					renderer.render( sceneRTT, camRTT, RTTtextures[5], true );
+
+				});
+				//shaderRTT = THREE.SCSL_LL2CUBE2;
+				shaderRTT = THREE.ShaderLib[ "LL2CUBE" ];
+				uniformsRTT = THREE.UniformsUtils.clone( shaderRTT.uniforms );
+				uniformsRTT.tSampler.value = LLTex;
+				uniformsRTT.nFace.value = 0;
+				materialRTT = new THREE.ShaderMaterial( {
+
+					uniforms: uniformsRTT,
+					vertexShader: shaderRTT.vertexShader,
+					fragmentShader: shaderRTT.fragmentShader
+
+				} );
+
+				//materialRTT = new THREE.MeshBasicMaterial( { map: LLTex } ) 
+
+				//RTTex = RTT(materialRTT);
+				
+
+
+				camRTT = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
+				camRTT.position.z = 100;
+
+				sceneRTT = new THREE.Scene();
+				//RTTex = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat } );
+
+				RTTex = new THREE.WebGLRenderTarget( RTTSize, RTTSize, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBFormat } );
+				//var uniforms = THREE.UniformsUtils.clone( shaderObj.uniforms );
+
+
+				var plane = new THREE.PlaneBufferGeometry( window.innerWidth, window.innerHeight );
+
+				var quad = new THREE.Mesh( plane, materialRTT );
+				quad.position.z = -100;
+				sceneRTT.add( quad );
+
+				updateTex = true;
+
+
+				//rendererRTT = new THREE.WebGLRenderer();
+				//rendererRTT.setPixelRatio( window.devicePixelRatio );
+				//rendererRTT.setSize( window.innerWidth, window.innerHeight );
+
+				//rendererRTT.clear();
+
+				// Render first scene into texture
+				
+				//rendererRTT.render( sceneRTT, camRTT, RTTex, true );
+				//console.log(RTTex.texture);
+
+				
+
+				///////////////////////////////////
+				//RTTex.image = LLTex;
+
+				
+				var textures = getTexturesFromAtlasFile("textures/cube/sun_temple_stripe.jpg", 6 );
+				//textures[0] = RTTex.texture; //size not same
+
+				
+
+				for ( var i = 0; i < 6; i ++ ) {
+
+					//materials.push( new THREE.MeshBasicMaterial( { map:textures[i]} ) );
+					materials.push( new THREE.MeshBasicMaterial( { map: RTTtextures[ i ]} ) );
+
+					//materials.push(materialRTT);
+
+				}
+
+				var skyBox = new THREE.Mesh( new THREE.CubeGeometry( 1000, 1000, 1000 ), new THREE.MeshFaceMaterial( materials ) );
+				skyBox.applyMatrix( new THREE.Matrix4().makeScale( 1, 1, - 1 ) );
+				scene.add( skyBox );
+
+
+				
+
+				//////////////////////////////Test
+
+				uniforms.tRGBMSampler.value = RGBMTex;
+
+				var material = new THREE.ShaderMaterial( {
+					uniforms: uniforms,
+					vertexShader: shader.vertexShader,
+					fragmentShader: shader.fragmentShader
+				} );
+
+
+				mesh = new THREE.Mesh( geometry, material );
+
+				//scene.add( mesh );
+
+				//////////////////////////////Test
+
+
+				/////////////////////////////////////////
+				//Drag Event
+
+				document.addEventListener( 'dragover', function ( event ) {
+
+					event.preventDefault();
+					event.dataTransfer.dropEffect = 'copy';
+
+				}, false );
+
+				document.addEventListener( 'dragenter', function ( event ) {
+
+					document.body.style.opacity = 0.5;
+
+				}, false );
+
+				document.addEventListener( 'dragleave', function ( event ) {
+
+					document.body.style.opacity = 1;
+
+				}, false );
+
+				document.addEventListener( 'drop', function ( event ) {
+
+					event.preventDefault();
+
+					var reader = new FileReader();
+					reader.addEventListener( 'load', function ( event ) {
+
+						uniformsRTT.tSampler.value.image.src = event.target.result;
+						uniformsRTT.tSampler.needsUpdate = true;
+
+						//update2();
+						//materials[0].map.needsUpdate = true;
+
+						//updateTex = true;
+						//console.log("New Tex");
+						//update();
+
+					}, false );
+					reader.readAsDataURL( event.dataTransfer.files[ 0 ] );
+
+					document.body.style.opacity = 1;
+
+				}, false );
+
+				//
+				////////////////////////////////////////////////////
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				function guiChanged() {
+					//var uniforms = shader.uniforms;
+
+					//uniforms.tRGBMSampler.value = effectController.tRGBMSampler;
+					uniforms.luminance.value = Math.pow(2, effectController.EV);
+					uniforms.maxRange.value = effectController.maxRange;
+					//uniforms.luminance.value = effectController.luminance;
+					//uniforms.GammaIn.value = effectController.GammaIn;
+					//uniforms.GammaOut.value = effectController.GammaOut;
+					//console.log("here");
+					//updateTex = true;
+					//renderer.clear();
+
+					// Render first scene into texture
+				
+					//renderer.render( sceneRTT, camRTT, RTTex, true );
+					//renderer.render( scene, camera );
+					update();
+				}
+
+				var gui = new dat.GUI();
+
+				gui.add( effectController, "maxRange", 1.0, 8.0, 8.0 ).onChange( guiChanged );
+				gui.add( effectController, "EV", -8.0, 8.0, 0.0 ).onChange( guiChanged );
+
+
+				guiChanged();
+
+
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+
+
+			function animate() {
+				requestAnimationFrame( animate );
+				//if (updateTex == true) update2();
+				update();
+
+
+			}
+
+			function update2() {
+				console.log("RTT");
+				renderer.clear();
+
+				// Render first scene into texture
+				
+				
+				//RTTex.texture.needsUpdate = true;
+				if (updateTex == true) {
+					uniformsRTT.nFace.value = 0;
+					renderer.render( sceneRTT, camRTT, RTTex, true );
+					RTTtextures[0] = RTTex.texture;
+					RTTtextures[0].needsUpdate = true;
+
+					uniformsRTT.nFace.value = 1;
+					renderer.render( sceneRTT, camRTT, RTTex, true );
+					RTTtextures[1] = RTTex.texture;
+					RTTtextures[1].needsUpdate = true;
+
+					uniformsRTT.nFace.value = 2;
+					renderer.render( sceneRTT, camRTT, RTTex, true );
+					RTTtextures[2] = RTTex.texture;
+					RTTtextures[2].needsUpdate = true;
+
+					uniformsRTT.nFace.value = 3;
+					renderer.render( sceneRTT, camRTT, RTTex, true );
+					RTTtextures[3] = RTTex.texture;
+					RTTtextures[3].needsUpdate = true;
+
+					uniformsRTT.nFace.value = 4;
+					renderer.render( sceneRTT, camRTT, RTTex, true );
+					RTTtextures[4] = RTTex.texture;
+					RTTtextures[4].needsUpdate = true;
+
+					uniformsRTT.nFace.value = 5;
+					renderer.render( sceneRTT, camRTT, RTTex, true );
+					RTTtextures[5] = RTTex.texture;
+					RTTtextures[5].needsUpdate = true;
+					updateTex = false;
+				}
+				
+			}
+
+
+			function update() {
+				controls.update();
+				//console.log("Screen");
+				renderer.render( scene, camera );
+				//renderer.setClearColor( 0x000000, 0 ); // the default
+				renderer.render( sceneHUD, cameraHUD );
+
+			}
+
+			function render() {
+				console.log("R");
+				setTimeout(
+                    function(){
+                    	renderer.render( sceneRTT, camRTT, RTTex, true );
+                        renderer.render( scene, camera );
+                    },
+                    2000
+                );
+				
+				
+			}
+
+		</script>
+	</body>
+</html>
+
+
+
