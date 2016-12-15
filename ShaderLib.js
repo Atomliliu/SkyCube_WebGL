@@ -1,4 +1,5 @@
 import { ShaderChunk } from './ShaderChunk';
+//import { SC_ShaderChunk } from './SC_ShaderChunk';
 import { UniformsUtils } from './UniformsUtils';
 import { Vector3 } from '../../math/Vector3';
 import { UniformsLib } from './UniformsLib';
@@ -226,7 +227,21 @@ var ShaderLib = {
 		vertexShader: ShaderChunk.distanceRGBA_vert,
 		fragmentShader: ShaderChunk.distanceRGBA_frag
 
+	},
+
+	//////////////////////////////////////////////////
+	LL2CUBE: {
+
+		uniforms: {
+			tSampler: { value: null },
+			nFace: { value: 0 }
+		},
+
+		vertexShader: ShaderChunk.SCSL_LL2CUBE_VERT,
+		fragmentShader: ShaderChunk.SCSL_LL2CUBE_FRAG
+
 	}
+	//////////////////////////////////////////////////
 
 };
 
