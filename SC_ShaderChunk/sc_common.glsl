@@ -64,7 +64,13 @@ vec3 getVecHorizonCubeMap(vec2 UV){
 }
 
 vec3 getVecVerticalCubeMap(vec2 UV){
+	vec2 UV2 = UV;
+	UV2 = clamp(UV2,0.0,1.0);
+	UV2.y *= 6.0;
+	float face = floor(UV.y*6.0);
 
+	UV2.y = clamp(UV2.y - face,0.0,1.0);
+	return getVec(UV2,int(face));
 }
 
 vec3 getVecHCrossCubeMap(vec2 UV){
@@ -140,7 +146,7 @@ vec2 getLPMapping_VEC2UV(vec3 vec) //Use for create LP map
 	//UV = UV * 2 - 1; // Range to -1 to 1
 
 	if(vec.z == 1.0){
-		"UV.x = UV.y = 0.0;
+		UV.x = UV.y = 0.0;
 	}
 
 	else {
@@ -178,9 +184,9 @@ vec2 getDPUVByVec(vec3 vec)
 {
 	vec2 uv;
 	if(vec.z < 0){ // Front
-		"uv = vec.xy/(1 - vec.z);
-		"uv = (uv + 1) * 0.5; // Range from -1 to 1 to 0 to 1
-		"uv.x *= 0.5; // Move to left in texture
+		uv = vec.xy/(1 - vec.z);
+		uv = (uv + 1) * 0.5; // Range from -1 to 1 to 0 to 1
+		uv.x *= 0.5; // Move to left in texture
 	}
 	else{ // Back
 		vec.y = -vec.y;
