@@ -1,13 +1,17 @@
 #define SC_PI		3.14159265358 
 #define SC_1D_PI		0.31830988618 
+
 #define SC_1D6		0.166666666667 
 #define SC_2D6		0.333333333333 
 #define SC_3D6		0.5
 #define SC_4D6		0.666666666667
 #define SC_5D6		0.833333333333
 
+#define SC_3D4		0.75
 
 
+//const int SC_HC_FaceX[4] = int[4](1,4,0,5);
+//const int SC_HC_FaceY[3] = int[3](2,4,3);
 
 ////////////////////////////////////////////////////////////////////////////
 
@@ -56,7 +60,7 @@ vec3 getVecHorizonCubeMap(vec2 UV){
 	//UV2.y = clamp(UV2.y,0.0,1.0);
 	UV2 = clamp(UV2,0.0,1.0);
 	UV2.x *= 6.0;
-	float face = floor(UV.x*6.0);
+	float face = floor(UV2.x);
 
 	UV2.x = clamp(UV2.x - face,0.0,1.0);
 	return getVec(UV2,int(face));
@@ -67,14 +71,34 @@ vec3 getVecVerticalCubeMap(vec2 UV){
 	vec2 UV2 = UV;
 	UV2 = clamp(UV2,0.0,1.0);
 	UV2.y *= 6.0;
-	float face = floor(UV.y*6.0);
+	float face = floor(UV2.y);
 
 	UV2.y = clamp(UV2.y - face,0.0,1.0);
 	return getVec(UV2,int(face));
 }
 
 vec3 getVecHCrossCubeMap(vec2 UV){
+	vec2 UV2 = UV;
+	UV2 = clamp(UV2,0.0,1.0);
 
+	UV2.x *= 3.0;
+	UV2.y *= 4.0;
+
+	int faceX = int(floor(UV2.x));
+	int faceY = int(floor(UV2.y));
+
+	UV2.x = clamp(UV2.x - faceX,0.0,1.0);
+	UV2.y = clamp(UV2.y - faceY,0.0,1.0);
+
+	if faceX == 1 {
+		//return getVec(UV2,SC_HC_FaceY[faceY]);
+	}
+	else {
+		//return getVec(UV2,SC_HC_FaceX[faceX]);
+	}
+
+
+	return vec2(0,0,0);
 }
 
 vec3 getVecVCrossCubeMap(vec2 UV){
