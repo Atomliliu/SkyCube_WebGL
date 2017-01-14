@@ -13,6 +13,8 @@
 //const int SC_HC_FaceX[4] = int[4](1,4,0,5);
 //const int SC_HC_FaceY[3] = int[3](2,4,3);
 
+highp float steps[5];// = {0,1,2,3,4};
+
 ////////////////////////////////////////////////////////////////////////////
 
 vec3 getVec(vec2 UV, int face){
@@ -78,46 +80,68 @@ vec3 getVecVerticalCubeMap(vec2 UV){
 }
 
 vec3 getVecHCrossCubeMap(vec2 UV){
+	//int SC_HC_FaceX[4];// = {1,4,0,5};
+	//const int SC_HC_FaceY[3] = int[3](2,4,3);
 	vec2 UV2 = UV;
 	UV2 = clamp(UV2,0.0,1.0);
 
 	UV2.x *= 3.0;
 	UV2.y *= 4.0;
 
-	int faceX = int(floor(UV2.x));
-	int faceY = int(floor(UV2.y));
+	float faceX = floor(UV2.x);
+	float faceY = floor(UV2.y);
 
 	UV2.x = clamp(UV2.x - faceX,0.0,1.0);
 	UV2.y = clamp(UV2.y - faceY,0.0,1.0);
 
-	if faceX == 1 {
+	if (faceX == 0.0) {
+		return getVec(UV2,1);
+	}
+	else if (faceX == 1.0) {
+		if (faceY == 0.0) {
+			return getVec(UV2,2);
+		}
+		else if (faceY == 2.0) {
+			return getVec(UV2,3);
+		}
+		else {
+			return getVec(UV2,4);
+		}
 		//return getVec(UV2,SC_HC_FaceY[faceY]);
+		//return vec3(0,0,0);
 	}
-	else {
-		//return getVec(UV2,SC_HC_FaceX[faceX]);
+	else if (faceX == 2.0) {
+		return getVec(UV2,0);
+	}
+	else if (faceX == 3.0) {
+		return getVec(UV2,5);
 	}
 
-
-	return vec2(0,0,0);
+	return vec3(0.0,0.0,1.0);
 }
 
 vec3 getVecVCrossCubeMap(vec2 UV){
+	return vec3(0,0,0);
 
 }
 
 vec3 getVecLLCubeMap(vec2 UV){
+	return vec3(0,0,0);
 
 }
 
 vec3 getVecLPCubeMap(vec2 UV){
+	return vec3(0,0,0);
 
 }
 
 vec3 getVecDPCubeMap(vec2 UV){
+	return vec3(0,0,0);
 
 }
 
 vec3 getVecSPCubeMap(vec2 UV){
+	return vec3(0,0,0);
 
 }
 
@@ -175,16 +199,16 @@ vec2 getLPMapping_VEC2UV(vec3 vec) //Use for create LP map
 
 	else {
 		th = sqrt(vec.x * vec.x + vec.y * vec.y);
-		if(vec.z < 0.0f) {
+		if(vec.z < 0.0) {
 			la = asin(th);
-			lr = (A_PI - la) * A_1D_PI;
+			lr = (SC_PI - la) * SC_1D_PI;
 			UV.y = lr * (vec.y / th);
 			UV.x = lr * (vec.x / th);
 		}
 
 		else{
 			la = asin(th);
-			lr = la * A_1D_PI;
+			lr = la * SC_1D_PI;
 			UV.y = lr * (vec.y / th);
 			UV.x = lr* (vec.x / th);
 		}
@@ -195,9 +219,9 @@ vec2 getLPMapping_VEC2UV(vec3 vec) //Use for create LP map
 	//From -1 to 1 move to 0 to 1 range
 	UV = (UV + 1.0) * 0.5;
 
-	if(mode > 0.9){ //sky to cube
-		UV.x = (1.0 - UV.x);
-	}
+	//if(mode > 0.9){ //sky to cube
+	//	UV.x = (1.0 - UV.x);
+	//}
 
 	return UV;
 }
@@ -207,15 +231,15 @@ vec2 getLPMapping_VEC2UV(vec3 vec) //Use for create LP map
 vec2 getDPUVByVec(vec3 vec)
 {
 	vec2 uv;
-	if(vec.z < 0){ // Front
-		uv = vec.xy/(1 - vec.z);
-		uv = (uv + 1) * 0.5; // Range from -1 to 1 to 0 to 1
+	if(vec.z < 0.0){ // Front
+		uv = vec.xy/(1.0 - vec.z);
+		uv = (uv + 1.0) * 0.5; // Range from -1 to 1 to 0 to 1
 		uv.x *= 0.5; // Move to left in texture
 	}
 	else{ // Back
 		vec.y = -vec.y;
-		uv = - vec.xy/(1 + vec.z);
-		uv = (uv + 1) * 0.5; // Range from -1 to 1 to 0 to 1
+		uv = - vec.xy/(1.0 + vec.z);
+		uv = (uv + 1.0) * 0.5; // Range from -1 to 1 to 0 to 1
 		//uv.y = -uv.y;
 		uv.x = (uv.x * 0.5) + 0.5; // Move to right in texture
 	}
@@ -229,23 +253,22 @@ vec3 getVecByDPUV(vec2 uv){
 	vec3 vec;
 	if(uv.x < 0.5){
 		uv.x = uv.x * 2.0;
-		uv = uv * 2 - 1; // Range from 0 to 1 to 1 to -1 (since in unity UV is invert by directX UV)
+		uv = uv * 2.0 - 1.0; // Range from 0 to 1 to 1 to -1 (since in unity UV is invert by directX UV)
 		uv *= 1.2;
-		A = uv.x * uv.x + uv.y * uv.y + 1;
-		vec = vec3(2*uv.x,2*uv.y,(A-2)); // -1+s^2+t^2 = A-2
+		A = uv.x * uv.x + uv.y * uv.y + 1.0;
+		vec = vec3(2.0*uv.x,2.0*uv.y,(A-2.0)); // -1+s^2+t^2 = A-2
 		return (vec/A);
 	}
 	else {
 		uv.x = uv.x * 2.0 - 1.0;
 
-		uv = uv * 2 - 1; // Range from 0 to 1 to 1 to -1 (since in unity UV is invert by directX UV)
+		uv = uv * 2.0 - 1.0; // Range from 0 to 1 to 1 to -1 (since in unity UV is invert by directX UV)
 		uv *= 1.2;
-		A = uv.x * uv.x + uv.y * uv.y + 1;
-		vec = vec3(2*uv.x,-2*uv.y,(A-2)); // -1+s^2+t^2 = A-2
+		A = uv.x * uv.x + uv.y * uv.y + 1.0;
+		vec = vec3(2.0*uv.x,-2.0*uv.y,(A-2.0)); // -1+s^2+t^2 = A-2
 		return (-vec/A);
 	}
 }
-
 
 
 
