@@ -113,6 +113,9 @@ import shadow_vert from './ShaderLib/shadow_vert.glsl';
 
 import SCSL_LL2CUBE_FRAG from './SC_ShaderLib/SCSL_LL2CUBE_FRAG.glsl';
 import SCSL_LL2CUBE_VERT from './SC_ShaderLib/SCSL_LL2CUBE_VERT.glsl';
+
+import SCSL_ENV2HCUBE_FRAG from './SC_ShaderLib/SCSL_ENV2HCUBE_FRAG.glsl';
+import SCSL_RASTER_VERT from './SC_ShaderLib/SCSL_RASTER_VERT.glsl';
 //////////////////////////////////////////////////////
 
 export var ShaderChunk = {
@@ -206,6 +209,10 @@ export var ShaderChunk = {
 	
 	SCSL_LL2CUBE_FRAG: SCSL_LL2CUBE_FRAG,
 	SCSL_LL2CUBE_VERT: SCSL_LL2CUBE_VERT,
+
+	SCSL_ENV2HCUBE_FRAG: SCSL_ENV2HCUBE_FRAG,
+	SCSL_RASTER_VERT: SCSL_RASTER_VERT,
+
 	/////////////////////////////////////////////////////
 
 	cube_frag: cube_frag,
