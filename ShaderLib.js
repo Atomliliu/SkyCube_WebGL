@@ -237,8 +237,20 @@ var ShaderLib = {
 			nFace: { value: 0 }
 		},
 
-		vertexShader: ShaderChunk.SCSL_LL2CUBE_VERT,
+		vertexShader: ShaderChunk.SCSL_RASTER_VERT,
 		fragmentShader: ShaderChunk.SCSL_LL2CUBE_FRAG
+
+	},
+
+	ENV2HCUBE: {
+
+		uniforms: {
+			tCube: { value: null },
+			fFlip: { value: 1 }
+		},
+
+		vertexShader: ShaderChunk.SCSL_RASTER_VERT,
+		fragmentShader: ShaderChunk.SCSL_ENV2HCUBE_FRAG
 
 	}
 	//////////////////////////////////////////////////
