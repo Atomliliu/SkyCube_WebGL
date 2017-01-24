@@ -215,6 +215,7 @@ export var ShaderChunk = {
 
 	/////////////////////////////////////////////////////
 
+	
 	cube_frag: cube_frag,
 	cube_vert: cube_vert,
 	depth_frag: depth_frag,
