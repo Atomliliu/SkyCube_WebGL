@@ -59,11 +59,33 @@
 			var materials = [];
 			var RTTtextures = [];
 			var RTTSize = 1024;
+			var CubeTex;
 
 			init();
 			//render();
 
 			animate();
+
+
+			function getImageData(image) {
+                var canvas = document.createElement('canvas');
+                canvas.width = image.width;
+                canvas.height = image.height;
+
+                var context = canvas.getContext('2d');
+                context.drawImage(image, 0, 0);
+
+                return context.getImageData(0, 0, image.width, image.height);
+            }
+
+
+
+            function getPixel(imagedata, x, y) {
+                var position = (x + imagedata.width * y) * 4, data = imagedata.data;
+                return {r: data[ position ], g: data[ position + 1 ], b: data[ position + 2 ], a: data[ position + 3 ]};
+            }
+
+
 
 			function getTexturesFromAtlasFile( atlasImgUrl, tilesNum ) {
 
@@ -140,29 +162,30 @@
 
 			function UpdateRTT(){
 
-				materialRTT.uniforms.nFace.value = 0;
-				renderer.render( sceneRTT, camRTT, RTTtextures[0], true );
+				//var texturezzz = new THREE.TextureLoader().load( "textures/water.jpg", function ( texture ) {
+				
 
+				for (var i = 0; i < 6; i++){
+					materialRTT.uniforms.nFace.value = i;
+					renderer.render( sceneRTT, camRTT, RTTtextures[i], true );
+					//console.log("RTTtextures["+i+"]"+RTTtextures[i].width);
+					//RTTtextures[i].texture.needsUpdate = true;
 
-				materialRTT.uniforms.nFace.value = 1;
-				renderer.render( sceneRTT, camRTT, RTTtextures[1], true );
+					var imagedata = getImageData(RTTtextures[i]);
+					CubeTex.images[i] = imagedata;
+					//CubeTex.needsUpdate = true;
+				}
 
+				CubeTex.needsUpdate = true;
+				//if ( update ) update( texture );
 
-				uniformsRTT.nFace.value = 2;
-				renderer.render( sceneRTT, camRTT, RTTtextures[2], true );
+				//});
 
+			}
 
-				uniformsRTT.nFace.value = 3;
-				renderer.render( sceneRTT, camRTT, RTTtextures[3], true );
-
-
-				uniformsRTT.nFace.value = 4;
-				renderer.render( sceneRTT, camRTT, RTTtextures[4], true );
-
-
-				uniformsRTT.nFace.value = 5;
-				renderer.render( sceneRTT, camRTT, RTTtextures[5], true );
-
+			function loadCubemapTexture(textureURLs, callback) {
+			    var tex = THREE.ImageUtils.loadTextureCube( textureURLs, undefined, callback );
+			    return tex;
 			}
 
 			function init() {
@@ -171,6 +194,9 @@
 				//var canvas, context;
 				//canvas = document.createElement( 'canvas' );
 				//context = canvas.getContext( '2d' );
+				CubeTex = new THREE.CubeTexture();
+
+
 
 				for ( var i = 0; i < 6; i ++ ) {
 
@@ -182,8 +208,16 @@
 
 
 
+				var textureURLs = [  // URLs of the six faces of the cube map 
 
-
+		            "textures/cube/skybox/px.jpg",
+		            "textures/cube/skybox/nx.jpg",
+		            "textures/cube/skybox/py.jpg",
+		            "textures/cube/skybox/ny.jpg",
+		            "textures/cube/skybox/pz.jpg",
+		            "textures/cube/skybox/nz.jpg"
+		       ];
+				
 
 
 
@@ -314,28 +348,27 @@
 				//RTT
 				var LLTex = new THREE.TextureLoader().load( 'textures/2294472375_24a3b8ef46_o.jpg', function() {
 					renderer.clear();
+					UpdateRTT();
+
+					/*
 					materialRTT.uniforms.nFace.value = 0;
 					renderer.render( sceneRTT, camRTT, RTTtextures[0], true );
 	
-
-					uniformsRTT.nFace.value = 1;
+					materialRTT.uniforms.nFace.value = 1;
 					renderer.render( sceneRTT, camRTT, RTTtextures[1], true );
 
-
-					uniformsRTT.nFace.value = 2;
+					materialRTT.uniforms.nFace.value = 2;
 					renderer.render( sceneRTT, camRTT, RTTtextures[2], true );
 	
-
-					uniformsRTT.nFace.value = 3;
+					materialRTT.uniforms.nFace.value = 3;
 					renderer.render( sceneRTT, camRTT, RTTtextures[3], true );
 
-
-					uniformsRTT.nFace.value = 4;
+					materialRTT.uniforms.nFace.value = 4;
 					renderer.render( sceneRTT, camRTT, RTTtextures[4], true );
 
-
-					uniformsRTT.nFace.value = 5;
+					materialRTT.uniforms.nFace.value = 5;
 					renderer.render( sceneRTT, camRTT, RTTtextures[5], true );
+					*/
 
 				});
 				//shaderRTT = THREE.SCSL_LL2CUBE2;
@@ -354,7 +387,21 @@
 				//materialRTT = new THREE.MeshBasicMaterial( { map: LLTex } ) 
 
 				//RTTex = RTT(materialRTT);
-				
+				var texture2 = loadCubemapTexture(textureURLs, update);
+
+				var shader2 = THREE.ShaderLib["cube"];
+				var uniforms2 = THREE.UniformsUtils.clone( shader2.uniforms );
+				uniforms2.tCube.value = CubeTex;
+				uniforms2.tFlip.value = 1;
+				var material2 = new THREE.ShaderMaterial( {
+
+					uniforms: uniforms2,
+					vertexShader: shader2.vertexShader,
+					fragmentShader: shader2.fragmentShader
+
+				} );
+
+
 
 
 				camRTT = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
@@ -403,13 +450,13 @@
 					//materials.push( new THREE.MeshBasicMaterial( { map:textures[i]} ) );
 					materials.push( new THREE.MeshBasicMaterial( { map: RTTtextures[ i ]} ) );
 
-					//materials.push(materialRTT);
+					//materials.push(material2);
 
 				}
 
 				var skyBox = new THREE.Mesh( new THREE.CubeGeometry( 1000, 1000, 1000 ), new THREE.MeshFaceMaterial( materials ) );
 				skyBox.applyMatrix( new THREE.Matrix4().makeScale( 1, 1, - 1 ) );
-				scene.add( skyBox );
+				//scene.add( skyBox );
 
 
 				
@@ -425,9 +472,9 @@
 				} );
 
 
-				mesh = new THREE.Mesh( geometry, material );
+				mesh = new THREE.Mesh( geometry, material2 );
 
-				//scene.add( mesh );
+				scene.add( mesh );
 
 				//////////////////////////////Test
 
