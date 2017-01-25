@@ -151,6 +151,24 @@
 
 			}
 
+			function loadTextures(textureURLs, callback) {
+			   var loaded = 0;
+			   function loadedOne() {
+			       loaded++;
+			       if (callback && loaded == textureURLs.length) {
+			           for (var i = 0; i < textureURLs; i++)
+			               textures[i].needsUpdate = true;
+			           callback();
+			       }
+			   }
+			   var textures = [];
+			   for (var i = 0; i < textureURLs.length; i++) {
+			       var tex = THREE.ImageUtils.loadTexture( textureURLs[i], undefined, loadedOne );
+			       textures.push(tex);
+			   }
+			   return textures;
+			}
+
 			function loadCubemapTexture(textureURLs, callback) {
 			    var tex = THREE.ImageUtils.loadTextureCube( textureURLs, undefined, callback );
 			    return tex;
@@ -415,12 +433,12 @@
 				var textures = getTexturesFromAtlasFile("textures/cube/sun_temple_stripe.jpg", 6 );
 				//textures[0] = RTTex.texture; //size not same
 
-				
+				var textures2 = loadTextures(textureURLs, render);
 
 				for ( var i = 0; i < 6; i ++ ) {
 
-					//materials.push( new THREE.MeshBasicMaterial( { map:textures[i]} ) );
-					materials.push( new THREE.MeshBasicMaterial( { map: RTTtextures[ i ]} ) );
+					materials.push( new THREE.MeshBasicMaterial( { map:textures2[i]} ) );
+					//materials.push( new THREE.MeshBasicMaterial( { map: RTTtextures[ i ]} ) );
 
 					//materials.push(material2);
 
