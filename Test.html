@@ -61,6 +61,8 @@
 			var RTTSize = 1024;
 			var CubeTex;
 
+			var WebGLCubeMapIndex = [];
+
 			init();
 			//render();
 
@@ -124,41 +126,7 @@
 
 			}
 
-			//function getTexFromRTT() {
 
-			//}
-
-			/*function RTT( matRTT ) {
-				var camRTT = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
-				camRTT.position.z = 100;
-
-				var sceneRTT = new THREE.Scene();
-				rtTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBFormat } );
-
-
-				//var uniforms = THREE.UniformsUtils.clone( shaderObj.uniforms );
-
-
-				var plane = new THREE.PlaneBufferGeometry( window.innerWidth, window.innerHeight );
-
-				var quad = new THREE.Mesh( plane, matRTT );
-				quad.position.z = -100;
-				sceneRTT.add( quad );
-
-
-				var rendererRTT = new THREE.WebGLRenderer();
-				rendererRTT.setPixelRatio( window.devicePixelRatio );
-				rendererRTT.setSize( window.innerWidth, window.innerHeight );
-
-				rendererRTT.clear();
-
-				// Render first scene into texture
-				console.log(rendererRTT.render( sceneRTT, camRTT, rtTexture, true ));
-				
-
-				return rtTexture;
-
-			}*/
 
 			function UpdateRTT(){
 
@@ -171,12 +139,12 @@
 					//console.log("RTTtextures["+i+"]"+RTTtextures[i].width);
 					//RTTtextures[i].texture.needsUpdate = true;
 
-					var imagedata = getImageData(RTTtextures[i]);
-					CubeTex.images[i] = imagedata;
+					//var imagedata = getImageData(RTTtextures[i]);
+					//CubeTex.images[i] = imagedata;
 					//CubeTex.needsUpdate = true;
 				}
 
-				CubeTex.needsUpdate = true;
+				//CubeTex.needsUpdate = true;
 				//if ( update ) update( texture );
 
 				//});
@@ -194,7 +162,8 @@
 				//var canvas, context;
 				//canvas = document.createElement( 'canvas' );
 				//context = canvas.getContext( '2d' );
-				CubeTex = new THREE.CubeTexture();
+				//CubeTex = new THREE.CubeTexture();
+				CubeTex = new THREE.SC_CubeMap(RTTSize);
 
 
 
@@ -347,8 +316,11 @@
 
 				//RTT
 				var LLTex = new THREE.TextureLoader().load( 'textures/2294472375_24a3b8ef46_o.jpg', function() {
-					renderer.clear();
+					//renderer.clear();
 					UpdateRTT();
+
+					//renderer, scene, cam, mat, matFaceVal
+					CubeTex.updateCubeMap( renderer, sceneRTT, camRTT, materialRTT, materialRTT.uniforms.nFace);
 
 					/*
 					materialRTT.uniforms.nFace.value = 0;
@@ -391,8 +363,8 @@
 
 				var shader2 = THREE.ShaderLib["cube"];
 				var uniforms2 = THREE.UniformsUtils.clone( shader2.uniforms );
-				uniforms2.tCube.value = CubeTex;
-				uniforms2.tFlip.value = 1;
+				uniforms2.tCube.value = CubeTex.renderTarget;
+				uniforms2.tFlip.value = 1.0;
 				var material2 = new THREE.ShaderMaterial( {
 
 					uniforms: uniforms2,
@@ -455,13 +427,14 @@
 				}
 
 				var skyBox = new THREE.Mesh( new THREE.CubeGeometry( 1000, 1000, 1000 ), new THREE.MeshFaceMaterial( materials ) );
-				skyBox.applyMatrix( new THREE.Matrix4().makeScale( 1, 1, - 1 ) );
+				skyBox.applyMatrix( new THREE.Matrix4().makeScale( 1, 1,  -1 ) );
 				//scene.add( skyBox );
 
 
 				
 
 				//////////////////////////////Test
+
 
 				uniforms.tRGBMSampler.value = RGBMTex;
 
@@ -473,6 +446,7 @@
 
 
 				mesh = new THREE.Mesh( geometry, material2 );
+				var mesh2 = new THREE.Mesh( new THREE.CubeGeometry( 100, 100, 100 ), material2 );
 
 				scene.add( mesh );
 
