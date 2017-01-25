@@ -30,10 +30,10 @@ function SC_CubeMap( cubeResolution ) {
 
 		renderTarget.texture.generateMipmaps = false;
 
-		if (cam === undefined) {
+		/*if (cam === undefined) {
 			cam = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
 			cam.position.z = 100;
-		}
+		}*/
 		
 
 		for (var i = 0; i < 6; i++){
