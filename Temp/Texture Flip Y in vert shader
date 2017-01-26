@@ -1,0 +1,47 @@
+http://stackoverflow.com/questions/35598494/webgl-texture-flip-horizontally
+1
+down vote
+The better question is what are you trying to do. You say you want to flip the texture. Why? What are you trying to accomplish?
+
+There are tons of ways to draw a texture flipped. Drawing a certain direction does not require flipping a texture's data. Say you're drawing a rectangle with a texture on it. You could
+
+Draw the rectangle flipped.
+Scale it by -1 in X.
+Change the texture coordinates in the data
+Manipulate the texture coordinates in the shader
+All of those are arguably faster and more useful than trying to actually flip the texture data. Today you ask how to x-flip the data. Tomorrow you'll ask how to rotate the data. You don't generally x-flip or rotate textures, you manipulate vertices and/or texture coordinates.
+
+So again, what are you actually trying to accomplish that you think x-flipping the texture data will solve?
+
+Old fixed function OpenGL had a texture matrix which corresponds to the last idea above. You might have a vertex shader like this
+
+attribute vec4 position;
+attribute vec2 texcoord;
+
+uniform mat4 matrix;
+
+varying vec2 v_texcoord;
+
+void main() {
+  gl_Position = matrix * position;
+
+  // pass through to fragment shader
+  v_texcoord = texcoord;  
+}
+You can just add a texture matrix like this
+
+attribute vec4 position;
+attribute vec2 texcoord;
+
+uniform mat4 matrix;
+uniform mat4 textureMatrix;  // ADDED!!
+
+varying vec2 v_texcoord;
+
+void main() {
+  gl_Position = matrix * position;
+
+  // pass through to fragment shader after
+  // multiplying by texture matrix
+  v_texcoord = (textureMatrix * vec4(texcoord, 0, 1)).xy;  // CHANGED !!
+}
