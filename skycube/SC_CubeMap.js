@@ -1,6 +1,6 @@
 import { Object3D } from '../core/Object3D';
 import { WebGLRenderTargetCube } from '../renderers/WebGLRenderTargetCube';
-import { LinearFilter, RGBFormat } from '../constants';
+import { LinearFilter, NearestFilter, RGBFormat } from '../constants';
 import { Vector3 } from '../math/Vector3';
 import { PerspectiveCamera } from '../cameras/OrthographicCamera';
 
@@ -17,7 +17,7 @@ function SC_CubeMap( cubeResolution ) {
 
 	this.type = 'SC_CubeMap';
 
-	var options = { format: RGBFormat, magFilter: LinearFilter, minFilter: LinearFilter };
+	var options = { minFilter: LinearFilter, magFilter: NearestFilter, format: RGBFormat };
 
 	this.renderTarget = new WebGLRenderTargetCube( cubeResolution, cubeResolution, options );
 
