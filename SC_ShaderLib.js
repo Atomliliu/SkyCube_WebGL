@@ -1,6 +1,7 @@
 import { ShaderChunk } from './ShaderChunk';
 //import { SC_ShaderChunk } from './SC_ShaderChunk';
 import { UniformsUtils } from './UniformsUtils';
+import { Vector2 } from '../../math/Vector2';
 import { Vector3 } from '../../math/Vector3';
 import { UniformsLib } from './UniformsLib';
 import { Color } from '../../math/Color';
@@ -233,6 +234,7 @@ var ShaderLib = {
 	LL2CUBE: {
 
 		uniforms: {
+			vUvFlip: { value: new Vector2(0,0) },
 			tSampler: { value: null },
 			nFace: { value: 0 }
 		},
@@ -245,12 +247,26 @@ var ShaderLib = {
 	ENV2HCUBE: {
 
 		uniforms: {
+			vUvFlip: { value: new Vector2(0,0) },
 			tCube: { value: null },
 			fFlip: { value: 1 }
 		},
 
 		vertexShader: ShaderChunk.SCSL_RASTER_VERT,
 		fragmentShader: ShaderChunk.SCSL_ENV2HCUBE_FRAG
+
+	},
+
+	ENV2HCC: {
+
+		uniforms: {
+			vUvFlip: { value: new Vector2(0,0) },
+			tCube: { value: null },
+			fFlip: { value: 1 }
+		},
+
+		vertexShader: ShaderChunk.SCSL_RASTER_VERT,
+		fragmentShader: ShaderChunk.SCSL_ENV2HCC_FRAG
 
 	}
 	//////////////////////////////////////////////////
