@@ -1,0 +1,65 @@
+http://stackoverflow.com/questions/23999954/texture-to-data-uri-in-three-js
+
+Since you asked specifically for the render to texture case, there's a function for that in another answer: http://stackoverflow.com/a/18804083/3640489
+
+Suppose you have a THREE.WebGLRenderTarget defined like so:
+
+var renderTarget = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, { 
+    minFilter: THREE.NearestFilter, 
+    magFilter: THREE.NearestFilter, 
+    format: THREE.RGBAFormat 
+});
+Then you get the WebGLRenderingContext from the renderer and call the function:
+
+var gl = renderer.getContext();
+var webglTexture = renderTarget.__webglTexture;
+var img = createImageFromTexture(gl, webglTexture, width, height);
+shareimprove this answer
+answered Jun 3 '14 at 9:24
+
+timeinvariant
+865
+add a comment
+
+up vote
+1
+down vote
+accepted
+Thanks guys for the help. I have figured out one solution. Probably it could be done simpler, but this solution works and looks quite fast.
+
+RTT
+
+this.renderer.render(this.scene, camera, this.rttTexture, true);
+Get scene data.
+
+this.pixelsIn = new Uint8Array(4 * 1024 * 1024);
+var gl = this.renderer.context;
+var framebuffer = this.rttTexture.__webglFramebuffer;
+gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+gl.viewport(0, 0, 1024, 1024);
+gl.readPixels(0, 0, 1024, 1024, gl.RGBA, gl.UNSIGNED_BYTE, this.pixelsIn);
+gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+Create 2d context.
+
+this.printScreenCanvas = document.createElement("canvas");
+this.printScreenCanvas.width = 1024;
+this.printScreenCanvas.height = 1024;
+this.printScreenContext = this.printScreenCanvas.getContext('2d');
+Create storage for 2d context.
+
+this.pixelsOut = this.printScreenContext.createImageData(1024, 1024);
+Must convert data + flip Y.
+
+var row, col, k = 4*1024;
+for(var i=0; i<this.pixelsIn.length; i++) {
+    row = Math.floor(i/k);
+    col = i % k;
+    this.pixelsOut.data[(1023-row)*k+col] = this.pixelsIn[i];
+}
+Store data in 2d context.
+
+this.printScreenContext.putImageData(this.pixelsOut,0,0);
+Get data URI data.
+
+return this.printScreenCanvas.toDataURL();
+shareimprove this answer
