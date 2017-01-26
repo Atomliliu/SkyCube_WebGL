@@ -1,3 +1,67 @@
+//SkyCube Three Function Libs
+
+
+function getImageData(image) {
+    var canvas = document.createElement('canvas');
+    canvas.width = image.width;
+    canvas.height = image.height;
+
+    var context = canvas.getContext('2d');
+    context.drawImage(image, 0, 0);
+
+    return context.getImageData(0, 0, image.width, image.height);
+}
+
+
+
+function getPixel(imagedata, x, y) {
+    var position = (x + imagedata.width * y) * 4, data = imagedata.data;
+    return {r: data[ position ], g: data[ position + 1 ], b: data[ position + 2 ], a: data[ position + 3 ]};
+}
+
+
+/*
+function UpdateRTT(){
+
+	//var texturezzz = new THREE.TextureLoader().load( "textures/water.jpg", function ( texture ) {
+	
+
+	for (var i = 0; i < 6; i++){
+		materialRTT.uniforms.nFace.value = i;
+		renderer.render( sceneRTT, camRTT, RTTtextures[i], true );
+	}
+
+
+}
+*/
+
+
+function loadTextures(textureURLs, callback) {
+   var loaded = 0;
+   function loadedOne() {
+       loaded++;
+       if (callback && loaded == textureURLs.length) {
+           for (var i = 0; i < textureURLs; i++)
+               textures[i].needsUpdate = true;
+           callback();
+       }
+   }
+   var textures = [];
+   for (var i = 0; i < textureURLs.length; i++) {
+       var tex = THREE.ImageUtils.loadTexture( textureURLs[i], undefined, loadedOne );
+       textures.push(tex);
+   }
+   return textures;
+}
+
+function loadCubemapTexture(textureURLs, callback) {
+    var tex = THREE.ImageUtils.loadTextureCube( textureURLs, undefined, callback );
+    return tex;
+}
+
+
+
+
 function getTexturesFromAtlasFile( atlasImgUrl, tilesNum ) {
 
 	var textures = [];
@@ -12,17 +76,54 @@ function getTexturesFromAtlasFile( atlasImgUrl, tilesNum ) {
 
 	imageObj.onload = function() {
 
-		var canvas, context;
+		var context,canvasObj;
 		var tileWidth = imageObj.height;
 
 		for ( var i = 0; i < textures.length; i ++ ) {
 
-			canvas = document.createElement( 'canvas' );
-			context = canvas.getContext( '2d' );
-			canvas.height = tileWidth;
-			canvas.width = tileWidth;
+			canvasObj = document.createElement( 'canvas' );
+			context = canvasObj.getContext( '2d' );
+			canvasObj.height = tileWidth;
+			canvasObj.width = tileWidth;
 			context.drawImage( imageObj, tileWidth * i, 0, tileWidth, tileWidth, 0, 0, tileWidth, tileWidth );
-			textures[ i ].image = canvas
+			textures[ i ].image = canvasObj
+			textures[ i ].needsUpdate = true;
+
+		}
+
+	};
+
+	imageObj.src = atlasImgUrl;
+
+	return textures;
+
+}
+
+function getTexturesFromAtlasFile3( canvasObj, contextObj, atlasImgUrl, tilesNum ) {
+
+	var textures = [];
+
+	for ( var i = 0; i < tilesNum; i ++ ) {
+
+		textures[ i ] = new THREE.Texture();
+
+	}
+
+	var imageObj = new Image();
+
+	imageObj.onload = function() {
+
+		var context,canvasObj;
+		var tileWidth = imageObj.height;
+
+		for ( var i = 0; i < textures.length; i ++ ) {
+
+			canvasObj = document.createElement( 'canvas' );
+			context = canvasObj.getContext( '2d' );
+			canvasObj.height = tileWidth;
+			canvasObj.width = tileWidth;
+			context.drawImage( imageObj, tileWidth * i, 0, tileWidth, tileWidth, 0, 0, tileWidth, tileWidth );
+			textures[ i ].image = canvasObj
 			textures[ i ].needsUpdate = true;
 
 		}
