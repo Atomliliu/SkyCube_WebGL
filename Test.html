@@ -366,6 +366,7 @@
 				uniformsRTT = THREE.UniformsUtils.clone( shaderRTT.uniforms );
 				uniformsRTT.tSampler.value = LLTex;
 				uniformsRTT.nFace.value = 0;
+				uniformsRTT.vUvFlip.value = new THREE.Vector2(0.0,1.0);
 				materialRTT = new THREE.ShaderMaterial( {
 
 					uniforms: uniformsRTT,
@@ -395,6 +396,7 @@
 
 
 				camRTT = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
+				//camRTT.up.set( 0, - 1, 0 );
 				camRTT.position.z = 100;
 
 				sceneRTT = new THREE.Scene();
