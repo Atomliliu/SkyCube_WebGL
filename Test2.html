@@ -155,6 +155,8 @@
 					vertexShader: shaderUI2.vertexShader,
 					fragmentShader: shaderUI2.fragmentShader
 				} );
+				materialUI2.transparent = true;
+				materialUI2.opacity = 0.0;
 
 				//////////////////////////////////////
 
@@ -315,9 +317,12 @@
 					var reader = new FileReader();
 					reader.addEventListener( 'load', function ( event ) {
 
-						uniformsRTT.tSampler.value.image.src = event.target.result;
-						uniformsRTT.tSampler.needsUpdate = true;
+						materialRTT.uniforms.tSampler.value.image.src = event.target.result;
+						materialRTT.uniforms.tSampler.value.needsUpdate = true;
 						CubeTex.updateCubeMap( renderer, sceneRTT, camRTT, materialRTT, materialRTT.uniforms.nFace);
+						//materialSkyBox.uniforms.tCube.value.needsUpdate = true;
+						//uniformsCubeEnv.tCube.needsUpdate = true;
+						console.log("LOADED");
 
 					}, false );
 					reader.readAsDataURL( event.dataTransfer.files[ 0 ] );
