@@ -1,0 +1,14 @@
+2017 01 27
+
+Drag in issue:
+Drag in didn't work when use texture for rendertarget. After a lot tests in Test.html I found I used a wrong way to update texture in material.
+For regular texture and material it should like:
+material.map.image.src = event.target.result;
+material.map.needsUpdate = true;
+
+For the shader material it should like: 
+materialUI.uniforms.tSampler.value.image.src = event.target.result;
+materialUI.uniforms.tSampler.value.needsUpdate = true;
+
+I forgot .value before .needsUpdate so it didn't work.
+The .needsUpdate only can be use on material which texture changed. For rendertarget texture, if still use same rendertarget you should not use .needsUpdate to update it.
