@@ -85,8 +85,8 @@ vec3 getVecHCrossCubeMap(vec2 UV){
 	vec2 UV2 = UV;
 	UV2 = clamp(UV2,0.0,1.0);
 
-	UV2.x *= 3.0;
-	UV2.y *= 4.0;
+	UV2.x *= 4.0;
+	UV2.y *= 3.0;
 
 	float faceX = floor(UV2.x);
 	float faceY = floor(UV2.y);
@@ -94,7 +94,7 @@ vec3 getVecHCrossCubeMap(vec2 UV){
 	UV2.x = clamp(UV2.x - faceX,0.0,1.0);
 	UV2.y = clamp(UV2.y - faceY,0.0,1.0);
 
-	if (faceX == 0.0) {
+	if (faceX == 0.0 && faceY == 1.0) {
 		return getVec(UV2,1);
 	}
 	else if (faceX == 1.0) {
@@ -110,14 +110,14 @@ vec3 getVecHCrossCubeMap(vec2 UV){
 		//return getVec(UV2,SC_HC_FaceY[faceY]);
 		//return vec3(0,0,0);
 	}
-	else if (faceX == 2.0) {
+	else if (faceX == 2.0 && faceY == 1.0) {
 		return getVec(UV2,0);
 	}
-	else if (faceX == 3.0) {
+	else if (faceX == 3.0 && faceY == 1.0) {
 		return getVec(UV2,5);
 	}
 
-	return vec3(0.0,0.0,1.0);
+	return vec3(0.0,0.0,0.0);
 }
 
 vec3 getVecVCrossCubeMap(vec2 UV){
