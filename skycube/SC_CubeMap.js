@@ -44,6 +44,7 @@ function SC_CubeMap( cubeResolution ) {
 			//console.log("RTTtextures["+i+"]"+RTTtextures[i].width);
 			//RTTtextures[i].texture.needsUpdate = true;
 		}
+		//renderTarget.texture.needsUpdate = true;
 
 		renderer.setRenderTarget( null );
 
