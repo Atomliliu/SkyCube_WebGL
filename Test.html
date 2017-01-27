@@ -286,6 +286,8 @@
 				// Create plane to render the HUD. This plane fill the whole screen.
 				var HUDplaneGeometry = new THREE.PlaneGeometry( hudWidth, hudHeight );
   				var HUDplane = new THREE.Mesh( HUDplaneGeometry, materialUI );
+  				//var mmm = new THREE.MeshBasicMaterial( { map: RGBMTexUI} );
+  				//var HUDplane = new THREE.Mesh( HUDplaneGeometry, mmm );
   				sceneHUD.add( HUDplane );
 
 
@@ -338,7 +340,7 @@
 					UpdateRTT();
 
 					//renderer, scene, cam, mat, matFaceVal
-					CubeTex.updateCubeMap( renderer, sceneRTT, camRTT, materialRTT, materialRTT.uniforms.nFace);
+					//CubeTex.updateCubeMap( renderer, sceneRTT, camRTT, materialRTT, materialRTT.uniforms.nFace);
 
 					/*
 					materialRTT.uniforms.nFace.value = 0;
@@ -439,8 +441,8 @@
 
 				for ( var i = 0; i < 6; i ++ ) {
 
-					materials.push( new THREE.MeshBasicMaterial( { map:textures2[i]} ) );
-					//materials.push( new THREE.MeshBasicMaterial( { map: RTTtextures[ i ]} ) );
+					//materials.push( new THREE.MeshBasicMaterial( { map:textures2[i]} ) );
+					materials.push( new THREE.MeshBasicMaterial( { map: RTTtextures[ i ].texture} ) );
 
 					//materials.push(material2);
 
@@ -448,7 +450,7 @@
 
 				var skyBox = new THREE.Mesh( new THREE.CubeGeometry( 1000, 1000, 1000 ), new THREE.MeshFaceMaterial( materials ) );
 				skyBox.applyMatrix( new THREE.Matrix4().makeScale( 1, 1,  -1 ) );
-				//scene.add( skyBox );
+				scene.add( skyBox );
 
 
 				
@@ -468,7 +470,7 @@
 				mesh = new THREE.Mesh( geometry, material2 );
 				var mesh2 = new THREE.Mesh( new THREE.CubeGeometry( 100, 100, 100 ), material2 );
 
-				scene.add( mesh );
+				//scene.add( mesh );
 
 				//////////////////////////////Test
 
@@ -502,8 +504,25 @@
 					var reader = new FileReader();
 					reader.addEventListener( 'load', function ( event ) {
 
-						uniformsRTT.tSampler.value.image.src = event.target.result;
-						uniformsRTT.tSampler.needsUpdate = true;
+						materialUI.uniforms.tSampler.value.image.src = event.target.result;
+						materialUI.uniforms.tSampler.value.needsUpdate = true;
+						//console.log(materialUI.uniforms.tSampler.value.image.src);
+
+						//uniformsUI.tSampler.value.image.src = event.target.result;
+						//uniformsUI.tSampler.needsUpdate = true;
+
+						//mmm.map.image.src = event.target.result;
+						//mmm.map.needsUpdate = true;
+
+						//uniformsRTT.tSampler.value.image.src = event.target.result;
+						//uniformsRTT.tSampler.needsUpdate = true;
+						//UpdateRTT();
+
+						//materials[0].map.needsUpdate = true;
+						//materials[1].map.needsUpdate = true;
+						//materials[2].map.needsUpdate = true;
+						//materials[3].map.needsUpdate = true;
+						
 
 						//update2();
 						//materials[0].map.needsUpdate = true;
@@ -625,7 +644,7 @@
 				renderer.render( scene, camera );
 				//renderer.setClearColor( 0x000000, 0 ); // the default
 				renderer.render( sceneHUD, cameraHUD );
-
+				//console.log("HUD");
 			}
 
 			function render() {
