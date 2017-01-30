@@ -59,7 +59,7 @@
 			var materials = [];
 			var RTTtextures = [];
 			var RTTSize = 1024;
-			var CubeTex;
+			var texCube;
 
 			var WebGLCubeMapIndex = [];
 
@@ -140,11 +140,11 @@
 					//RTTtextures[i].texture.needsUpdate = true;
 
 					//var imagedata = getImageData(RTTtextures[i]);
-					//CubeTex.images[i] = imagedata;
-					//CubeTex.needsUpdate = true;
+					//texCube.images[i] = imagedata;
+					//texCube.needsUpdate = true;
 				}
 
-				//CubeTex.needsUpdate = true;
+				//texCube.needsUpdate = true;
 				//if ( update ) update( texture );
 
 				//});
@@ -180,8 +180,8 @@
 				//var canvas, context;
 				//canvas = document.createElement( 'canvas' );
 				//context = canvas.getContext( '2d' );
-				//CubeTex = new THREE.CubeTexture();
-				CubeTex = new THREE.SC_CubeMap(RTTSize);
+				//texCube = new THREE.texCubeture();
+				texCube = new THREE.SC_CubeMap(RTTSize);
 
 
 
@@ -340,7 +340,7 @@
 					UpdateRTT();
 
 					//renderer, scene, cam, mat, matFaceVal
-					//CubeTex.updateCubeMap( renderer, sceneRTT, camRTT, materialRTT, materialRTT.uniforms.nFace);
+					//texCube.updateCubeMap( renderer, sceneRTT, camRTT, materialRTT, materialRTT.uniforms.nFace);
 
 					/*
 					materialRTT.uniforms.nFace.value = 0;
@@ -384,7 +384,7 @@
 
 				var shader2 = THREE.ShaderLib["cube"];
 				var uniforms2 = THREE.UniformsUtils.clone( shader2.uniforms );
-				uniforms2.tCube.value = CubeTex.renderTarget;
+				uniforms2.tCube.value = texCube.renderTarget;
 				uniforms2.tFlip.value = 1.0;
 				var material2 = new THREE.ShaderMaterial( {
 
