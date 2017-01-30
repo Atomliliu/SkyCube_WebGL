@@ -1,3 +1,5 @@
+//Texture coordination (0,0) is bottom left
+
 #define SC_PI		3.14159265358 
 #define SC_1D_PI		0.31830988618 
 
@@ -55,7 +57,7 @@ vec3 getVec(vec2 UV, int face){
 }
 
 
-
+//Horizon Linear CubeMap
 vec3 getVecHorizonCubeMap(vec2 UV){
 	vec2 UV2 = UV;
 	//UV2.x = clamp(UV2.x,0.0,1.0);
@@ -69,6 +71,7 @@ vec3 getVecHorizonCubeMap(vec2 UV){
 	
 }
 
+//Vertical Linear CubeMap
 vec3 getVecVerticalCubeMap(vec2 UV){
 	vec2 UV2 = UV;
 	UV2 = clamp(UV2,0.0,1.0);
@@ -79,6 +82,7 @@ vec3 getVecVerticalCubeMap(vec2 UV){
 	return getVec(UV2,int(face));
 }
 
+//Horizon Cross CubeMap
 vec3 getVecHCrossCubeMap(vec2 UV){
 	//int SC_HC_FaceX[4];// = {1,4,0,5};
 	//const int SC_HC_FaceY[3] = int[3](2,4,3);
@@ -99,10 +103,10 @@ vec3 getVecHCrossCubeMap(vec2 UV){
 	}
 	else if (faceX == 1.0) {
 		if (faceY == 0.0) {
-			return getVec(UV2,2);
+			return getVec(UV2,3);
 		}
 		else if (faceY == 2.0) {
-			return getVec(UV2,3);
+			return getVec(UV2,2);
 		}
 		else {
 			return getVec(UV2,4);
@@ -120,16 +124,54 @@ vec3 getVecHCrossCubeMap(vec2 UV){
 	return vec3(0.0,0.0,0.0);
 }
 
+//Vertical Cross CubeMap
 vec3 getVecVCrossCubeMap(vec2 UV){
-	return vec3(0,0,0);
+	vec2 UV2 = UV;
+	UV2 = clamp(UV2,0.0,1.0);
+
+	UV2.x *= 3.0;
+	UV2.y *= 4.0;
+
+	float faceX = floor(UV2.x);
+	float faceY = floor(UV2.y);
+
+	UV2.x = clamp(UV2.x - faceX,0.0,1.0);
+	UV2.y = clamp(UV2.y - faceY,0.0,1.0);
+
+	if (faceX == 0.0 && faceY == 2.0) {
+		return getVec(UV2,1);
+	}
+	else if (faceX == 1.0) {
+		if (faceY == 0.0) {
+			return getVec(UV2,5);
+		}
+		else if (faceY == 1.0) {
+			return getVec(UV2,3);
+		}
+		else if (faceY == 2.0) {
+			return getVec(UV2,4);
+		}
+		else {
+			return getVec(UV2,2);
+		}
+		//return getVec(UV2,SC_HC_FaceY[faceY]);
+		//return vec3(0,0,0);
+	}
+	else if (faceX == 2.0 && faceY == 2.0) {
+		return getVec(UV2,0);
+	}
+
+	return vec3(0.0,0.0,0.0);
 
 }
 
+//LL CubeMap
 vec3 getVecLLCubeMap(vec2 UV){
 	return vec3(0,0,0);
 
 }
 
+//LP CubeMap
 vec3 getVecLPCubeMap(vec2 UV){
 	return vec3(0,0,0);
 
