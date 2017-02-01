@@ -19,6 +19,10 @@ highp float steps[5];// = {0,1,2,3,4};
 
 ////////////////////////////////////////////////////////////////////////////
 
+
+///////////////////////////////////////////////////////////
+/////////////////////UV to Vector//////////////////////////
+
 vec3 getVec(vec2 UV, int face){
 
     highp vec3 VEC;
@@ -56,9 +60,21 @@ vec3 getVec(vec2 UV, int face){
     return normalize(VEC);
 }
 
+//Split CubeMap
+vec3 getVecSplitCubeMap(vec2 UV, int face, int mode){
+	vec2 UV2 = UV;
+	UV2 = clamp(UV2,0.0,1.0);
+
+	if(mode >= 1){
+		UV2.x = 1.0 - UV2.x;
+	}
+
+	return getVec(UV2,face);
+	
+}
 
 //Horizon Linear CubeMap
-vec3 getVecHorizonCubeMap(vec2 UV){
+vec3 getVecHorizonCubeMap(vec2 UV, int mode){
 	vec2 UV2 = UV;
 	//UV2.x = clamp(UV2.x,0.0,1.0);
 	//UV2.y = clamp(UV2.y,0.0,1.0);
@@ -72,7 +88,7 @@ vec3 getVecHorizonCubeMap(vec2 UV){
 }
 
 //Vertical Linear CubeMap
-vec3 getVecVerticalCubeMap(vec2 UV){
+vec3 getVecVerticalCubeMap(vec2 UV, int mode){
 	vec2 UV2 = UV;
 	UV2 = clamp(UV2,0.0,1.0);
 	UV2.y *= 6.0;
@@ -83,7 +99,7 @@ vec3 getVecVerticalCubeMap(vec2 UV){
 }
 
 //Horizon Cross CubeMap
-vec3 getVecHCrossCubeMap(vec2 UV){
+vec3 getVecHCrossCubeMap(vec2 UV, int mode){
 	//int SC_HC_FaceX[4];// = {1,4,0,5};
 	//const int SC_HC_FaceY[3] = int[3](2,4,3);
 	vec2 UV2 = UV;
@@ -125,7 +141,7 @@ vec3 getVecHCrossCubeMap(vec2 UV){
 }
 
 //Vertical Cross CubeMap
-vec3 getVecVCrossCubeMap(vec2 UV){
+vec3 getVecVCrossCubeMap(vec2 UV, int mode){
 	vec2 UV2 = UV;
 	UV2 = clamp(UV2,0.0,1.0);
 
@@ -165,29 +181,78 @@ vec3 getVecVCrossCubeMap(vec2 UV){
 
 }
 
-//LL CubeMap
-vec3 getVecLLCubeMap(vec2 UV){
+//LatLong CubeMap (Latitude/Longitude)
+vec3 getVecLLCubeMap(vec2 UV, int mode){
 	return vec3(0,0,0);
 
 }
 
-//LP CubeMap
-vec3 getVecLPCubeMap(vec2 UV){
+//Light Probe CubeMap (Angular)
+vec3 getVecLPCubeMap(vec2 UV, int mode){
+	vec3 VEC;
+	if(mode >= 1){
+		UV.x = 1.0 - UV.x;
+	}
+	UV = UV * 2.0 - 1.0; // Range to -1 to 1
+
+	float lr = sqrt(UV.x * UV.x + UV.y * UV.y);
+	if(lr == 0.0){
+		VEC.x = 0.0;
+		VEC.y = 0.0;
+		VEC.z = 1.0;
+	}
+	else if(lr<=1.0){
+		float la = SC_PI * lr; // 0-1 to range 0-Pi
+		float th = sin(la);
+		VEC.x = (UV.x/lr)*th;
+		VEC.y = (UV.y/lr)*th;
+		VEC.z = cos(la);
+	}
+	else{//Back
+		VEC.x = 0.0;
+		VEC.y = 0.0;
+		VEC.z = -1.0;
+	}
+
+	return VEC;
+
+}
+
+//Dual-Paraboloid CubeMap (Hemispheres)
+vec3 getVecDPCubeMap(vec2 UV, int mode){
+	float A;
+	vec3 vec;
+	if(uv.x < 0.5){
+		uv.x = uv.x * 2.0;
+		uv = uv * 2.0 - 1.0; // Range from 0 to 1 to 1 to -1 (since in unity UV is invert by directX UV)
+		uv *= 1.2;
+		A = uv.x * uv.x + uv.y * uv.y + 1.0;
+		vec = vec3(2.0*uv.x,2.0*uv.y,(A-2.0)); // -1+s^2+t^2 = A-2
+		return (vec/A);
+	}
+	else {
+		uv.x = uv.x * 2.0 - 1.0;
+
+		uv = uv * 2.0 - 1.0; // Range from 0 to 1 to 1 to -1 (since in unity UV is invert by directX UV)
+		uv *= 1.2;
+		A = uv.x * uv.x + uv.y * uv.y + 1.0;
+		vec = vec3(2.0*uv.x,-2.0*uv.y,(A-2.0)); // -1+s^2+t^2 = A-2
+		return (-vec/A);
+	}
+
+}
+
+
+
+//Spherical Mirrored Probe Cubemap (360x360 degrees)
+vec3 getVecSPCubeMap(vec2 UV, int mode){
 	return vec3(0,0,0);
 
 }
 
-vec3 getVecDPCubeMap(vec2 UV){
-	return vec3(0,0,0);
 
-}
-
-vec3 getVecSPCubeMap(vec2 UV){
-	return vec3(0,0,0);
-
-}
-
-
+///////////////////////////////////////////////////////////
+/////////////////////Vector to UV//////////////////////////
 vec2 getLLMapping_VEC2UV(vec3 vec) //Use for create LP map",
 {
 	vec2 UV;
@@ -290,6 +355,29 @@ vec2 getDPUVByVec(vec3 vec)
 }
 
 
+
+
+
+
+vec3 DecodeRGBM(vec4 rgbm, float maxRange, float lum)
+{
+	return rgbm.rgb * (rgbm.a * maxRange) * lum;
+}
+
+
+
+vec4 EncodeRGBM(vec3 rgb, float maxRange)
+{
+    float maxRGB = max(rgb.x,max(rgb.g,rgb.b));
+    float M = maxRGB / maxRange;
+    M = ceil(M * 255.0) / 255.0;
+    return vec4(rgb / (M * maxRange), M);
+}
+
+
+
+
+/////////////////////////////////////////////////////////
 vec3 getVecByDPUV(vec2 uv){
 	float A;
 	vec3 vec;
@@ -313,18 +401,3 @@ vec3 getVecByDPUV(vec2 uv){
 }
 
 
-
-vec3 DecodeRGBM(vec4 rgbm, float maxRange, float lum)
-{
-	return rgbm.rgb * (rgbm.a * maxRange) * lum;
-}
-
-
-
-vec4 EncodeRGBM(vec3 rgb, float maxRange)
-{
-    float maxRGB = max(rgb.x,max(rgb.g,rgb.b));
-    float M = maxRGB / maxRange;
-    M = ceil(M * 255.0) / 255.0;
-    return vec4(rgb / (M * maxRange), M);
-}
