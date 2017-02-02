@@ -183,7 +183,22 @@ vec3 getVecVCrossCubeMap(vec2 UV, int mode){
 
 //LatLong CubeMap (Latitude/Longitude)
 vec3 getVecLLCubeMap(vec2 UV, int mode){
-	return vec3(0,0,0);
+	vec3 VEC;
+	float uval;
+	if(mode >= 1){
+		uval = 2.0 * SC_PI * (1.0 - UV.x);
+	}
+	else{
+		uval = 2.0 * SC_PI * (UV.x);
+	}
+
+	float vval = SC_PI * (UV.y);
+
+	VEC.x = -sin(uval)*sin(vval);
+	VEC.y = -cos(vval);
+	VEC.z = -(sin(vval)*cos(uval));
+
+	return VEC;
 
 }
 
