@@ -83,6 +83,9 @@ vec3 getVecHorizonCubeMap(vec2 UV, int mode){
 	float face = floor(UV2.x);
 
 	UV2.x = clamp(UV2.x - face,0.0,1.0);
+	if(mode >= 1){
+		UV2.x = 1.0 - UV2.x;
+	}
 	return getVec(UV2,int(face));
 	
 }
@@ -95,6 +98,9 @@ vec3 getVecVerticalCubeMap(vec2 UV, int mode){
 	float face = floor(UV2.y);
 
 	UV2.y = clamp(UV2.y - face,0.0,1.0);
+	if(mode >= 1){
+		UV2.x = 1.0 - UV2.x;
+	}
 	return getVec(UV2,int(face));
 }
 
@@ -113,6 +119,9 @@ vec3 getVecHCrossCubeMap(vec2 UV, int mode){
 
 	UV2.x = clamp(UV2.x - faceX,0.0,1.0);
 	UV2.y = clamp(UV2.y - faceY,0.0,1.0);
+	if(mode >= 1){
+		UV2.x = 1.0 - UV2.x;
+	}
 
 	if (faceX == 0.0 && faceY == 1.0) {
 		return getVec(UV2,1);
@@ -153,8 +162,12 @@ vec3 getVecVCrossCubeMap(vec2 UV, int mode){
 
 	UV2.x = clamp(UV2.x - faceX,0.0,1.0);
 	UV2.y = clamp(UV2.y - faceY,0.0,1.0);
+	if(mode >= 1){
+		UV2.x = 1.0 - UV2.x;
+	}
 
 	if (faceX == 0.0 && faceY == 2.0) {
+		
 		return getVec(UV2,1);
 	}
 	else if (faceX == 1.0) {
@@ -233,25 +246,31 @@ vec3 getVecLPCubeMap(vec2 UV, int mode){
 
 }
 
+
 //Dual-Paraboloid CubeMap (Hemispheres)
 vec3 getVecDPCubeMap(vec2 UV, int mode){
 	float A;
 	vec3 vec;
-	if(uv.x < 0.5){
-		uv.x = uv.x * 2.0;
-		uv = uv * 2.0 - 1.0; // Range from 0 to 1 to 1 to -1 (since in unity UV is invert by directX UV)
-		uv *= 1.2;
-		A = uv.x * uv.x + uv.y * uv.y + 1.0;
-		vec = vec3(2.0*uv.x,2.0*uv.y,(A-2.0)); // -1+s^2+t^2 = A-2
+	if(UV.x < 0.5){
+		UV.x = UV.x * 2.0;
+		if(mode >= 1){ //sky to cube
+			UV.x = (1.0 - UV.x);
+		}
+		UV = UV * 2.0 - 1.0; // Range from 0 to 1 to 1 to -1 (since in unity UV is invert by directX UV)
+		UV *= 1.2;
+		A = UV.x * UV.x + UV.y * UV.y + 1.0;
+		vec = vec3(2.0*UV.x,2.0*UV.y,(A-2.0)); // -1+s^2+t^2 = A-2
 		return (vec/A);
 	}
 	else {
-		uv.x = uv.x * 2.0 - 1.0;
-
-		uv = uv * 2.0 - 1.0; // Range from 0 to 1 to 1 to -1 (since in unity UV is invert by directX UV)
-		uv *= 1.2;
-		A = uv.x * uv.x + uv.y * uv.y + 1.0;
-		vec = vec3(2.0*uv.x,-2.0*uv.y,(A-2.0)); // -1+s^2+t^2 = A-2
+		UV.x = UV.x * 2.0 - 1.0;
+		if(mode >= 1){ //sky to cube
+			UV.x = (1.0 - UV.x);
+		}
+		UV = UV * 2.0 - 1.0; // Range from 0 to 1 to 1 to -1 (since in unity UV is invert by directX UV)
+		UV *= 1.2;
+		A = UV.x * UV.x + UV.y * UV.y + 1.0;
+		vec = vec3(2.0*UV.x,-2.0*UV.y,(A-2.0)); // -1+s^2+t^2 = A-2
 		return (-vec/A);
 	}
 
@@ -259,16 +278,46 @@ vec3 getVecDPCubeMap(vec2 UV, int mode){
 
 
 
-//Spherical Mirrored Probe Cubemap (360x360 degrees)
+
+//Spherical Mirrored Probe Cubemap (360x360 degrees) / AKA Matcap
 vec3 getVecSPCubeMap(vec2 UV, int mode){
-	return vec3(0,0,0);
+	vec3 VEC;
+	if(mode >= 1){
+		UV.x = 1.0 - UV.x;
+	}
+	UV = UV * 2.0 - 1.0; // Range to -1 to 1
+
+	float lr2 = UV.x * UV.x + UV.y * UV.y;
+	float lr = sqrt(lr2);
+	float z = sqrt(1.0-lr2);
+	vec2 xy_lr = vec2(UV.x/lr,UV.y/lr);
+	float vec_Lr = 2.0 * lr * z;
+
+	if(lr == 0.0){
+		VEC.x = 0.0;
+		VEC.y = 0.0;
+		VEC.z = 1.0;
+	}
+
+	else if(lr<=1.0){
+		VEC.x = xy_lr.x * vec_Lr;
+		VEC.y = xy_lr.y * vec_Lr;
+		VEC.z = 1.0 - 2.0*lr2;
+	}
+	else{//Back
+		VEC.x = 0.0;
+		VEC.y = 0.0;
+		VEC.z = -1.0;
+	}
+
+
+	return VEC;
 
 }
 
-
 ///////////////////////////////////////////////////////////
 /////////////////////Vector to UV//////////////////////////
-vec2 getLLMapping_VEC2UV(vec3 vec, float mode) //Use for create LP map",
+vec2 getLLMapping_VEC2UV(vec3 vec, int mode) //Use for create LP map",
 {
 	vec2 UV;
 
@@ -303,8 +352,8 @@ vec2 getLLMapping_VEC2UV(vec3 vec, float mode) //Use for create LP map",
 
 	UV.x = (UV.x + 1.0) * 0.5;
 	
-	if(mode > 0.9f){ //sky to cube
-		UV.x = (1.0f - UV.x);
+	if(mode >= 1){ //sky to cube
+		UV.x = (1.0 - UV.x);
 	}
 
 	return vec2(UV);
@@ -312,7 +361,7 @@ vec2 getLLMapping_VEC2UV(vec3 vec, float mode) //Use for create LP map",
 
 
 
-vec2 getLPMapping_VEC2UV(vec3 vec, float mode) //Use for create LP map
+vec2 getLPMapping_VEC2UV(vec3 vec, int mode) //Use for create LP map
 {
 	vec2 UV;
 	float  th, la, lr, L, P;
@@ -345,30 +394,38 @@ vec2 getLPMapping_VEC2UV(vec3 vec, float mode) //Use for create LP map
 	//From -1 to 1 move to 0 to 1 range
 	UV = (UV + 1.0) * 0.5;
 
-	//if(mode > 0.9){ //sky to cube
-	//	UV.x = (1.0 - UV.x);
-	//}
+	if(mode >= 1){ //sky to cube
+		UV.x = (1.0 - UV.x);
+	}
 
 	return UV;
 }
 
 
 
-vec2 getDPUVByVec(vec3 vec, float mode)
+vec2 getDPUVByVec(vec3 vec, int mode)
 {
 	vec2 uv;
 	if(vec.z < 0.0){ // Front
 		uv = vec.xy/(1.0 - vec.z);
 		uv = (uv + 1.0) * 0.5; // Range from -1 to 1 to 0 to 1
+		if(mode >= 1){ //sky to cube
+			uv.x = (1.0 - uv.x);
+		}
 		uv.x *= 0.5; // Move to left in texture
 	}
 	else{ // Back
 		vec.y = -vec.y;
 		uv = - vec.xy/(1.0 + vec.z);
 		uv = (uv + 1.0) * 0.5; // Range from -1 to 1 to 0 to 1
+		if(mode >= 1){ //sky to cube
+			uv.x = (1.0 - uv.x);
+		}
 		//uv.y = -uv.y;
 		uv.x = (uv.x * 0.5) + 0.5; // Move to right in texture
 	}
+
+
 
 	return uv;
 }
@@ -397,26 +454,5 @@ vec4 EncodeRGBM(vec3 rgb, float maxRange)
 
 
 /////////////////////////////////////////////////////////
-vec3 getVecByDPUV(vec2 uv){
-	float A;
-	vec3 vec;
-	if(uv.x < 0.5){
-		uv.x = uv.x * 2.0;
-		uv = uv * 2.0 - 1.0; // Range from 0 to 1 to 1 to -1 (since in unity UV is invert by directX UV)
-		uv *= 1.2;
-		A = uv.x * uv.x + uv.y * uv.y + 1.0;
-		vec = vec3(2.0*uv.x,2.0*uv.y,(A-2.0)); // -1+s^2+t^2 = A-2
-		return (vec/A);
-	}
-	else {
-		uv.x = uv.x * 2.0 - 1.0;
-
-		uv = uv * 2.0 - 1.0; // Range from 0 to 1 to 1 to -1 (since in unity UV is invert by directX UV)
-		uv *= 1.2;
-		A = uv.x * uv.x + uv.y * uv.y + 1.0;
-		vec = vec3(2.0*uv.x,-2.0*uv.y,(A-2.0)); // -1+s^2+t^2 = A-2
-		return (-vec/A);
-	}
-}
 
 
