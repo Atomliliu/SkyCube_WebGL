@@ -268,7 +268,7 @@ vec3 getVecSPCubeMap(vec2 UV, int mode){
 
 ///////////////////////////////////////////////////////////
 /////////////////////Vector to UV//////////////////////////
-vec2 getLLMapping_VEC2UV(vec3 vec) //Use for create LP map",
+vec2 getLLMapping_VEC2UV(vec3 vec, float mode) //Use for create LP map",
 {
 	vec2 UV;
 
@@ -302,13 +302,17 @@ vec2 getLLMapping_VEC2UV(vec3 vec) //Use for create LP map",
 	}
 
 	UV.x = (UV.x + 1.0) * 0.5;
+	
+	if(mode > 0.9f){ //sky to cube
+		UV.x = (1.0f - UV.x);
+	}
 
 	return vec2(UV);
 }
 
 
 
-vec2 getLPMapping_VEC2UV(vec3 vec) //Use for create LP map
+vec2 getLPMapping_VEC2UV(vec3 vec, float mode) //Use for create LP map
 {
 	vec2 UV;
 	float  th, la, lr, L, P;
@@ -350,7 +354,7 @@ vec2 getLPMapping_VEC2UV(vec3 vec) //Use for create LP map
 
 
 
-vec2 getDPUVByVec(vec3 vec)
+vec2 getDPUVByVec(vec3 vec, float mode)
 {
 	vec2 uv;
 	if(vec.z < 0.0){ // Front
