@@ -64,6 +64,7 @@
 			var camCube, sceneCube;
 
 			var WebGLCubeMapIndex = [];
+			var mouse = new THREE.Vector2(), raycaster, INTERSECTED;
 
 			init();
 			//render();
@@ -73,7 +74,6 @@
 
 
 			function UpdateRTT(){
-
 				//var texturezzz = new THREE.TextureLoader().load( "textures/water.jpg", function ( texture ) {
 
 				for (var i = 0; i < 6; i++){
@@ -88,6 +88,11 @@
 
 
 
+
+			
+
+
+
 			function init() {
 
 				var container, skyBox;
@@ -95,6 +100,8 @@
 				texCube = new THREE.SC_CubeMap(RTTSize);
 
 				camCube = new THREE.CubeCamera( 1, 100000, RTTSize );
+
+				raycaster = new THREE.Raycaster();
 
 
 				for ( var i = 0; i < 6; i ++ ) {
@@ -262,6 +269,7 @@
 				var uniformsUI = THREE.UniformsUtils.clone( shaderUI.uniforms );
 
 				uniformsUI.tCube.value = camCube.renderTarget;
+				uniformsUI.fOpacity.value = 0.5;
 				//uniformsUI.tFlip.value = 1.0;
 
 
@@ -270,6 +278,8 @@
 					vertexShader: shaderUI.vertexShader,
 					fragmentShader: shaderUI.fragmentShader
 				} );
+				materialUI.transparent = true;
+				materialUI.opacity = 0.0;
 
 				//////////////////////////////////////
 
@@ -278,6 +288,7 @@
 				var uniformsUI2 = THREE.UniformsUtils.clone( shaderUI.uniforms );
 
 				uniformsUI2.tCube.value = camCube.renderTarget;
+				uniformsUI2.fOpacity.value = 0.5;
 				//uniformsUI.tFlip.value = 1.0;
 
 
@@ -364,6 +375,10 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				//document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+
+
 				function guiChanged() {
 					//var uniforms = shader.uniforms;
 
@@ -403,9 +418,77 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
+				//Update HUD size here
+
 			}
 
 
+
+			function RaycasterSetup( MouseCoords, CamRay, SceneRay )
+			{
+				// find intersections
+				raycaster.setFromCamera( MouseCoords, CamRay );
+				//var intersects = 
+				return raycaster.intersectObjects( SceneRay.children );
+			}
+
+
+
+
+			function onDocumentMouseMove( event ) {
+				event.preventDefault();
+				mouse.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
+
+				var intersects = RaycasterSetup(mouse, cameraHUD, sceneHUD);
+				//console.log(intersects.length);
+				if ( intersects.length > 0 ) {
+					
+
+					if ( INTERSECTED != intersects[ 0 ].object ) {
+						//console.log(intersects[ 0 ].object);
+
+						//if ( INTERSECTED ) INTERSECTED.material.opacity = 0;
+						if ( INTERSECTED ) INTERSECTED.material.uniforms.fOpacity.value = 0.5;
+						INTERSECTED = intersects[ 0 ].object;
+						//INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
+						INTERSECTED.material.uniforms.fOpacity.value = 1.0;
+
+					}
+				} else {
+					if ( INTERSECTED ) INTERSECTED.material.uniforms.fOpacity.value = 0.5;
+					INTERSECTED = null;
+				}
+
+
+			}
+
+/*
+			function onDocumentMouseDown( event ) {
+				event.preventDefault();
+				mouse.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
+				raycaster.setFromCamera( mouse, camera );
+				var intersects = raycaster.intersectObjects( objects );
+				if ( intersects.length > 0 ) {
+					var intersect = intersects[ 0 ];
+					// delete cube
+					if ( isShiftDown ) {
+						if ( intersect.object != plane ) {
+							scene.remove( intersect.object );
+							objects.splice( objects.indexOf( intersect.object ), 1 );
+						}
+					// create cube
+					} else {
+						var voxel = new THREE.Mesh( cubeGeo, cubeMaterial );
+						voxel.position.copy( intersect.point ).add( intersect.face.normal );
+						voxel.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
+						scene.add( voxel );
+						objects.push( voxel );
+					}
+					render();
+				}
+			}
+
+*/
 
 			function animate() {
 				requestAnimationFrame( animate );
@@ -442,5 +525,6 @@
 		</script>
 	</body>
 </html>
+
 
 
