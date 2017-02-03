@@ -6,9 +6,10 @@ varying vec2 vUv;
 
 //uniform int nFace;
 uniform float fFlip;
+uniform float fOpacity;
 
 void main() {
-	vec3 dir = getVecHCrossCubeMap(vUv);
+	vec3 dir = getVecHCrossCubeMap(vUv, 0);
 	vec4 result = vec4(0,0,0,0);
 	if (dir != vec3(0,0,0)) {
 		result = textureCube( tCube, vec3( fFlip * dir.x, dir.yz ) );
@@ -18,6 +19,6 @@ void main() {
 
 	gl_FragColor = result;
 
-	//gl_FragColor.a *= opacity;
+	gl_FragColor.a *= fOpacity;
 
 }
