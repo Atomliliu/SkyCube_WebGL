@@ -249,11 +249,26 @@ var ShaderLib = {
 		uniforms: {
 			vUvFlip: { value: new Vector2(0,0) },
 			tCube: { value: null },
+			fOpacity: { value: 1.0 },
 			fFlip: { value: 1 }
 		},
 
 		vertexShader: ShaderChunk.SCSL_RASTER_VERT,
 		fragmentShader: ShaderChunk.SCSL_ENV2HCUBE_FRAG
+
+	},
+
+	ENV2HCC: {
+
+		uniforms: {
+			vUvFlip: { value: new Vector2(0,0) },
+			tCube: { value: null },
+			fOpacity: { value: 1.0 },
+			fFlip: { value: 1 }
+		},
+
+		vertexShader: ShaderChunk.SCSL_RASTER_VERT,
+		fragmentShader: ShaderChunk.SCSL_ENV2HCC_FRAG
 
 	}
 	//////////////////////////////////////////////////
