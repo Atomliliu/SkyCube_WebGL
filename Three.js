@@ -169,6 +169,7 @@ export { CurveUtils } from './extras/CurveUtils.js';
 /////////////////////////////////////////////////////
 //SC
 export { SC_CubeMap } from './skycube/SC_CubeMap.js';
+export { SC_OutHUD } from './skycube/SC_OutHUD.js';
 /////////////////////////////////////////////////////
 export * from './constants.js';
 export * from './Three.Legacy.js';
