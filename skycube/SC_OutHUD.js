@@ -1,15 +1,15 @@
 import { Object3D } from '../core/Object3D';
 import { WebGLRenderTarget } from '../renderers/WebGLRenderTarget';
-import { ShaderMaterial } from '../../materials/ShaderMaterial';
-import { UniformsUtils } from '../shaders/UniformsUtils';
-import { ShaderLib } from '../shaders/ShaderLib';
+import { ShaderMaterial } from '../materials/ShaderMaterial';
+import { UniformsUtils } from '../renderers/shaders/UniformsUtils';
+import { ShaderLib } from '../renderers/shaders/ShaderLib';
 //import { _Math } from '../math/Math';
 
 import { LinearFilter, NearestFilter, RGBFormat } from '../constants';
 import { Vector2 } from '../math/Vector2';
 import { Vector3 } from '../math/Vector3';
 import { PerspectiveCamera } from '../cameras/OrthographicCamera';
-import { Scenes } from '../scenes/Scenes';
+import { Scenes } from '../scenes/Scene';
 
 
 
@@ -95,9 +95,9 @@ function SC_OutHUD( cubeMap, width, height ) {
 		uniformsUI.tCube.value = cubeMap;
 		//uniformsUI.fOpacity.value = 0.5;
 
-		UI_Materials[i] = new ShaderMaterial(uniforms: uniformsUI,
+		UI_Materials[i] = new ShaderMaterial({uniforms: uniformsUI,
 					vertexShader: UI_Shaders[i].vertexShader,
-					fragmentShader: UI_Shaders[i].fragmentShader);
+					fragmentShader: UI_Shaders[i].fragmentShader});
 
 		UI_Materials[i].transparent = true;
 		UI_Materials[i].opacity = 0.0;
