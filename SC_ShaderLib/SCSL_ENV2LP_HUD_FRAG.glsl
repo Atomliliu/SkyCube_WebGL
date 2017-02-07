@@ -11,6 +11,9 @@ uniform float fOpacity;
 void main() {
 	vec3 dir = getVecLPCubeMap(vUv, 0);
 	vec4 result = textureCube( tCube, vec3( fFlip * dir.x, dir.yz ) );
+	if (dir == vec3(0.0,0.0,-1.0)) {
+		result.w = 0.0;
+	}
 
 	//vec4 result = texture2D( tSampler,  getLLMapping_VEC2UV( getVec(vUv,nFace) ) );
 
