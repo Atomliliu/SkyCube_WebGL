@@ -2,7 +2,7 @@ import { Object3D } from '../core/Object3D';
 import { WebGLRenderTargetCube } from '../renderers/WebGLRenderTargetCube';
 import { LinearFilter, NearestFilter, RGBFormat } from '../constants';
 import { Vector3 } from '../math/Vector3';
-import { PerspectiveCamera } from '../cameras/OrthographicCamera';
+//import { OrthographicCamera } from '../cameras/OrthographicCamera';
 
 /**
  * Camera for rendering cube maps
