@@ -11,7 +11,7 @@ void main() {
 	//vec4 frag(v2f i) : COLOR 
 	//{
 		//vec2 UV = vUv;
-		vec4 result = texture2D( tSampler,  getLLMapping_VEC2UV( getVec(vUv,nFace) ) );
+		vec4 result = texture2D( tSampler,  getLLMapping_VEC2UV( getVec(vUv,nFace),0 ) );
 
 		gl_FragColor = result;
 
