@@ -5,11 +5,15 @@ import { UniformsUtils } from '../renderers/shaders/UniformsUtils';
 import { ShaderLib } from '../renderers/shaders/ShaderLib';
 //import { _Math } from '../math/Math';
 
+import { Mesh } from '../objects/Mesh';
+import { BoxGeometry } from '../geometries/BoxGeometry';
+import { PlaneGeometry } from '../geometries/PlaneGeometry';
+
 import { LinearFilter, NearestFilter, RGBFormat } from '../constants';
 import { Vector2 } from '../math/Vector2';
 import { Vector3 } from '../math/Vector3';
-import { PerspectiveCamera } from '../cameras/OrthographicCamera';
-import { Scenes } from '../scenes/Scene';
+import { OrthographicCamera } from '../cameras/OrthographicCamera';
+import { Scene } from '../scenes/Scene';
 
 
 
@@ -36,7 +40,7 @@ function SC_OutHUD( cubeMap, width, height ) {
 	};*/
 
 
-	this.UI_ShaderNames = [
+	var UI_ShaderNames = [
 		"ENV2VCUBE_HUD",
 		"ENV2VCC_HUD",
 		"ENV2LP_HUD",
@@ -46,7 +50,7 @@ function SC_OutHUD( cubeMap, width, height ) {
 		"ENV2HCC_HUD",
 		"ENV2DP_HUD"
 	 ];
-	this.Out_ShaderNames = [
+	var Out_ShaderNames = [
 		"ENV2VCUBE",
 		"ENV2VCC",
 		"ENV2LP",
@@ -57,9 +61,32 @@ function SC_OutHUD( cubeMap, width, height ) {
 		"ENV2DP"
 	 ];
 
+	//
+	var UI_IconsSizeX = [
+		0.16666666666666666666666666666667,
+		0.75,
+		1.0,
+		1.0,
+		1.0,
+		1.0,
+		1.0,
+		1.0
+	];
+
+	var UI_IconsSizeY = [
+		1.0,
+		1.0,
+		1.0,
+		1.0,
+		1.0,
+		0.5,
+		0.75,
+		0.5
+	];
+
 	var UI_Shaders = [];
 	var UI_Materials = [];
-	var Out_Shaders = [];
+	//var Out_Shaders = [];
 
 	var UI_IconPos = [];
 	var UI_IconPlane = [];
@@ -80,10 +107,10 @@ function SC_OutHUD( cubeMap, width, height ) {
 
 	
 	// Create the camera and set the viewport to match the screen dimensions.
-	this.cameraHUD = new THREE.OrthographicCamera(-UI_width/2, UI_width/2, UI_height/2, -UI_height/2, 0, 30 );
+	this.cameraHUD = new OrthographicCamera(-UI_width/2, UI_width/2, UI_height/2, -UI_height/2, 0, 30 );
 
 	// Create also a custom scene for HUD.
-	this.sceneHUD = new THREE.Scene();
+	this.sceneHUD = new Scene();
 
 	//Init
 	//Need update size first
@@ -102,14 +129,14 @@ function SC_OutHUD( cubeMap, width, height ) {
 		UI_Materials[i].transparent = true;
 		UI_Materials[i].opacity = 0.0;
 
-		Out_Shaders[i] = ShaderLib[ Out_ShaderNames[i] ];
+		//Out_Shaders[i] = ShaderLib[ Out_ShaderNames[i] ];
 
-		UI_IconPos[i] = new Vector2(0,0);
-		UI_IconPlane[i] = new new THREE.Mesh( new THREE.PlaneGeometry( iconSize, iconSize ), UI_Materials[i] );
+		//UI_IconPos[i] = new Vector2(0,0);
+		UI_IconPlane[i] = new Mesh( new PlaneGeometry( iconSize*UI_IconsSizeX[i], iconSize*UI_IconsSizeY[i] ), UI_Materials[i] );
 		UI_IconPlane[i].position.x = UI_IconPos[i].x;
 		UI_IconPlane[i].position.y = UI_IconPos[i].y;
 
-		sceneHUD.add( UI_IconPlane[i] );
+		this.sceneHUD.add( UI_IconPlane[i] );
 	}
 
 	
@@ -142,8 +169,10 @@ function SC_OutHUD( cubeMap, width, height ) {
 		iconSize = Math.min(iconEdgeSize.x,iconEdgeSize.y) - iconMinGap;
 		if (iconSize <= 4) return; // Too small to render it
 
+
 		//Setup position
-		for ( var i = 0; i < UI_IconPos.length; i ++ ) {
+		for ( var i = 0; i < UI_ShaderNames.length; i ++ ) {
+			UI_IconPos[i] = new Vector2(0,0);
 			UI_IconPos[i].x = Math.round(iconEdgeSize.x * ((i-1) + 0.5) - (UI_width*0.5));
 			UI_IconPos[i].y = Math.round(iconEdgeSize.y * ((i-1) + 0.5) - (UI_height*0.5));
 		}
