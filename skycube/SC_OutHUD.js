@@ -1,6 +1,7 @@
 import { Object3D } from '../core/Object3D';
 import { WebGLRenderTarget } from '../renderers/WebGLRenderTarget';
 import { ShaderMaterial } from '../materials/ShaderMaterial';
+import { MultiMaterial } from '../materials/MultiMaterial';
 import { UniformsUtils } from '../renderers/shaders/UniformsUtils';
 import { ShaderLib } from '../renderers/shaders/ShaderLib';
 //import { _Math } from '../math/Math';
@@ -41,47 +42,51 @@ function SC_OutHUD( cubeMap, width, height ) {
 
 
 	var UI_ShaderNames = [
-		"ENV2VCUBE_HUD",
-		"ENV2VCC_HUD",
-		"ENV2LP_HUD",
-		"ENV2CUBEFACE_HUD",
-		"ENV2SP_HUD",
-		"ENV2LL_HUD",
+		"ENV2DP_HUD",
 		"ENV2HCC_HUD",
-		"ENV2DP_HUD"
+		"ENV2LL_HUD",
+		"ENV2SP_HUD",
+		"ENV2CUBEFACE_HUD",
+		"ENV2LP_HUD",
+		"ENV2HCUBE_HUD",
+		"ENV2VCC_HUD",
+		"ENV2VCUBE_HUD"
 	 ];
 	var Out_ShaderNames = [
-		"ENV2VCUBE",
-		"ENV2VCC",
-		"ENV2LP",
-		"ENV2CUBEFACE",
-		"ENV2SP",
-		"ENV2LL",
+		"ENV2DP",
 		"ENV2HCC",
-		"ENV2DP"
+		"ENV2LL",
+		"ENV2SP",
+		"ENV2CUBEFACE",
+		"ENV2LP",
+		"ENV2HCUBE",
+		"ENV2VCC",
+		"ENV2VCUBE"
 	 ];
 
 	//
 	var UI_IconsSizeX = [
-		0.16666666666666666666666666666667,
+		1.0,
+		1.0,
+		1.0,
+		1.0,
+		1.0,
+		1.0,
+		1.0,
 		0.75,
-		1.0,
-		1.0,
-		1.0,
-		1.0,
-		1.0,
-		1.0
+		0.16666666666666666666666666666667
 	];
 
 	var UI_IconsSizeY = [
-		1.0,
-		1.0,
-		1.0,
-		1.0,
-		1.0,
 		0.5,
 		0.75,
-		0.5
+		0.5,
+		1.0,
+		1.0,
+		1.0,
+		0.16666666666666666666666666666667,
+		1.0,
+		1.0
 	];
 
 	var UI_Shaders = [];
@@ -105,6 +110,11 @@ function SC_OutHUD( cubeMap, width, height ) {
 	var iconEdgeSize = new Vector2(0,0);
 	var iconMinGap = 2.0;
 
+	var boxUIGeo = new BoxGeometry( 1, 1, 1 );
+	var boxUIMats = [];
+	var boxUIFaceIndex = [0,2,4,-1,-1,-1];
+	//var boxUIMesh;
+
 	
 	// Create the camera and set the viewport to match the screen dimensions.
 	this.cameraHUD = new OrthographicCamera(-UI_width/2, UI_width/2, UI_height/2, -UI_height/2, 0, 30 );
@@ -114,32 +124,67 @@ function SC_OutHUD( cubeMap, width, height ) {
 
 	//Init
 	//Need update size first
-	updateHUDSize();
+	var boxUIShader = ShaderLib[ "ENV2CUBEFACE_HUD" ];
+	
+	function setupBoxUI(index){
+		//Init box materials (3) +x +y +z
+		for ( var i = 0; i < boxUIFaceIndex.length; i ++ ) {
+			var boxUIUniforms = UniformsUtils.clone( boxUIShader.uniforms );
+			boxUIUniforms.tCube.value = cubeMap;
+			boxUIUniforms.nFace.value = boxUIFaceIndex[i];
+			boxUIMats.push( new ShaderMaterial({uniforms: boxUIUniforms,
+						vertexShader: boxUIShader.vertexShader,
+						fragmentShader: boxUIShader.fragmentShader}));
+		}
 
-	for ( var i = 0; i < UI_ShaderNames.length; i ++ ) {
-		UI_Shaders[i] = ShaderLib[ UI_ShaderNames[i] ];
-		var uniformsUI = UniformsUtils.clone( UI_Shaders[i].uniforms );
-		uniformsUI.tCube.value = cubeMap;
-		//uniformsUI.fOpacity.value = 0.5;
+		//boxUIMesh = new Mesh( boxUIGeo, new MultiMaterial( boxUIMats ) );
+		UI_IconPlane[index] = new Mesh( boxUIGeo, new MultiMaterial( boxUIMats ) );
+		UI_IconPlane[index].rotation.x = 0.5;
+		//Better use push replace [index]
 
-		UI_Materials[i] = new ShaderMaterial({uniforms: uniformsUI,
-					vertexShader: UI_Shaders[i].vertexShader,
-					fragmentShader: UI_Shaders[i].fragmentShader});
-
-		UI_Materials[i].transparent = true;
-		UI_Materials[i].opacity = 0.0;
-
-		//Out_Shaders[i] = ShaderLib[ Out_ShaderNames[i] ];
-
-		//UI_IconPos[i] = new Vector2(0,0);
-		UI_IconPlane[i] = new Mesh( new PlaneGeometry( iconSize*UI_IconsSizeX[i], iconSize*UI_IconsSizeY[i] ), UI_Materials[i] );
-		UI_IconPlane[i].position.x = UI_IconPos[i].x;
-		UI_IconPlane[i].position.y = UI_IconPos[i].y;
-
-		this.sceneHUD.add( UI_IconPlane[i] );
 	}
+	
 
 	
+
+	for ( var i = 0; i < UI_ShaderNames.length; i ++ ) {
+		if(UI_ShaderNames[i] == "ENV2CUBEFACE_HUD"){
+			UI_Shaders[i] = ShaderLib[ UI_ShaderNames[i] ];
+			setupBoxUI(i);
+			
+			//this.sceneHUD.add( UI_IconPlane[i] );
+
+		}
+		else{
+			UI_Shaders[i] = ShaderLib[ UI_ShaderNames[i] ];
+			var uniformsUI = UniformsUtils.clone( UI_Shaders[i].uniforms );
+			uniformsUI.tCube.value = cubeMap;
+			//uniformsUI.fOpacity.value = 0.5;
+
+			UI_Materials[i] = new ShaderMaterial({uniforms: uniformsUI,
+						vertexShader: UI_Shaders[i].vertexShader,
+						fragmentShader: UI_Shaders[i].fragmentShader});
+
+			UI_Materials[i].transparent = true;
+			UI_Materials[i].opacity = 0.0;
+
+			//Out_Shaders[i] = ShaderLib[ Out_ShaderNames[i] ];
+
+			//UI_IconPos[i] = new Vector2(0,0);
+			UI_IconPlane[i] = new Mesh( new PlaneGeometry( 1, 1 ), UI_Materials[i] );
+			//UI_IconPlane[i] = new Mesh( new PlaneGeometry( iconSize*UI_IconsSizeX[i], iconSize*UI_IconsSizeY[i] ), UI_Materials[i] );
+			//UI_IconPlane[i].position.x = UI_IconPos[i].x;
+			//UI_IconPlane[i].position.y = UI_IconPos[i].y;
+
+			//console.log(UI_IconPlane[i].position);
+		}
+		this.sceneHUD.add( UI_IconPlane[i] );
+		
+		
+	}
+
+	updateHUDSize();
+	updateIconPlaneSize();
 
 
 	this.highlitHUD = function ( matSelected ) {
@@ -154,6 +199,8 @@ function SC_OutHUD( cubeMap, width, height ) {
 	function updateHUDSize(){
 		var smallerSide = Math.floor(Math.sqrt(UI_ShaderNames.length)); //Smaller number for short side
 		var largerSide = Math.ceil(UI_ShaderNames.length/smallerSide); //Larger side number
+		
+
 		if (UI_width >= UI_height){
 			layoutNum.x = largerSide;
 			layoutNum.y = smallerSide;
@@ -165,24 +212,35 @@ function SC_OutHUD( cubeMap, width, height ) {
 
 		iconEdgeSize.x = Math.floor(UI_width/layoutNum.x);
 		iconEdgeSize.y = Math.floor(UI_height/layoutNum.y);
+		console.log(iconEdgeSize);
 
 		iconSize = Math.min(iconEdgeSize.x,iconEdgeSize.y) - iconMinGap;
 		if (iconSize <= 4) return; // Too small to render it
+		console.log(iconSize);
 
+		//Setup position (0,0) is left bottom
+		var index = 0;
+		for ( var iy = 0; iy < layoutNum.y; iy ++ ) {
+			for ( var ix = 0; ix < layoutNum.x; ix ++ ) {
+				UI_IconPos[index] = new Vector2(0,0);
 
-		//Setup position
-		for ( var i = 0; i < UI_ShaderNames.length; i ++ ) {
-			UI_IconPos[i] = new Vector2(0,0);
-			UI_IconPos[i].x = Math.round(iconEdgeSize.x * ((i-1) + 0.5) - (UI_width*0.5));
-			UI_IconPos[i].y = Math.round(iconEdgeSize.y * ((i-1) + 0.5) - (UI_height*0.5));
+				UI_IconPos[index].x = Math.round(iconEdgeSize.x * (ix + 0.5) - (UI_width*0.5));
+				UI_IconPos[index].y = Math.round(iconEdgeSize.y * (iy + 0.5) - (UI_height*0.5));
+				index++;
+			}
+			
+
 		}
 	}
 
 	function updateIconPlaneSize(){
 		if(UI_IconPlane.length == UI_IconPos.length) {
 			for ( var i = 0; i < UI_IconPlane.length; i ++ ) {
-				UI_IconPlane[i].position.x = UI_IconPos[i].x;
-				UI_IconPlane[i].position.y = UI_IconPos[i].y;
+				//UI_IconPlane[i].position.x = UI_IconPos[i].x;
+				//UI_IconPlane[i].position.y = UI_IconPos[i].y;
+
+				UI_IconPlane[i].position.copy( UI_IconPos[i] );
+				UI_IconPlane[i].scale.copy( new Vector2(iconSize*UI_IconsSizeX[i], iconSize*UI_IconsSizeY[i]) );
 			}
 		}
 		
@@ -193,13 +251,16 @@ function SC_OutHUD( cubeMap, width, height ) {
 
 		if ( this.parent === null ) this.updateMatrixWorld();
 
-		UI_width = Math.abs(width);
-		UI_height = Math.abs(height);
+		if ((UI_width != width) || (UI_height != height)){
+			UI_width = Math.abs(width);
+			UI_height = Math.abs(height);
 
-		updateHUDSize();
-		updateIconPlaneSize();
+			updateHUDSize();
+			updateIconPlaneSize();
+		}
+		
 
-		renderer.render( scene, cam );
+		renderer.render( this.sceneHUD, this.cameraHUD );
 
 	};
 
