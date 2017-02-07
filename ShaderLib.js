@@ -356,6 +356,22 @@ var ShaderLib = {
 
 	},
 
+	ENV2CUBEFACE_HUD: {
+
+		uniforms: {
+			vUvFlip: { value: new Vector2(0,0) },
+			tCube: { value: null },
+			//fOpacity: { value: 1.0 },
+			nFace: { value: 0 },
+			fFlip: { value: 1 }
+
+		},
+
+		vertexShader: ShaderChunk.SCSL_RASTER_VERT,
+		fragmentShader: ShaderChunk.SCSL_ENV2CUBEFACE_HUD_FRAG
+
+	},
+
 
 
 
@@ -482,7 +498,9 @@ var ShaderLib = {
 			vUvFlip: { value: new Vector2(0,0) },
 			tCube: { value: null },
 			fOpacity: { value: 1.0 },
+			nFace: { value: 0 },
 			fFlip: { value: 1 }
+
 		},
 
 		vertexShader: ShaderChunk.SCSL_RASTER_VERT,
