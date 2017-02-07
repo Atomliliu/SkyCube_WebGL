@@ -272,6 +272,97 @@ var ShaderLib = {
 
 	},
 
+	ENV2VCC: {
+
+		uniforms: {
+			vUvFlip: { value: new Vector2(0,0) },
+			tCube: { value: null },
+			//fOpacity: { value: 1.0 },
+			fFlip: { value: 1 }
+		},
+
+		vertexShader: ShaderChunk.SCSL_RASTER_VERT,
+		fragmentShader: ShaderChunk.SCSL_ENV2VCC_FRAG
+
+	},
+
+	ENV2VCUBE: {
+
+		uniforms: {
+			vUvFlip: { value: new Vector2(0,0) },
+			tCube: { value: null },
+			//fOpacity: { value: 1.0 },
+			fFlip: { value: 1 }
+		},
+
+		vertexShader: ShaderChunk.SCSL_RASTER_VERT,
+		fragmentShader: ShaderChunk.SCSL_ENV2VCUBE_FRAG
+
+	},
+
+	ENV2LL: {
+
+		uniforms: {
+			vUvFlip: { value: new Vector2(0,0) },
+			tCube: { value: null },
+			//fOpacity: { value: 1.0 },
+			fFlip: { value: 1 }
+		},
+
+		vertexShader: ShaderChunk.SCSL_RASTER_VERT,
+		fragmentShader: ShaderChunk.SCSL_ENV2LL_FRAG
+
+	},
+
+	ENV2LP: {
+
+		uniforms: {
+			vUvFlip: { value: new Vector2(0,0) },
+			tCube: { value: null },
+			//fOpacity: { value: 1.0 },
+			fFlip: { value: 1 }
+		},
+
+		vertexShader: ShaderChunk.SCSL_RASTER_VERT,
+		fragmentShader: ShaderChunk.SCSL_ENV2LP_FRAG
+
+	},
+
+	ENV2SP: {
+
+		uniforms: {
+			vUvFlip: { value: new Vector2(0,0) },
+			tCube: { value: null },
+			//fOpacity: { value: 1.0 },
+			fFlip: { value: 1 }
+		},
+
+		vertexShader: ShaderChunk.SCSL_RASTER_VERT,
+		fragmentShader: ShaderChunk.SCSL_ENV2SP_FRAG
+
+	},
+
+	ENV2DP: {
+
+		uniforms: {
+			vUvFlip: { value: new Vector2(0,0) },
+			tCube: { value: null },
+			//fOpacity: { value: 1.0 },
+			fFlip: { value: 1 }
+		},
+
+		vertexShader: ShaderChunk.SCSL_RASTER_VERT,
+		fragmentShader: ShaderChunk.SCSL_ENV2DP_FRAG
+
+	},
+
+
+
+
+
+
+
+	/////////////////////////HUD//////////////////////
 
 	ENV2HCUBE_HUD: {
 
@@ -298,6 +389,104 @@ var ShaderLib = {
 
 		vertexShader: ShaderChunk.SCSL_RASTER_VERT,
 		fragmentShader: ShaderChunk.SCSL_ENV2HCC_HUD_FRAG
+
+	},
+
+	ENV2VCC_HUD: {
+
+		uniforms: {
+			vUvFlip: { value: new Vector2(0,0) },
+			tCube: { value: null },
+			fOpacity: { value: 1.0 },
+			fFlip: { value: 1 }
+		},
+
+		vertexShader: ShaderChunk.SCSL_RASTER_VERT,
+		fragmentShader: ShaderChunk.SCSL_ENV2VCC_HUD_FRAG
+
+	},
+
+	ENV2VCUBE_HUD: {
+
+		uniforms: {
+			vUvFlip: { value: new Vector2(0,0) },
+			tCube: { value: null },
+			fOpacity: { value: 1.0 },
+			fFlip: { value: 1 }
+		},
+
+		vertexShader: ShaderChunk.SCSL_RASTER_VERT,
+		fragmentShader: ShaderChunk.SCSL_ENV2VCUBE_HUD_FRAG
+
+	},
+
+	ENV2LL_HUD: {
+
+		uniforms: {
+			vUvFlip: { value: new Vector2(0,0) },
+			tCube: { value: null },
+			fOpacity: { value: 1.0 },
+			fFlip: { value: 1 }
+		},
+
+		vertexShader: ShaderChunk.SCSL_RASTER_VERT,
+		fragmentShader: ShaderChunk.SCSL_ENV2LL_HUD_FRAG
+
+	},
+
+	ENV2LP_HUD: {
+
+		uniforms: {
+			vUvFlip: { value: new Vector2(0,0) },
+			tCube: { value: null },
+			fOpacity: { value: 1.0 },
+			fFlip: { value: 1 }
+		},
+
+		vertexShader: ShaderChunk.SCSL_RASTER_VERT,
+		fragmentShader: ShaderChunk.SCSL_ENV2LP_HUD_FRAG
+
+	},
+
+	ENV2SP_HUD: {
+
+		uniforms: {
+			vUvFlip: { value: new Vector2(0,0) },
+			tCube: { value: null },
+			fOpacity: { value: 1.0 },
+			fFlip: { value: 1 }
+		},
+
+		vertexShader: ShaderChunk.SCSL_RASTER_VERT,
+		fragmentShader: ShaderChunk.SCSL_ENV2SP_HUD_FRAG
+
+	},
+
+	ENV2DP_HUD: {
+
+		uniforms: {
+			vUvFlip: { value: new Vector2(0,0) },
+			tCube: { value: null },
+			fOpacity: { value: 1.0 },
+			fFlip: { value: 1 }
+		},
+
+		vertexShader: ShaderChunk.SCSL_RASTER_VERT,
+		fragmentShader: ShaderChunk.SCSL_ENV2DP_HUD_FRAG
+
+	},
+
+	ENV2CUBEFACE_HUD: {
+
+		uniforms: {
+			vUvFlip: { value: new Vector2(0,0) },
+			tCube: { value: null },
+			fOpacity: { value: 1.0 },
+			fFlip: { value: 1 }
+		},
+
+		vertexShader: ShaderChunk.SCSL_RASTER_VERT,
+		fragmentShader: ShaderChunk.SCSL_ENV2CUBEFACE_HUD_FRAG
 
 	}
 	//////////////////////////////////////////////////
