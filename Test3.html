@@ -232,7 +232,7 @@
   				var height = window.innerHeight;
   				//console.log(width);
 
-  				hud = new THREE.SC_OutHUD(camCube.renderTarget,width,height);
+  				hud = new THREE.SC_OutHUD(camCube.renderTarget, width, height);
 
 				var hudWidth = 240;
 				var hudHeight = 40;
@@ -250,9 +250,9 @@
 
 
   				// Create texture from rendered graphics.
-  				var RTTHUD = new THREE.WebGLRenderTarget( hudWidth, hudHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat } );
-				//var hudTexture = new THREE.Texture(hudCanvas);
-				//RTTHUD.texture.needsUpdate = true;
+  				//var RTTHUD = new THREE.WebGLRenderTarget( hudWidth, hudHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat } );
+				////var hudTexture = new THREE.Texture(hudCanvas);
+				////RTTHUD.texture.needsUpdate = true;
   
 				
 
@@ -268,6 +268,8 @@
 
 				//RGBMTexUI.magFilter = THREE.NearestFilter;
 				//RGBMTexUI.minFilter = THREE.NearestFilter;
+
+
 
 				var shaderUI = THREE.ShaderLib[ "ENV2HCUBE_HUD" ];//THREE.SCSL_LL2CUBE_UI;
 				var uniformsUI = THREE.UniformsUtils.clone( shaderUI.uniforms );
@@ -509,9 +511,9 @@
 				//console.log("Screen");
 				renderer.render( scene, camera );
 				//renderer.setClearColor( 0x000000, 0 ); // the default
-				//renderer.render( sceneHUD, cameraHUD );
-
 				renderer.render( hud.sceneHUD, hud.cameraHUD );
+				//hud.updateHUD();
+
 			}
 			/*
 			function render() {
