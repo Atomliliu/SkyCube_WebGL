@@ -1,6 +1,7 @@
 
 
 
+
 THREE.SC_OutHUD = function ( cubeMap, width, height ) {
 
 	//Object3D.call( this );
@@ -250,7 +251,7 @@ THREE.SC_OutHUD = function ( cubeMap, width, height ) {
 	}
 
 	//Update HUD rendering
-	this.updateHUD = function ( renderer, width, height ) {
+	this.updateHUD = function ( width, height ) {
 
 		if ( this.parent === null ) this.updateMatrixWorld();
 
@@ -267,13 +268,15 @@ THREE.SC_OutHUD = function ( cubeMap, width, height ) {
 			this.cameraHUD.top = UI_height/2;
 			this.cameraHUD.bottom  = -UI_height/2;
 			this.cameraHUD.far = iconSize+10;
-			//this.cameraHUD.updateProjectionMatrix ();
+			this.cameraHUD.updateProjectionMatrix ();
 		}
 		
 
-		renderer.render( this.sceneHUD, this.cameraHUD );
-
 	};
+
+	this.renderHUD = function (renderer) {
+		renderer.render( this.sceneHUD, this.cameraHUD );
+	}
 
 
 };
