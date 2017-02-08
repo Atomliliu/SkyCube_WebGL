@@ -31,12 +31,13 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js webgl</a> - equirectangular panorama demo. photo by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank">Li Liu</a>.<br />
+			<a href="http://threejs.org" target="_blank">three.js webgl</a> - <br />
 			drag equirectangular texture into the page.
 		</div>
 
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/skycube/SC_OutHUD.js"></script>
 		
 		<script src="js/SC_SL.js"></script>
 		<script src="js/SC_SL2.js"></script>
@@ -439,29 +440,51 @@
 			}
 
 
+			function setupMultiMat(mats, paraName, paraVal){
+				for (var i = 0; i < mats.materials.length; i++) {
+					mats.materials[i].uniforms[paraName].value = paraVal;
+				}
+			}
 
 
 			function onDocumentMouseMove( event ) {
 				event.preventDefault();
 				mouse.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
 
-				var intersects = RaycasterSetup(mouse, cameraHUD, sceneHUD);
+				var intersects = RaycasterSetup(mouse, hud.cameraHUD, hud.sceneHUD);
 				//console.log(intersects.length);
 				if ( intersects.length > 0 ) {
 					
 
 					if ( INTERSECTED != intersects[ 0 ].object ) {
-						//console.log(intersects[ 0 ].object);
+						console.log(intersects[ 0 ].object.material.type);
+						if(intersects[ 0 ].object.material.type == "MultiMaterial"){
+							
+							if ( INTERSECTED ) setupMultiMat(INTERSECTED.material,"fOpacity",1.0);
+							INTERSECTED = intersects[ 0 ].object;
 
-						//if ( INTERSECTED ) INTERSECTED.material.opacity = 0;
-						if ( INTERSECTED ) INTERSECTED.material.uniforms.fOpacity.value = 0.5;
-						INTERSECTED = intersects[ 0 ].object;
-						//INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
-						INTERSECTED.material.uniforms.fOpacity.value = 1.0;
+							setupMultiMat(INTERSECTED.material,"fOpacity",0.5)
+						}
+						else{
+							if ( INTERSECTED ) INTERSECTED.material.uniforms.fOpacity.value = 1.0;
+							INTERSECTED = intersects[ 0 ].object;
+
+							INTERSECTED.material.uniforms.fOpacity.value = 0.5;
+						}
+
+						
 
 					}
 				} else {
-					if ( INTERSECTED ) INTERSECTED.material.uniforms.fOpacity.value = 0.5;
+					if ( INTERSECTED ) {
+						if(INTERSECTED.material.type == "MultiMaterial"){
+							setupMultiMat(INTERSECTED.material,"fOpacity",1.0);
+						}
+						else{
+							INTERSECTED.material.uniforms.fOpacity.value = 1.0;
+						}
+					}
+					
 					INTERSECTED = null;
 				}
 
