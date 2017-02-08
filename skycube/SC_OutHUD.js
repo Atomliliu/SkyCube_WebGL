@@ -1,7 +1,6 @@
 
 
 
-
 THREE.SC_OutHUD = function ( cubeMap, width, height ) {
 
 	//Object3D.call( this );
