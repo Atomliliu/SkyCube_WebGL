@@ -356,7 +356,7 @@ var ShaderLib = {
 
 	},
 
-	ENV2CUBEFACE_HUD: {
+	ENV2CUBEFACE: {
 
 		uniforms: {
 			vUvFlip: { value: new Vector2(0,0) },
@@ -368,7 +368,7 @@ var ShaderLib = {
 		},
 
 		vertexShader: ShaderChunk.SCSL_RASTER_VERT,
-		fragmentShader: ShaderChunk.SCSL_ENV2CUBEFACE_HUD_FRAG
+		fragmentShader: ShaderChunk.SCSL_ENV2CUBEFACE_FRAG
 
 	},
 
