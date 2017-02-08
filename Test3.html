@@ -426,6 +426,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				//Update HUD size here
+				hud.updateHUD( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -457,7 +458,7 @@
 					
 
 					if ( INTERSECTED != intersects[ 0 ].object ) {
-						console.log(intersects[ 0 ].object.material.type);
+						//console.log(intersects[ 0 ].object.material.type);
 						if(intersects[ 0 ].object.material.type == "MultiMaterial"){
 							
 							if ( INTERSECTED ) setupMultiMat(INTERSECTED.material,"fOpacity",1.0);
@@ -534,8 +535,8 @@
 				//console.log("Screen");
 				renderer.render( scene, camera );
 				//renderer.setClearColor( 0x000000, 0 ); // the default
-				renderer.render( hud.sceneHUD, hud.cameraHUD );
-				//hud.updateHUD();
+				//renderer.render( hud.sceneHUD, hud.cameraHUD );
+				hud.renderHUD(renderer);
 
 			}
 			/*
