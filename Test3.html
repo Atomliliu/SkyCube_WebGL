@@ -65,9 +65,10 @@
 			var camCube, sceneCube;
 
 			var WebGLCubeMapIndex = [];
-			var mouse = new THREE.Vector2(), raycaster, INTERSECTED;
+			//var mouse = new THREE.Vector2(), raycaster, INTERSECTED;
 
 			var hud;
+			//var _hovered = null
 
 			init();
 			//render();
@@ -104,7 +105,7 @@
 
 				camCube = new THREE.CubeCamera( 1, 100000, RTTSize );
 
-				raycaster = new THREE.Raycaster();
+				//raycaster = new THREE.Raycaster();
 
 
 				for ( var i = 0; i < 6; i ++ ) {
@@ -233,8 +234,8 @@
   				var height = window.innerHeight;
   				//console.log(width);
 
-  				hud = new THREE.SC_OutHUD(camCube.renderTarget, width, height);
-
+  				hud = new THREE.SC_OutHUD(camCube.renderTarget, width, height, renderer.domElement);
+  				/*
 				var hudWidth = 240;
 				var hudHeight = 40;
 				// We will use 2D canvas element to render our HUD.  
@@ -311,6 +312,7 @@
 
 
 
+
 				// Create plane to render the HUD. This plane fill the whole screen.
 				var HUDplaneGeometry = new THREE.PlaneGeometry( hudWidth, hudHeight );
   				var HUDplane = new THREE.Mesh( HUDplaneGeometry, materialUI );
@@ -329,7 +331,7 @@
 				//END UI/HUD
 				//////////////////////////////////////
 
-
+				*/
 
 
 
@@ -373,7 +375,7 @@
 					}, false );
 					reader.readAsDataURL( event.dataTransfer.files[ 0 ] );
 
-					document.body.style.opacity = 1;
+					document.body.style.opacity = 1.0;
 
 				}, false );
 
@@ -382,7 +384,7 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				//document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				//document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 
 
@@ -430,7 +432,7 @@
 
 			}
 
-
+/*
 
 			function RaycasterSetup( MouseCoords, CamRay, SceneRay )
 			{
@@ -459,16 +461,25 @@
 
 					if ( INTERSECTED != intersects[ 0 ].object ) {
 						//console.log(intersects[ 0 ].object.material.type);
+						INTERSECTED = intersects[ 0 ].object;
+
+						//cursor changed by hover
+						if ( _hovered !== INTERSECTED ) {
+
+							hud.cameraHUD.dispatchEvent( { type: 'hoveron', object: INTERSECTED } );
+
+							renderer.domElement.style.cursor = 'pointer';
+							_hovered = INTERSECTED;
+
+						}
 						if(intersects[ 0 ].object.material.type == "MultiMaterial"){
 							
 							if ( INTERSECTED ) setupMultiMat(INTERSECTED.material,"fOpacity",1.0);
-							INTERSECTED = intersects[ 0 ].object;
 
 							setupMultiMat(INTERSECTED.material,"fOpacity",0.5)
 						}
 						else{
 							if ( INTERSECTED ) INTERSECTED.material.uniforms.fOpacity.value = 1.0;
-							INTERSECTED = intersects[ 0 ].object;
 
 							INTERSECTED.material.uniforms.fOpacity.value = 0.5;
 						}
@@ -477,6 +488,14 @@
 
 					}
 				} else {
+					if ( _hovered !== null ) {
+
+						hud.cameraHUD.dispatchEvent( { type: 'hoveroff', object: _hovered } );
+
+						renderer.domElement.style.cursor = 'auto';
+						_hovered = null;
+
+					}
 					if ( INTERSECTED ) {
 						if(INTERSECTED.material.type == "MultiMaterial"){
 							setupMultiMat(INTERSECTED.material,"fOpacity",1.0);
@@ -492,33 +511,35 @@
 
 			}
 
-/*
+
+
+
+
+
+
 			function onDocumentMouseDown( event ) {
 				event.preventDefault();
 				mouse.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
-				raycaster.setFromCamera( mouse, camera );
-				var intersects = raycaster.intersectObjects( objects );
-				if ( intersects.length > 0 ) {
-					var intersect = intersects[ 0 ];
-					// delete cube
-					if ( isShiftDown ) {
-						if ( intersect.object != plane ) {
-							scene.remove( intersect.object );
-							objects.splice( objects.indexOf( intersect.object ), 1 );
-						}
-					// create cube
-					} else {
-						var voxel = new THREE.Mesh( cubeGeo, cubeMaterial );
-						voxel.position.copy( intersect.point ).add( intersect.face.normal );
-						voxel.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
-						scene.add( voxel );
-						objects.push( voxel );
-					}
-					render();
-				}
-			}
 
-*/
+				var intersects = RaycasterSetup(mouse, hud.cameraHUD, hud.sceneHUD);
+				//console.log(intersects.length);
+				if ( intersects.length > 0 ) {
+					var picked = intersects[ 0 ].object;
+					if(intersects[ 0 ].object.material.type == "MultiMaterial"){
+						setupMultiMat(picked.material,"fOpacity",1.0)
+					}
+					else{
+						picked.material.uniforms.fOpacity.value = 1.0;
+					}
+
+					//Do export here
+					console.log("Export!");
+				}
+			
+			}
+			*/
+
+
 
 			function animate() {
 				requestAnimationFrame( animate );
