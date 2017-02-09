@@ -2,13 +2,15 @@
 
 
 
-THREE.SC_OutHUD = function ( cubeMap, width, height ) {
+THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 
 	//Object3D.call( this );
 
-	this.type = 'SC_OutHUD';
+	//this.type = 'SC_OutHUD';
 
-	this.enabled = true;
+	//this.enabled = true;
+
+	var scope = this; // for Events Func
 
 	//var options = { minFilter: LinearFilter, magFilter: NearestFilter, format: RGBFormat };
 
@@ -97,6 +99,34 @@ THREE.SC_OutHUD = function ( cubeMap, width, height ) {
 	var boxUIFaceIndex = [0,1,2,3,4,5];
 	//var boxUIMesh;
 
+	var mouse = new THREE.Vector2();
+	var raycaster = new THREE.Raycaster();
+	var selected = null, hovered = null;
+	var INTERSECTED;
+
+
+	function activate() {
+
+		domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
+		domElement.addEventListener( 'mousedown', onDocumentMouseDown, false );
+		domElement.addEventListener( 'mouseup', onDocumentMouseUp, false );
+
+	}
+
+	function deactivate() {
+
+		domElement.removeEventListener( 'mousemove', onDocumentMouseMove, false );
+		domElement.removeEventListener( 'mousedown', onDocumentMouseDown, false );
+		domElement.removeEventListener( 'mouseup', onDocumentMouseUp, false );
+
+	}
+
+	function dispose() {
+
+		deactivate();
+
+	}
+
 	
 	
 	// Create also a custom scene for HUD.
@@ -179,6 +209,12 @@ THREE.SC_OutHUD = function ( cubeMap, width, height ) {
 	// Create the camera and set the viewport to match the screen dimensions.
 	this.cameraHUD = new THREE.OrthographicCamera(-UI_width/2, UI_width/2, UI_height/2, -UI_height/2, 0, iconSize+50 );
 
+	activate();
+	this.activate = activate;
+	this.deactivate = deactivate;
+	this.dispose = dispose;
+
+
 
 
 	this.highlitHUD = function ( matSelected ) {
@@ -189,6 +225,7 @@ THREE.SC_OutHUD = function ( cubeMap, width, height ) {
 	this.resetHUD = function ( matSelected ) {
 		matSelected.uniforms.fOpacity.value = InitOpacity;
 	};
+
 
 	function updateHUDSize(){
 		var smallerSide = Math.floor(Math.sqrt(UI_ShaderNames.length)); //Smaller number for short side
@@ -206,11 +243,11 @@ THREE.SC_OutHUD = function ( cubeMap, width, height ) {
 
 		iconEdgeSize.x = Math.floor(UI_width/layoutNum.x);
 		iconEdgeSize.y = Math.floor(UI_height/layoutNum.y);
-		console.log(iconEdgeSize);
+		//console.log(iconEdgeSize);
 
 		iconSize = Math.min(iconEdgeSize.x,iconEdgeSize.y) - iconMinGap;
 		if (iconSize <= 4) return; // Too small to render it
-		console.log(iconSize);
+		//console.log(iconSize);
 
 		//Setup position (0,0) is left bottom
 		var index = 0;
@@ -267,7 +304,7 @@ THREE.SC_OutHUD = function ( cubeMap, width, height ) {
 			this.cameraHUD.right = UI_width/2;
 			this.cameraHUD.top = UI_height/2;
 			this.cameraHUD.bottom  = -UI_height/2;
-			this.cameraHUD.far = iconSize+10;
+			this.cameraHUD.far = iconSize*2;
 			this.cameraHUD.updateProjectionMatrix ();
 		}
 		
@@ -279,7 +316,139 @@ THREE.SC_OutHUD = function ( cubeMap, width, height ) {
 	}
 
 
+
+
+
+	
+
+
+	function RaycasterSetup( MouseCoords, CamRay, SceneRay )
+	{
+		// find intersections
+		raycaster.setFromCamera( MouseCoords, CamRay );
+
+		//var intersects = 
+		return raycaster.intersectObjects( SceneRay.children );
+	}
+
+
+	function setupMultiMat(mats, paraName, paraVal){
+		for (var i = 0; i < mats.materials.length; i++) {
+			mats.materials[i].uniforms[paraName].value = paraVal;
+		}
+	}
+
+
+
+	function onDocumentMouseMove( event ) {
+		event.preventDefault();
+		mouse.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
+		//console.log(scope.sceneHUD);
+		var intersects = RaycasterSetup(mouse, scope.cameraHUD, scope.sceneHUD);
+		if ( intersects.length > 0 ) {
+			
+
+			if ( INTERSECTED != intersects[ 0 ].object ) {
+				
+				INTERSECTED = intersects[ 0 ].object;
+
+				//cursor changed by hover
+				if ( hovered !== INTERSECTED ) {
+
+					scope.dispatchEvent( { type: 'hoveron', object: INTERSECTED } );
+
+					domElement.style.cursor = 'pointer';
+					hovered = INTERSECTED;
+
+				}
+				if(intersects[ 0 ].object.material.type == "MultiMaterial"){
+					
+					if ( INTERSECTED ) setupMultiMat(INTERSECTED.material,"fOpacity",1.0);
+
+					setupMultiMat(INTERSECTED.material,"fOpacity",0.5)
+				}
+				else{
+					if ( INTERSECTED ) INTERSECTED.material.uniforms.fOpacity.value = 1.0;
+
+					INTERSECTED.material.uniforms.fOpacity.value = 0.5;
+				}
+
+				
+
+			}
+		} else {
+			if ( hovered !== null ) {
+
+				scope.dispatchEvent( { type: 'hoveroff', object: hovered } );
+
+				domElement.style.cursor = 'auto';
+				hovered = null;
+
+			}
+			if ( INTERSECTED ) {
+				if(INTERSECTED.material.type == "MultiMaterial"){
+					setupMultiMat(INTERSECTED.material,"fOpacity",1.0);
+				}
+				else{
+					INTERSECTED.material.uniforms.fOpacity.value = 1.0;
+				}
+			}
+			
+			INTERSECTED = null;
+		}
+
+
+	}
+
+
+
+	function onDocumentMouseDown( event ) {
+		event.preventDefault();
+		mouse.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
+
+		var intersects = RaycasterSetup(mouse, scope.cameraHUD, scope.sceneHUD);
+		//console.log(intersects.length);
+		if ( intersects.length > 0 ) {
+			var picked = intersects[ 0 ].object;
+			if(intersects[ 0 ].object.material.type == "MultiMaterial"){
+				setupMultiMat(picked.material,"fOpacity",1.0)
+			}
+			else{
+				picked.material.uniforms.fOpacity.value = 1.0;
+			}
+
+			//Do export here
+			console.log("Export!");
+		}
+	
+	}
+
+
+	function onDocumentMouseUp( event ) {
+
+		event.preventDefault();
+
+		/*
+		if ( _selected ) {
+
+			scope.dispatchEvent( { type: 'dragend', object: _selected } );
+
+			_selected = null;
+
+		}
+		*/
+
+		domElement.style.cursor = 'auto';
+
+	}
+
+
+
+
 };
+
+THREE.SC_OutHUD.prototype = Object.create( THREE.EventDispatcher.prototype );
+THREE.SC_OutHUD.prototype.constructor = THREE.SC_OutHUD;
 
 //SC_OutHUD.prototype = Object.create( Object3D.prototype );
 //SC_OutHUD.prototype.constructor = SC_OutHUD;
