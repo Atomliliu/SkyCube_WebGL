@@ -37,6 +37,8 @@
 
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/skycube/SC_Raster.js"></script>
+		<script src="js/skycube/SC_OutputImg.js"></script>
 		<script src="js/skycube/SC_OutHUD.js"></script>
 		
 		<script src="js/SC_SL.js"></script>
@@ -234,7 +236,7 @@
   				var height = window.innerHeight;
   				//console.log(width);
 
-  				hud = new THREE.SC_OutHUD(camCube.renderTarget, width, height, renderer.domElement);
+  				hud = new THREE.SC_OutHUD(camCube.renderTarget.texture, width, height, renderer.domElement);
   				/*
 				var hudWidth = 240;
 				var hudHeight = 40;
