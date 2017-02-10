@@ -8,7 +8,7 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 
 	//this.type = 'SC_OutHUD';
 
-	//this.enabled = true;
+	this.enabled = true;
 
 	var scope = this; // for Events Func
 
@@ -24,6 +24,7 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 
 	};*/
 
+	var Out_Size = 1024;
 
 	var UI_ShaderNames = [
 		"ENV2DP_HUD",
@@ -75,7 +76,7 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 
 	var UI_Shaders = [];
 	var UI_Materials = [];
-	//var Out_Shaders = [];
+	var Out_Shaders;
 
 	var UI_IconPos = [];
 	var UI_IconPlane = [];
@@ -102,6 +103,7 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 	var mouse = new THREE.Vector2();
 	var raycaster = new THREE.Raycaster();
 	var selected = null, hovered = null;
+	var outShaderName = "";
 	var INTERSECTED;
 
 
@@ -118,6 +120,7 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 		domElement.removeEventListener( 'mousemove', onDocumentMouseMove, false );
 		domElement.removeEventListener( 'mousedown', onDocumentMouseDown, false );
 		domElement.removeEventListener( 'mouseup', onDocumentMouseUp, false );
+		this.enabled = false;
 
 	}
 
@@ -154,6 +157,7 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 		}
 
 		UI_Materials[index] = new THREE.MultiMaterial( boxUIMats );
+		UI_Materials[index].name = Out_ShaderNames[index]; //output shader name
 		
 
 		//boxUIMesh = new Mesh( boxUIGeo, new MultiMaterial( boxUIMats ) );
@@ -187,6 +191,7 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 
 			UI_Materials[i].transparent = true;
 			UI_Materials[i].opacity = 0.0;
+			UI_Materials[i].name = Out_ShaderNames[i]; //output shader name
 
 			//Out_Shaders[i] = ShaderLib[ Out_ShaderNames[i] ];
 
@@ -311,8 +316,11 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 
 	};
 
-	this.renderHUD = function (renderer) {
-		renderer.render( this.sceneHUD, this.cameraHUD );
+	this.renderHUD = function (render) {
+		if(this.enabled == true){
+			render.render( this.sceneHUD, this.cameraHUD );
+		}
+		
 	}
 
 
@@ -410,15 +418,16 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 		//console.log(intersects.length);
 		if ( intersects.length > 0 ) {
 			var picked = intersects[ 0 ].object;
-			if(intersects[ 0 ].object.material.type == "MultiMaterial"){
+			if(picked.material.type == "MultiMaterial"){
 				setupMultiMat(picked.material,"fOpacity",1.0)
 			}
 			else{
 				picked.material.uniforms.fOpacity.value = 1.0;
 			}
+			outShaderName = picked.material.name;
+			selected = picked;
 
-			//Do export here
-			console.log("Export!");
+			
 		}
 	
 	}
@@ -437,6 +446,26 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 
 		}
 		*/
+
+		//Do export here
+		if(outShaderName != ""){
+			Out_Shaders = THREE.ShaderLib[ outShaderName ];
+			var uniformsOut = THREE.UniformsUtils.clone( Out_Shaders.uniforms );
+			uniformsOut.tCube.value = cubeMap;
+
+			var Out_Mat = new THREE.ShaderMaterial({uniforms: uniformsOut,
+						vertexShader: Out_Shaders.vertexShader,
+						fragmentShader: Out_Shaders.fragmentShader});
+
+			Out_Mat.transparent = false;
+
+			var Out = new THREE.SC_OutputImg(renderer,10,10);
+			var rtt = new THREE.SC_Raster(renderer,Out_Size,Out_Size);
+			rtt.RTT(Out_Mat);
+			Out.OutputRT2PNG(renderer,rtt.rtRTT);
+		}
+		
+		console.log("Export!");
 
 		domElement.style.cursor = 'auto';
 
