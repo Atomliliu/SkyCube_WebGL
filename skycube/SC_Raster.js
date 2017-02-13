@@ -13,7 +13,7 @@ THREE.SC_Raster = function ( render, width, height ) {
 	//camRTT.up.set( 0, - 1, 0 );
 	this.camRTT.position.z = 100;
 
-	this.rtRTT = new THREE.WebGLRenderTarget( width, height, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBFormat } );
+	this.rtRTT = new THREE.WebGLRenderTarget( width, height, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat } );
 
 
 
