@@ -25,6 +25,8 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 	};*/
 
 	var Out_Size = 1024;
+	var Out_Width = 0;
+	var Out_Height = 0;
 
 	var UI_ShaderNames = [
 		"ENV2DP_HUD",
@@ -74,6 +76,19 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 		1.0
 	];
 
+	//
+	var Out_SizeScale = [
+		4.0,
+		4.0,
+		4.0,
+		4.0,
+		1.0,
+		4.0,
+		6.0,
+		4.0,
+		6.0
+	];
+
 	var UI_Shaders = [];
 	var UI_Materials = [];
 	var Out_Shaders;
@@ -105,6 +120,26 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 	var selected = null, hovered = null;
 	var outShaderName = "";
 	var INTERSECTED;
+
+	//function getSelOutShaderName(){
+	//	return outShaderName;
+	//}
+
+	function getSelOutSize() {
+		var outSize = new THREE.Vector3(0,0,0);//X ratio, Y ratio, Scale
+		if(selected != null && outShaderName != ""){
+			var index = Out_ShaderNames.indexOf(outShaderName);//findIndex(getSelOutShaderName);
+			console.log(outShaderName);
+			console.log(index);
+			if(index != undefined){
+				outSize.x = UI_IconsSizeX[index];
+				outSize.y = UI_IconsSizeY[index];
+				outSize.z = Out_SizeScale[index];
+			}
+			
+		}
+		return outSize;
+	}
 
 
 	function activate() {
@@ -426,8 +461,6 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 			}
 			outShaderName = picked.material.name;
 			selected = picked;
-
-			
 		}
 	
 	}
@@ -452,6 +485,7 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 			Out_Shaders = THREE.ShaderLib[ outShaderName ];
 			var uniformsOut = THREE.UniformsUtils.clone( Out_Shaders.uniforms );
 			uniformsOut.tCube.value = cubeMap;
+			uniformsOut.vUvFlip.value = new THREE.Vector2(0,1);//Canvas is top-lift texture coordinate
 
 			var Out_Mat = new THREE.ShaderMaterial({uniforms: uniformsOut,
 						vertexShader: Out_Shaders.vertexShader,
@@ -459,10 +493,20 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 
 			Out_Mat.transparent = false;
 
-			var Out = new THREE.SC_OutputImg(renderer,10,10);
-			var rtt = new THREE.SC_Raster(renderer,Out_Size,Out_Size);
-			rtt.RTT(Out_Mat);
-			Out.OutputRT2PNG(renderer,rtt.rtRTT);
+			var whRatio = getSelOutSize();
+			if (whRatio.x != 0.0 && whRatio.y!=0.0){
+				Out_Width = Math.round(whRatio.x * Out_Size * whRatio.z);
+				Out_Height = Math.round(whRatio.y * Out_Size * whRatio.z);
+
+				var Out = new THREE.SC_OutputImg(renderer,Out_Width,Out_Height);
+				var rtt = new THREE.SC_Raster(renderer,Out_Width,Out_Height);
+				rtt.RTT(Out_Mat);
+				
+				Out.OutputRT2PNG(renderer,rtt.rtRTT);
+			}
+			else{
+				console.log("Size is wrong!");
+			}
 		}
 		
 		console.log("Export!");
