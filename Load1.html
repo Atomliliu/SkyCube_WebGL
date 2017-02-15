@@ -3,6 +3,38 @@
 <head>
 <style>
 
+.container {
+    text-align: center;
+    position: absolute;
+	margin: auto;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 90%;
+	height: 50%;
+	border-radius: 3px;
+	font-size: 16px;
+    font-family: Arial, Helvetica, sans-serif;
+    /*background-color: #eeeeee;*/
+    padding: 16px;
+
+}
+
+.drop_container {
+    text-align: center;
+	margin: auto;
+	border-radius: 6px;
+	width: 80%;
+    padding: 0 10%;
+    border: 3px dashed #555555;
+}
+
+
+div.drop_container:hover {
+	background-color: #eeeeee;
+}
+
 label.buttonLoad input[type="file"] {
     position: fixed;
     top: -1000px;
@@ -18,6 +50,7 @@ label.buttonLoad input[type="file"] {
     text-decoration: none;
     display: inline-block;
     font-size: 16px;
+    font-family: Arial, Helvetica, sans-serif; 
     margin: 4px 2px;
     -webkit-transition-duration: 0.4s; /* Safari */
     transition-duration: 0.4s;
@@ -43,12 +76,37 @@ label.buttonLoad input[type="file"] {
 	transition: 0.01s;
 }
 
-label.myLabel input[type="file"] {
+#drop_zone {
+	text-align: center;
+	margin: auto;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	font-size: 16px;
+    font-family: Arial, Helvetica, sans-serif; 
+    width: 350px;
+    height: 50%;
+    border: 4px dashed #555555;
+
+}
+
+#drop_zonetext {
+	text-align: center;
+	margin: auto;
+	border-radius: 6px;
+	width: 80%;
+    padding: 10% 0;
+    border: 3px dashed #555555;
+}
+
+/***** Example custom styling *****/
+/*label.myLabel input[type="file"] {
     position: fixed;
     top: -1000px;
 }
 
-/***** Example custom styling *****/
+
 .myLabel {
     border: 2px solid #AAA;
     border-radius: 4px;
@@ -68,30 +126,39 @@ label.myLabel input[type="file"] {
 }
 .myLabel :valid + span {
     color: #4A4;
-}
+}*/
 
 </style>
 </head>
 <body>
 
-<h2>CSS Buttons</h2>
+<h2>...</h2>
 
 <!--<button>Default Button</button>
 <a href="#" class="button">Link Button</a>
-<button class="buttonLoad">Button</button>-->
-<input type="button" class="button buttonLoad" value="Input Image" />
+<button class="buttonLoad">Button</button>
+<input type="button" class="button buttonLoad" value="Input Image" />-->
 
-<label class="button buttonLoad">
-    <input type="file" required/>
-    <span>Input Image</span>
-</label>
 
-<label class="myLabel">
+
+<div class="container">
+	<!--<div id="drop_zone">-->
+		<div id = "drop_zonetext" class = "drop_container" >Drop Image Here</div>
+	<!--</div>-->
+	<p>OR</p>
+	<label class="button buttonLoad">
+	    <input type="file" id="file" required/>
+	    <span>Input Image</span>
+	</label>
+</div>
+
+<!--<label class="myLabel">
     <input type="file" required/>
     <span>My Label</span>
 </label>
 
-<input type="file" class="button buttonLoad" id="file" name="files[]" />
+<input type="file" class="button buttonLoad" id="file" name="files[]" />-->
+
 <output id="list"></output>
 
 <script>
@@ -112,6 +179,7 @@ label.myLabel input[type="file"] {
 
 	function handleFileSelect(evt) {
 		var files = evt.target.files; // FileList object
+		console.log(files[0].name);
 
 		// files is a FileList of File objects. List some properties.
 		var output = [];
@@ -125,6 +193,50 @@ label.myLabel input[type="file"] {
 	}
 
 	document.getElementById('file').addEventListener('change', handleFileSelect, false);
+
+
+	function handleFileSelect(evt) {
+    evt.stopPropagation();
+    evt.preventDefault();
+
+    var files = evt.dataTransfer.files; // FileList object.
+    console.log(files[0].name);
+
+    // files is a FileList of File objects. List some properties.
+    var output = [];
+    for (var i = 0, f; f = files[i]; i++) {
+      output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
+                  f.size, ' bytes, last modified: ',
+                  f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
+                  '</li>');
+    }
+    document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
+  }
+
+	function handleDragOver(evt) {
+		evt.stopPropagation();
+		evt.preventDefault();
+		evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
+	}
+
+	
+
+	// Setup the dnd listeners.
+	var dropZone = document.getElementById('drop_zonetext');
+	dropZone.addEventListener('dragover', handleDragOver, false);
+	dropZone.addEventListener('drop', handleFileSelect, false);
+
+	dropZone.addEventListener( 'dragenter', function ( event ) {
+
+		dropZone.style.backgroundcolor = "#555555";
+
+	}, false );
+
+	dropZone.addEventListener( 'dragleave', function ( event ) {
+
+		dropZone.style.backgroundcolor = "white";
+
+	}, false );
 
 
 </script>
