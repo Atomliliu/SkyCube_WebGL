@@ -31,9 +31,9 @@
 }
 
 
-div.drop_container:hover {
+/*div.drop_container:hover {
 	background-color: #eeeeee;
-}
+}*/
 
 label.buttonLoad input[type="file"] {
     position: fixed;
@@ -78,26 +78,28 @@ label.buttonLoad input[type="file"] {
 
 #drop_zone {
 	text-align: center;
+	position: absolute;
 	margin: auto;
 	top: 0;
 	right: 0;
 	bottom: 0;
 	left: 0;
-	font-size: 16px;
+	/*font-size: 16px;
     font-family: Arial, Helvetica, sans-serif; 
-    width: 350px;
-    height: 50%;
-    border: 4px dashed #555555;
-
+    border: 4px dashed #ffffff;user-select: none;
+*/
+    width: 100%;
+    height: 100%;
+    background: #555555;
+    opacity: 1.0;
+    display: block;
 }
 
-#drop_zonetext2 {
+#drop_zonetext {
 	text-align: center;
 	margin: auto;
-	border-radius: 6px;
 	width: 80%;
-    padding: 10% 0;
-    border: 3px dashed #555555;
+    padding: 5% 0;
 }
 
 /***** Example custom styling *****/
@@ -140,16 +142,18 @@ label.buttonLoad input[type="file"] {
 <input type="button" class="button buttonLoad" value="Input Image" />-->
 
 
-
+<div id = "drop_zone"  >
 <div class="container">
 	<!--<div id="drop_zone">-->
-		<div id = "drop_zonetext" class = "drop_container" >Drop Image Here</div>
+		<div id = "drop_zonetext"  ><h1>Drop files to upload</h1></div>
 	<!--</div>-->
 	<p>OR</p>
 	<label class="button buttonLoad">
 	    <input type="file" id="file" required/>
 	    <span>Input Image</span>
 	</label>
+</div>
+
 </div>
 
 <!--<label class="myLabel">
@@ -162,6 +166,8 @@ label.buttonLoad input[type="file"] {
 <output id="list"></output>
 
 <script>
+	var x = document.getElementById('drop_zone');
+	var dropZone = document;//document.getElementById('drop_zonetext');
 
 	function checkCompatible(){
 		// Check for the various File API support.
@@ -211,7 +217,9 @@ label.buttonLoad input[type="file"] {
 	                  '</li>');
 	    }
 	    document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
-	    dropZone.style.backgroundColor = "white";
+	    //dropZone.body.style.backgroundColor = "white";
+	    //x.style.display = 'none';
+	    //x.style.opacity = 0.0;
 	}
 
 	function handleDragOver(evt) {
@@ -224,29 +232,105 @@ label.buttonLoad input[type="file"] {
 	
 
 	// Setup the dnd listeners.
-	var dropZone = document.getElementById('drop_zonetext');
-	dropZone.addEventListener('dragover', handleDragOver, false);
-	dropZone.addEventListener('drop', handleFileSelect, false);
+	
+/*	document.addEventListener('dragover', handleDragOver, false);
+	document.addEventListener('drop', handleFileSelect, false);
 
-	dropZone.addEventListener( 'dragenter', function ( event ) {
+	document.addEventListener('dragenter', function ( event ) {
 		//console.log(dropZone.style.backgroundColor);
-		dropZone.style.backgroundColor  = "#555555";
+		//
+		//dropZone.style.backgroundColor  = "#555555";
+
+		//document.body.style.opacity = 0.1;
+		//console.log("In");
+	    
+	    //x.style.display = 'block';
+	    //x.style.backgroundColor  = "#555555";
+	    //x.style.opacity = 0.5;
+	    //x.style.display = 'block';
+
+	    //dropZone.body.style.backgroundColor  = "#555555";
+	    
 
 
 	}, false );
 
-	dropZone.addEventListener( 'dragleave', function ( event ) {
-
-		dropZone.style.backgroundColor = "white";
+	document.addEventListener( 'dragleave', function ( event ) {
+		//if ( event.target.className == "droptarget" ) {
+	    //    event.target.style.border = "";
+	    //    document.getElementById("demo").innerHTML = "Left the dropzone";
+	    //}
+		//console.log("leave");
+		//dropZone.body.style.backgroundColor = "white";
+		//x.style.display = 'none';
+		//x.style.opacity = 0.0;
+		//x.style.display = 'none';
 
 	}, false );
+
+
+	x.addEventListener('dragenter', function ( event ) {
+		//console.log(dropZone.style.backgroundColor);
+		//
+		//dropZone.style.backgroundColor  = "#555555";
+
+		//document.body.style.opacity = 0.1;
+		console.log("In2");
+	    
+	    //x.style.display = 'block';
+	    //x.style.backgroundColor  = "#555555";
+	    //x.style.opacity = 0.5;
+	    //x.style.display = 'block';
+
+	    //dropZone.body.style.backgroundColor  = "#555555";
+	    
+
+
+	}, false );
+
+	x.addEventListener( 'dragleave', function ( event ) {
+		//if ( event.target.className == "droptarget" ) {
+	    //    event.target.style.border = "";
+	    //    document.getElementById("demo").innerHTML = "Left the dropzone";
+	    //}
+		console.log("leave2");
+		//dropZone.body.style.backgroundColor = "white";
+		//x.style.display = 'none';
+		//x.style.opacity = 1.0;
+		//x.style.display = 'none';
+
+	}, false );
+	*/
+
+	[ 'drag', 'dragstart', 'dragend', 'dragover', 'dragenter', 'dragleave', 'drop' ].forEach( function( event )
+	{
+		x.addEventListener( event, function( e )
+		{
+			// preventing the unwanted behaviours
+			e.preventDefault();
+			e.stopPropagation();
+		});
+	});
+
+	[ 'dragover', 'dragenter' ].forEach( function( event )
+	{
+		x.addEventListener( event, function()
+		{
+			//form.classList.add( 'is-dragover' );
+			x.style.opacity = 0.5;
+		});
+	});
+	[ 'dragleave', 'dragend', 'drop' ].forEach( function( event )
+	{
+		x.addEventListener( event, function()
+		{
+			//form.classList.remove( 'is-dragover' );
+			x.style.opacity = 1.0;
+		});
+	});
 
 
 </script>
 
 </body>
 </html>
-
-
-
-
