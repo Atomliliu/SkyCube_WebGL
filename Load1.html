@@ -91,7 +91,7 @@ label.buttonLoad input[type="file"] {
 
 }
 
-#drop_zonetext {
+#drop_zonetext2 {
 	text-align: center;
 	margin: auto;
 	border-radius: 6px;
@@ -196,27 +196,29 @@ label.buttonLoad input[type="file"] {
 
 
 	function handleFileSelect(evt) {
-    evt.stopPropagation();
-    evt.preventDefault();
+	    evt.stopPropagation();
+	    evt.preventDefault();
 
-    var files = evt.dataTransfer.files; // FileList object.
-    console.log(files[0].name);
+	    var files = evt.dataTransfer.files; // FileList object.
+	    console.log(files[0].name);
 
-    // files is a FileList of File objects. List some properties.
-    var output = [];
-    for (var i = 0, f; f = files[i]; i++) {
-      output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
-                  f.size, ' bytes, last modified: ',
-                  f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
-                  '</li>');
-    }
-    document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
-  }
+	    // files is a FileList of File objects. List some properties.
+	    var output = [];
+	    for (var i = 0, f; f = files[i]; i++) {
+	      output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
+	                  f.size, ' bytes, last modified: ',
+	                  f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
+	                  '</li>');
+	    }
+	    document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
+	    dropZone.style.backgroundColor = "white";
+	}
 
 	function handleDragOver(evt) {
 		evt.stopPropagation();
 		evt.preventDefault();
 		evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
+
 	}
 
 	
@@ -227,14 +229,15 @@ label.buttonLoad input[type="file"] {
 	dropZone.addEventListener('drop', handleFileSelect, false);
 
 	dropZone.addEventListener( 'dragenter', function ( event ) {
+		//console.log(dropZone.style.backgroundColor);
+		dropZone.style.backgroundColor  = "#555555";
 
-		dropZone.style.backgroundcolor = "#555555";
 
 	}, false );
 
 	dropZone.addEventListener( 'dragleave', function ( event ) {
 
-		dropZone.style.backgroundcolor = "white";
+		dropZone.style.backgroundColor = "white";
 
 	}, false );
 
