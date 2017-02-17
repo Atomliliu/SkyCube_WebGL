@@ -86,13 +86,14 @@ label.buttonLoad input[type="file"] {
 	left: 0;
 	/*font-size: 16px;
     font-family: Arial, Helvetica, sans-serif; 
-    border: 4px dashed #ffffff;user-select: none;
+    border: 4px dashed #ffffff;user-select: none;    display: none;
 */
     width: 100%;
     height: 100%;
     background: #555555;
     opacity: 1.0;
-    display: block;
+	visibility: hidden;
+
 }
 
 #drop_zonetext {
@@ -142,7 +143,7 @@ label.buttonLoad input[type="file"] {
 <input type="button" class="button buttonLoad" value="Input Image" />-->
 
 
-<div id = "drop_zone"  >
+
 <div class="container">
 	<!--<div id="drop_zone">-->
 		<div id = "drop_zonetext"  ><h1>Drop files to upload</h1></div>
@@ -153,8 +154,8 @@ label.buttonLoad input[type="file"] {
 	    <span>Input Image</span>
 	</label>
 </div>
+<div id = "drop_zone"  ></div>
 
-</div>
 
 <!--<label class="myLabel">
     <input type="file" required/>
@@ -235,19 +236,27 @@ label.buttonLoad input[type="file"] {
 	
 /*	document.addEventListener('dragover', handleDragOver, false);
 	document.addEventListener('drop', handleFileSelect, false);
+*/
 
-	document.addEventListener('dragenter', function ( event ) {
+	function showDropZone() {
+    	x.style.visibility = "visible";
+	}
+	function hideDropZone() {
+	    x.style.visibility = "hidden";
+	}
+	window.addEventListener('dragenter', function ( event ) {
 		//console.log(dropZone.style.backgroundColor);
 		//
 		//dropZone.style.backgroundColor  = "#555555";
 
 		//document.body.style.opacity = 0.1;
-		//console.log("In");
+		console.log("In");
 	    
 	    //x.style.display = 'block';
 	    //x.style.backgroundColor  = "#555555";
 	    //x.style.opacity = 0.5;
 	    //x.style.display = 'block';
+	    showDropZone();
 
 	    //dropZone.body.style.backgroundColor  = "#555555";
 	    
@@ -255,12 +264,12 @@ label.buttonLoad input[type="file"] {
 
 	}, false );
 
-	document.addEventListener( 'dragleave', function ( event ) {
+	window.addEventListener( 'dragleave', function ( event ) {
 		//if ( event.target.className == "droptarget" ) {
 	    //    event.target.style.border = "";
 	    //    document.getElementById("demo").innerHTML = "Left the dropzone";
 	    //}
-		//console.log("leave");
+		console.log("leave");
 		//dropZone.body.style.backgroundColor = "white";
 		//x.style.display = 'none';
 		//x.style.opacity = 0.0;
@@ -268,7 +277,7 @@ label.buttonLoad input[type="file"] {
 
 	}, false );
 
-
+/**/
 	x.addEventListener('dragenter', function ( event ) {
 		//console.log(dropZone.style.backgroundColor);
 		//
@@ -297,11 +306,18 @@ label.buttonLoad input[type="file"] {
 		//dropZone.body.style.backgroundColor = "white";
 		//x.style.display = 'none';
 		//x.style.opacity = 1.0;
-		//x.style.display = 'none';
+		hideDropZone();
 
 	}, false );
-	*/
+	
+	x.addEventListener('dragenter', allowDrag);
+	x.addEventListener('dragover', allowDrag);
 
+	x.addEventListener('dragstart', function(e){
+	    e.dataTransfer.setData('application/node type', this);
+	    console.log("dragstart:", e)
+	});
+	/*
 	[ 'drag', 'dragstart', 'dragend', 'dragover', 'dragenter', 'dragleave', 'drop' ].forEach( function( event )
 	{
 		x.addEventListener( event, function( e )
@@ -318,6 +334,7 @@ label.buttonLoad input[type="file"] {
 		{
 			//form.classList.add( 'is-dragover' );
 			x.style.opacity = 0.5;
+			x.style.display = 'block';
 		});
 	});
 	[ 'dragleave', 'dragend', 'drop' ].forEach( function( event )
@@ -326,8 +343,9 @@ label.buttonLoad input[type="file"] {
 		{
 			//form.classList.remove( 'is-dragover' );
 			x.style.opacity = 1.0;
+			x.style.display = 'none';
 		});
-	});
+	});*/
 
 
 </script>
