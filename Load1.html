@@ -142,13 +142,15 @@ h3{
 <input type="file" class="button buttonLoad" id="file" name="files[]" />
 
 <output id="list"></output>-->
-
+<script src="../build/three.js"></script>
+<script src="js/skycube/SC_GrabAndDropFiles.js"></script>
 <script>
 
 
 
 	var dropZone = document.getElementById('drop_zone');
 	//var dropZone = document;//document.getElementById('drop_zonetext');
+	var ddd = new THREE.SC_GrabAndDropFiles("");
 
 	function checkCompatible(){
 		// Check for the various File API support.
@@ -239,7 +241,8 @@ h3{
 	    dropZone.style.visibility = "hidden";
 	}
 	window.addEventListener('dragenter', function ( event ) {
-	    showDropZone();
+	   //showDropZone();
+	   ddd.showDropZone();
 	}, false );
 
 	window.addEventListener( 'dragleave', function ( event ) {
