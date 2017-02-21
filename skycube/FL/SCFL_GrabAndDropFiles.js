@@ -5,19 +5,41 @@ SCFL_GrabAndDropFiles = function ( idName, typeName ) {
 	var root = this;
 	this.div = undefined;
 	this.files;
+
+	//var common = new SCFL_Common();
 	
 	this.enabled = true;
 
-	var filesType = [];
+	var loadType = [];
+	
 	var typeIsRight = false;
 
 	function type2Array(){
-		filesType = typeName.split(",");
-
+		loadType = typeName.split(",");
 	}
 
 	if(typeName != undefined && typeName != ""){
 		type2Array();
+	}
+
+	function checkTypeAvailable( fileCheck, fileTypeArray ){
+		var fileExt = fileCheck.name.split(".");
+
+		var fe = fileTypeArray.indexOf("." + fileExt[fileExt.length - 1]);
+		//console.log(fileExt[fileExt.length - 1]);
+		if (fe >= 0) {return true;}
+		else {return false;}
+	}
+
+	function checkTypeAvailableInFiles( filesArray, fileTypeArray ){
+		for (var i = 0; i< filesArray.length; i++) {
+	    	var f = filesArray[i];
+	    	
+	    	if (checkTypeAvailable(f,fileTypeArray)){
+	    		return true;
+	    	}
+	    }
+	    return false;
 	}
 
 
@@ -83,28 +105,6 @@ SCFL_GrabAndDropFiles = function ( idName, typeName ) {
 	    removeDropZone();
 	}
 
-	function checkTypeAvailable( fc ){
-		var fileExt = fc.name.split(".");
-
-		var fe = filesType.indexOf("."+fileExt[fileExt.length - 1]);
-		//console.log(fileExt[fileExt.length - 1]);
-		if (fe >= 0) {return true;}
-		else {return false;}
-	}
-
-	function checkTypeAvailableInFiles( fs ){
-		for (var i = 0; i< fs.length; i++) {
-	    	var f = fs[i];
-	    	
-	    	if (checkTypeAvailable(f)){
-	    		return true;
-	    	}
-	    }
-
-	    return false;
-
-	}
-
 
 	function onDragEnter(event){
 		//event.stopPropagation();
@@ -126,13 +126,13 @@ SCFL_GrabAndDropFiles = function ( idName, typeName ) {
 	    event.stopPropagation();
 	    event.preventDefault();
 
-	    //console.log(filesType.length);
+	    //console.log(loadType.length);
 
 	    root.files = event.dataTransfer.files; // FileList object.
 
-		if(filesType.length >= 1){
+		if(loadType.length >= 1){
 			
-		    if(checkTypeAvailableInFiles(root.files)){
+		    if(checkTypeAvailableInFiles(root.files, loadType)){
 	    		//;
 	    		console.log("good");
 	    	}
@@ -197,3 +197,4 @@ SCFL_GrabAndDropFiles = function ( idName, typeName ) {
 	this.deactivate = deactivate;
 	this.dispose = dispose;
 };
+
