@@ -144,17 +144,8 @@ h3{
 <script src="../build/three.js"></script>
 <script src="js/skycube/FL/SCFL_Common.js"></script>-->
 <script src="js/skycube/FL/SCFL_GrabAndDropFiles.js"></script>
+<script src="js/skycube/FL/SCFL_LoadFiles.js"></script>
 <script>
-
-
-	var type = ".jpg,.png,.tga,.tif";
-	var dropZone = new SCFL_GrabAndDropFiles("", type);
-	dropZone.activate();
-	setupFilesType("file");
-
-	function setupFilesType( idName ){
-		document.getElementById(idName).setAttribute("accept", type);
-	}
 
 	function checkCompatible(){
 		// Check for the various File API support.
@@ -170,26 +161,51 @@ h3{
 		return false;
 	}
 
-	function handleFileSelect(evt) {
-		var files = evt.target.files; // FileList object
-		//console.log(files[0].name);
+	///////////////////////////////////////////////////////////////////////////////
+	var type = ".jpg,.png,.tga,.tif";
+	var loader = new SCFL_LoadFiles();
 
-		// files is a FileList of File objects. List some properties.
-		//var output = [];
-		for (var i = 0, f; f = files[i]; i++) {
-		  /*output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
-		              f.size, ' bytes, last modified: ',
-		              f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
-		              '</li>');*/
+	var dropZone = new SCFL_GrabAndDropFiles("", type);
+
+	var loadStatus = false;
+	
+	dropZone.activate();
+	setupFilesType("file");
+
+	dropZone.onLoaded = function(){
+		loadStatus = loader.load(dropZone.files);
+		if(loadStatus){
+			//
 		}
-		//document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
+	}
+
+	loader.onLoaded = function(){
+		test();
+	}
+
+	
+
+	function setupFilesType( idName ){
+		document.getElementById(idName).setAttribute("accept", type);
+	}
+
+	
+
+	function handleFileSelect(evt) {
+		loadStatus = loader.load(evt.target.files); // FileList object
+		if(loadStatus){
+			//
+		}
 	}
 
 	// Setup the dnd listeners.
 	document.getElementById('file').addEventListener('change', handleFileSelect, false);
 
 
-
+	///////////////////////////TEST////////////////////////////
+	function test(){
+		console.log(loader.rImgWidth[0]);
+	}
 
 
 </script>
