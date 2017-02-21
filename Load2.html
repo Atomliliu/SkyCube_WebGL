@@ -141,7 +141,8 @@ h3{
 <input type="file" class="button buttonLoad" id="file" name="files[]" />
 
 <output id="list"></output>
-<script src="../build/three.js"></script>-->
+<script src="../build/three.js"></script>
+<script src="js/skycube/FL/SCFL_Common.js"></script>-->
 <script src="js/skycube/FL/SCFL_GrabAndDropFiles.js"></script>
 <script>
 
@@ -176,8 +177,6 @@ h3{
 		// files is a FileList of File objects. List some properties.
 		//var output = [];
 		for (var i = 0, f; f = files[i]; i++) {
-			console.log(f.type);
-			console.log(f.name);
 		  /*output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
 		              f.size, ' bytes, last modified: ',
 		              f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
@@ -185,31 +184,6 @@ h3{
 		}
 		//document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
 	}
-
-	
-
-
-	/*function handleFileDrop(evt) {
-	    evt.stopPropagation();
-	    evt.preventDefault();
-
-	    var files = evt.dataTransfer.files; // FileList object.
-	    //console.log(files[0].name);
-
-	    // files is a FileList of File objects. List some properties.
-	    //var output = [];
-	    for (var i = 0, f; f = files[i]; i++) {*/
-	      /*output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
-	                  f.size, ' bytes, last modified: ',
-	                  f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
-	                  '</li>');*/
-	    /*}
-	    //document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
-	    hideDropZone();
-	}*/
-
-
-	
 
 	// Setup the dnd listeners.
 	document.getElementById('file').addEventListener('change', handleFileSelect, false);
