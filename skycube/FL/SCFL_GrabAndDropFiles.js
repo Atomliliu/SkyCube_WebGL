@@ -1,4 +1,5 @@
 //Grab and Drop
+//import {SCFL_LoadPanorama} from "SCFL_LoadPanorama.js";
 
 SCFL_GrabAndDropFiles = function ( idName, typeName ) {
 
@@ -122,6 +123,8 @@ SCFL_GrabAndDropFiles = function ( idName, typeName ) {
 	    //console.log("dragstart:", event);
 	}
 
+	this.onLoaded = undefined;
+
 	function onFileDrop(event) {
 	    event.stopPropagation();
 	    event.preventDefault();
@@ -133,12 +136,15 @@ SCFL_GrabAndDropFiles = function ( idName, typeName ) {
 		if(loadType.length >= 1){
 			
 		    if(checkTypeAvailableInFiles(root.files, loadType)){
-	    		//;
-	    		console.log("good");
+		    	if(root.onLoaded) {root.onLoaded();}
+	    		//if(cbFunc) {
+	    		//	cbFunc(root.files);
+	    		//}
+	    		//console.log("good");
 	    	}
 			else{
 				//Alert Window for Filr type
-				console.log("file type not supported!");
+				//console.log("file type not supported!");
 			}
 		}
 		
