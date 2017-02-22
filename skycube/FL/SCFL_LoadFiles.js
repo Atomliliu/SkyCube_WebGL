@@ -1,185 +1,60 @@
-//
+//Loading files
+//import {SCFL_LoadPanorama} from "SCFL_LoadPanorama.js";
 
-SCFL_LoadPanorama = function ( imgFile ) {
-	//this.img = imgFile;
-	this.enabled = true;
-
-	//var imgWidth = this.img.width;
-	//var imgHeight = this.img.height;
-	var divModal;
+SCFL_LoadFiles = function() {
 
 	var root = this;
+	var reader = new FileReader();
 
-	this.defIndex = 0;
-
-	var WHRatio = [
-		2.0,
-		1.3333333333333333333333333333333,
-		2.0,
-		1.0,
-		1.0,
-		1.0,
-		6.0,
-		0.75,
-		0.16666666666666666666666666666667
-	];
-
-	var FormatNames = [
-		"DP",
-		"HCC",
-		"LL",
-		"SP",
-		"CUBEFACE",
-		"LP",
-		"HCUBE",
-		"VCC",
-		"VCUBE"
-	];
-
-	/*var Out_ShaderNames = [
-		"ENV2DP",
-		"ENV2HCC",
-		"ENV2LL",
-		"ENV2SP",
-		"ENV2CUBEFACE",
-		"ENV2LP",
-		"ENV2HCUBE",
-		"ENV2VCC",
-		"ENV2VCUBE"
-	];*/
+	this.files = [];
+	this.enabled = true;
+	var filesType = [];
 
 
-	//Move this func to common
-	function loadjscssfile(fileName, fileType){
-	    if (fileType=="js"){ //if filename is a external JavaScript file
-	        var fileRef=document.createElement('script')
-	        fileRef.setAttribute("type","text/javascript")
-	        fileRef.setAttribute("src", fileName)
-	    }
-	    else if (fileType=="css"){ //if filename is an external CSS file
-	        var fileRef=document.createElement("link")
-	        fileRef.setAttribute("rel", "stylesheet")
-	        fileRef.setAttribute("type", "text/css")
-	        fileRef.setAttribute("href", fileName)
-	    }
-	    if (typeof fileRef!="undefined")
-	        document.getElementsByTagName("head")[0].appendChild(fileRef)
-	}
+	this.rFilesData = [];
+	this.rFilesType = [];
+	this.rFilesSize = [];
+	this.rImgWidth = [];
+	this.rImgHeight = [];
 
-	/*function listDD() {
-	    document.getElementById("dropdownList").classList.toggle("show");
-	}*/
+	this.rSelData;
+	this.rSelType = 1;
 
-	function selFormatWindow() {
-		divModal = document.createElement("div");
-		divModal.id = "myModal";
-		divModal.setAttribute("class", "modal");
-
-		var divContent = document.createElement("div");
-		divContent.setAttribute("class", "modal-content");
-
-		var span = document.createElement("SPAN");
-		span.setAttribute("class", "close");
-		var closeIcon = document.createTextNode("\xD7");
-		span.appendChild(closeIcon);
-
-
-		var p = document.createElement("P");
-		var text1 = document.createTextNode("Some text in the Modal...");
-		p.appendChild(text1);
-
-		//dropdown
-		var divDD = document.createElement("div");
-		divDD.setAttribute("class", "dropdown");
-
-		var selectDD = document.createElement("select");
-		/*buttonDD.setAttribute("class", "dropbtn");
-		//var textButtonDD = document.createTextNode("Dropdown");
-		//buttonDD.appendChild(textButtonDD);
-		//buttonDD.onclick=listDD;
-		//var divDDList = document.createElement("div");
-		//divDDList.id = "dropdownList";
-		//divDDList.setAttribute("class", "dropdown-content");
-		//divDDList.onclick=function(){console.log(this.selectedIndex);};*/
-		//Add DD List
-		for (var i=0;i<FormatNames.length;i++) {
-			var item = document.createElement("option");
-			item.id = FormatNames[i];
-			item.value = FormatNames[i];
-			item.innerHTML = FormatNames[i];
-			//item.appendChild(document.createTextNode(FormatNames[i]));
-			selectDD.appendChild(item);
-			
-		}
-		selectDD.selectedIndex = root.defIndex;
-		selectDD.onchange = function(){
-		    onSelFormat(this.selectedIndex,this.options[this.selectedIndex].value);
-		};
-		divDD.appendChild(selectDD);
-		//divDD.appendChild(divDDList);
-
-		//
-		divContent.appendChild(span);
-		divContent.appendChild(p);
-		divContent.appendChild(divDD);
-		divModal.appendChild(divContent);
-
-		document.body.appendChild(divModal);
-
-		span.onclick = function() {
-		    divModal.style.display = "none";
-		}
-	}
-
-
-	function onSelFormat(index,name){
-		console.log(index);
-		console.log(name);
-	}
-
-
-	// Close the dropdown if the user clicks outside of it
-	window.onclick = function(event) {
-	  if (!event.target.matches('.dropbtn')) {
-
-	    var dropdowns = document.getElementsByClassName("dropdown-content");
-	    var i;
-	    for (i = 0; i < dropdowns.length; i++) {
-	      var openDropdown = dropdowns[i];
-	      if (openDropdown.classList.contains('show')) {
-	        openDropdown.classList.remove('show');
-	      }
-	    }
-	  }
-	}
-
-
-
-/*
-
-<select>
-  <option id="myOption" value="volvocar">Volvo</option>
-  <option value="saabcar">Saab</option>
-</select>
-
-
-
-<div class="dropdown">
-  <button onclick="myFunction()" class="dropbtn">Dropdown</button>
-  <div id="myDropdown" class="dropdown-content">
-    <a href="#home">Home</a>
-    <a href="#about">About</a>
-    <a href="#contact">Contact</a>
-  </div>
-</div>
-*/
 	
 
-	function activate() {
-		loadjscssfile("js/skycube/CSS/SC_InputPanoramaFormatModal.css","css");
+	
 
-		selFormatWindow();
-		divModal.style.display = "block";
+	
+
+	function checkCompatible(){
+		// Check for the various File API support.
+		if (window.File && window.FileReader && window.FileList && window.Blob) {
+		  // Great success! All the File APIs are supported.
+		  return true;
+		} 
+		else {
+		  alert('The File APIs are not fully supported in this browser.');
+		  return false;
+		}
+		return false;
+	}
+
+	function checkType( format ){
+		switch (format.toLowerCase()) {
+			case "jpg":
+				break;
+			case "png":
+				break;
+			case "fbx":
+				return 2;
+			default:
+				return -1;
+		}
+		return 1;
+	}
+
+
+	function activate() {
 
 	}
 
@@ -192,8 +67,130 @@ SCFL_LoadPanorama = function ( imgFile ) {
 		deactivate();
 	}
 
+	function clear() {
+		root.files = [];
+		var filesType = [];
+
+
+		root.rFilesData = [];
+		root.rFilesType = [];
+		root.rFilesSize = [];
+		root.rImgWidth = [];
+		root.rImgHeight = [];
+
+		root.rSelData = undefined;
+	}
+
 	this.activate = activate;
 	this.deactivate = deactivate;
 	this.dispose = dispose;
+	this.clear = clear;
+
+	/*function onImgLoadedSize(w,h){
+		root.rImgWidth.push(w);
+		root.rImgHeight.push(h);
+
+	}
+
+	function NativeImgReader2(file, callback) {
+	    reader.onload = function(evt) {
+	        var image = new Image();
+	        image.onload = function(evt) {
+	            var width = this.width;
+	            var height = this.height;
+	            if (callback) callback(width, height);
+	        };
+	        root.rFilesData.push(evt.target.result);
+	    };
+	    reader.readAsDataURL(file);
+	}*/
+
+	this.onLoaded = undefined;
+
+	function NativeImgThumbReader(file) {
+	    reader.onload = function(evt) {
+	        var image = new Image();
+	        image.onload = function(evt) {
+	            root.rImgWidth.push(this.width);
+				root.rImgHeight.push(this.height);
+	  			root.rFilesData.push(this);
+	  			if (root.onLoaded) root.onLoaded();
+	        };
+	        image.src = evt.target.result;
+	        
+	    };
+	    reader.readAsDataURL(file);
+	}
+
+	function NativeImgReader(file) {
+	    reader.onload = function(evt) {
+	        var image = new Image();
+	        image.onload = function(evt) {
+	  			root.rSelData = this;
+	  			if (root.onLoaded) root.onLoaded();
+	        };
+	        image.src = evt.target.result;
+	        
+	    };
+	    reader.readAsDataURL(file);
+	}
+
+
+	this.load = function(fileList, fileExtList){
+		clear();
+		if (fileList!=undefined && fileList.length > 0){
+			if(fileExtList!=undefined && fileList.length == fileExtList.length){
+				filesType = fileExtList;
+			}
+			else{
+				for(var i=0;i<fileList.length;i++){
+					var fileExt = fileList[i].name.split(".");
+
+					filesType[i] = fileExt[fileExt.length - 1];
+				}
+			}
+			
+		}
+		else{
+			return false;
+		}
+
+		//////////////////////////////////
+		if(fileList.length > 1){
+			//
+		}
+		else //Single file
+		{
+			var f = fileList[0];
+			var ft = filesType[0];
+			var fn = f.name;
+
+			root.rFilesType[0] = checkType(ft);
+
+			if(root.rFilesType[0] == 1){
+				/*reader.addEventListener( 'load', function ( event ) {
+					root.rfilesData.push(event.target.result);
+					root.rfilesSize.push(f.Size);
+					console.log("LOADED");
+
+				}, false );
+
+				reader.readAsDataURL( f );*/
+				NativeImgReader(f);
+				//console.log(root.rImgWidth[0]+'+'+root.rImgHeight[0]);
+				return true;
+			}
+			else{
+				//
+				console.log("file type not supported!");
+			}
+			
+		}
+
+	}
 
 };
+
+
+
+
