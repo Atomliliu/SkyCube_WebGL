@@ -28,6 +28,7 @@ h3{
 <script src="js/skycube/FL/SCFL_InputFiles.js"></script>
 <script src="js/skycube/FL/SCFL_GrabAndDropFiles.js"></script>
 <script src="js/skycube/FL/SCFL_LoadFiles.js"></script>
+<script src="js/skycube/FL/SCFL_LoadPanorama.js"></script>
 <script>
 
 	function checkCompatible(){
@@ -52,12 +53,21 @@ h3{
 
 	var dropZone = new SCFL_GrabAndDropFiles("", type);
 
+
 	var loadStatus = false;
 
 
 	inputPage.activate();
 	dropZone.activate();
 
+	inputPage.onLoaded = function(){
+		loadStatus = loader.load(inputPage.files);
+		if(loadStatus){
+			//
+
+		}
+		//test();
+	}
 
 	dropZone.onLoaded = function(){
 		loadStatus = loader.load(dropZone.files);
@@ -71,30 +81,14 @@ h3{
 		test();
 	}
 
-
-	/*
-	setupFilesType("file");
-
-	function setupFilesType( idName ){
-		document.getElementById(idName).setAttribute("accept", type);
-	}
-
-	
-
-	function handleFileSelect(evt) {
-		loadStatus = loader.load(evt.target.files); // FileList object
-		if(loadStatus){
-			//
-		}
-	}
-
-	// Setup the dnd listeners.
-	document.getElementById('file').addEventListener('change', handleFileSelect, false);
-	*/
-
 	///////////////////////////TEST////////////////////////////
 	function test(){
-		console.log(loader.rImgWidth[0]);
+		//console.log(loader.rImgWidth[0]);
+		console.log(loader.rSelData.width);
+		var panaorama = new SCFL_LoadPanorama(loader.rSelData);
+		inputPage.hidden();
+		panaorama.activate();
+
 	}
 
 
