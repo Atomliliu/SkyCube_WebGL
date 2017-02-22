@@ -15,6 +15,7 @@ SCFL_GrabAndDropFiles = function ( idName, typeName ) {
 	
 	var typeIsRight = false;
 
+	//Move it to THREE
 	function type2Array(){
 		loadType = typeName.split(",");
 	}
@@ -23,15 +24,20 @@ SCFL_GrabAndDropFiles = function ( idName, typeName ) {
 		type2Array();
 	}
 
+	//Move it to THREE
 	function checkTypeAvailable( fileCheck, fileTypeArray ){
 		var fileExt = fileCheck.name.split(".");
 
 		var fe = fileTypeArray.indexOf("." + fileExt[fileExt.length - 1]);
+		//var fileExt = fileName.substr(fileName.lastIndexOf('.') + 1);
+		//var fileExt = filename.split('.').pop();
+
 		//console.log(fileExt[fileExt.length - 1]);
 		if (fe >= 0) {return true;}
 		else {return false;}
 	}
 
+	//Move it to THREE
 	function checkTypeAvailableInFiles( filesArray, fileTypeArray ){
 		for (var i = 0; i< filesArray.length; i++) {
 	    	var f = filesArray[i];
@@ -43,7 +49,7 @@ SCFL_GrabAndDropFiles = function ( idName, typeName ) {
 	    return false;
 	}
 
-
+	//Move it to THREE
 	function checkCompatible(){
 		// Check for the various File API support.
 		if (window.File && window.FileReader && window.FileList && window.Blob) {
