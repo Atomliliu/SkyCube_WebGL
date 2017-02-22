@@ -17,6 +17,9 @@ SCFL_LoadFiles = function() {
 	this.rImgWidth = [];
 	this.rImgHeight = [];
 
+	this.rSelData;
+	this.rSelType = 1;
+
 	
 
 	
@@ -74,6 +77,8 @@ SCFL_LoadFiles = function() {
 		root.rFilesSize = [];
 		root.rImgWidth = [];
 		root.rImgHeight = [];
+
+		root.rSelData = undefined;
 	}
 
 	this.activate = activate;
@@ -102,7 +107,7 @@ SCFL_LoadFiles = function() {
 
 	this.onLoaded = undefined;
 
-	function NativeImgReader(file) {
+	function NativeImgThumbReader(file) {
 	    reader.onload = function(evt) {
 	        var image = new Image();
 	        image.onload = function(evt) {
@@ -117,7 +122,18 @@ SCFL_LoadFiles = function() {
 	    reader.readAsDataURL(file);
 	}
 
-	
+	function NativeImgReader(file) {
+	    reader.onload = function(evt) {
+	        var image = new Image();
+	        image.onload = function(evt) {
+	  			root.rSelData = this;
+	  			if (root.onLoaded) root.onLoaded();
+	        };
+	        image.src = evt.target.result;
+	        
+	    };
+	    reader.readAsDataURL(file);
+	}
 
 
 	this.load = function(fileList, fileExtList){
