@@ -93,14 +93,7 @@ SCFL_LoadPanorama = function ( imgFile ) {
 		divDD.setAttribute("class", "dropdown");
 
 		var selectDD = document.createElement("select");
-		/*buttonDD.setAttribute("class", "dropbtn");
-		//var textButtonDD = document.createTextNode("Dropdown");
-		//buttonDD.appendChild(textButtonDD);
-		//buttonDD.onclick=listDD;
-		//var divDDList = document.createElement("div");
-		//divDDList.id = "dropdownList";
-		//divDDList.setAttribute("class", "dropdown-content");
-		//divDDList.onclick=function(){console.log(this.selectedIndex);};*/
+
 		//Add DD List
 		for (var i=0;i<FormatNames.length;i++) {
 			var item = document.createElement("option");
@@ -161,17 +154,6 @@ SCFL_LoadPanorama = function ( imgFile ) {
   <option id="myOption" value="volvocar">Volvo</option>
   <option value="saabcar">Saab</option>
 </select>
-
-
-
-<div class="dropdown">
-  <button onclick="myFunction()" class="dropbtn">Dropdown</button>
-  <div id="myDropdown" class="dropdown-content">
-    <a href="#home">Home</a>
-    <a href="#about">About</a>
-    <a href="#contact">Contact</a>
-  </div>
-</div>
 */
 	
 
