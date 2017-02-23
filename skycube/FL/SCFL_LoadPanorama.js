@@ -12,11 +12,11 @@ SCFL_LoadPanorama = function ( imgFile ) {
 
 	this.defIndex = 0;
 
+	//
 	var WHRatio = [
 		2.0,
 		1.3333333333333333333333333333333,
 		2.0,
-		1.0,
 		1.0,
 		1.0,
 		6.0,
@@ -25,15 +25,14 @@ SCFL_LoadPanorama = function ( imgFile ) {
 	];
 
 	var FormatNames = [
-		"DP",
-		"HCC",
-		"LL",
-		"SP",
-		"CUBEFACE",
-		"LP",
-		"HCUBE",
-		"VCC",
-		"VCUBE"
+		"Dual-Paraboloid (Hemispheres)",
+		"Horizon Cross CubeMap",
+		"LatLong (Latitude/Longitude)",
+		"Spherical Mirrored Probe (Matcap)",
+		"Light Probe (Angular)",
+		"Horizon Linear CubeMap",
+		"Vertical Cross CubeMap",
+		"Vertical Linear CubeMap"
 	];
 
 	/*var Out_ShaderNames = [
@@ -41,7 +40,6 @@ SCFL_LoadPanorama = function ( imgFile ) {
 		"ENV2HCC",
 		"ENV2LL",
 		"ENV2SP",
-		"ENV2CUBEFACE",
 		"ENV2LP",
 		"ENV2HCUBE",
 		"ENV2VCC",
@@ -90,7 +88,7 @@ SCFL_LoadPanorama = function ( imgFile ) {
 
 		//dropdown
 		var divDD = document.createElement("div");
-		divDD.setAttribute("class", "dropdown");
+		//divDD.setAttribute("class", "dropdown");
 
 		var selectDD = document.createElement("select");
 
@@ -111,6 +109,12 @@ SCFL_LoadPanorama = function ( imgFile ) {
 		divDD.appendChild(selectDD);
 		//divDD.appendChild(divDDList);
 
+		//Button
+		var buttonDD = document.createElement("button");
+		//buttonDD.setAttribute("class",);
+		buttonDD.innerHTML = "Input";
+		divDD.appendChild(buttonDD);
+		
 		//
 		divContent.appendChild(span);
 		divContent.appendChild(p);
