@@ -1,7 +1,7 @@
 //
 
-SCFL_LoadPanorama = function ( imgFile ) {
-	//this.img = imgFile;
+SCFL_LoadPanorama = function ( imgFile, renderer ) {
+	this.img = imgFile;
 	this.enabled = true;
 
 	//var imgWidth = this.img.width;
@@ -11,6 +11,14 @@ SCFL_LoadPanorama = function ( imgFile ) {
 	var root = this;
 
 	this.defIndex = 0;
+
+	//RTT　Import
+	var RTTex, rendererRTT, camRTT, sceneRTT,shaderRTT,uniformsRTT;
+	//var updateTex = false;
+	var materialsCube = [];
+	var RTTtextures = [];
+	var RTTSize = 1024;
+	var camCube, sceneCube;
 
 	//
 	var WHRatio = [
@@ -35,16 +43,28 @@ SCFL_LoadPanorama = function ( imgFile ) {
 		"Vertical Linear CubeMap"
 	];
 
-	/*var Out_ShaderNames = [
+
+	var FormatImgURL = [
+		"textures/sprite1.png",
+		"textures/sprite2.png",
+		"textures/sprite0.png",
+		"textures/sprite1.png",
+		"textures/sprite1.png",
+		"textures/sprite1.png",
+		"textures/sprite1.png",
+		"textures/sprite1.png"
+	];
+
+	var In_ShaderNames = [
 		"ENV2DP",
 		"ENV2HCC",
-		"ENV2LL",
+		"LL2CUBE",
 		"ENV2SP",
 		"ENV2LP",
 		"ENV2HCUBE",
 		"ENV2VCC",
 		"ENV2VCUBE"
-	];*/
+	];
 
 
 	//Move this func to common
@@ -68,7 +88,17 @@ SCFL_LoadPanorama = function ( imgFile ) {
 	    document.getElementById("dropdownList").classList.toggle("show");
 	}*/
 
-	function selFormatWindow() {
+	function setFormatImg( idName ){
+		//var img = document.getElementById('myImg');
+		var modalImg = document.getElementById(idName);
+		//var captionText = document.getElementById("caption");
+
+		modalImg.src=FormatImgURL[root.defIndex];
+	}
+
+
+
+	function setupFormatWindow() {
 		divModal = document.createElement("div");
 		divModal.id = "myModal";
 		divModal.setAttribute("class", "modal");
@@ -85,6 +115,13 @@ SCFL_LoadPanorama = function ( imgFile ) {
 		var p = document.createElement("P");
 		var text1 = document.createTextNode("Some text in the Modal...");
 		p.appendChild(text1);
+
+		//Image
+		var imgDD = document.createElement("img");
+		//imgDD.setAttribute("class", "dropdown");
+		imgDD.id="imgDD";
+
+
 
 		//dropdown
 		var divDD = document.createElement("div");
@@ -111,27 +148,54 @@ SCFL_LoadPanorama = function ( imgFile ) {
 
 		//Button
 		var buttonDD = document.createElement("button");
-		//buttonDD.setAttribute("class",);
-		buttonDD.innerHTML = "Input";
+		buttonDD.setAttribute("class","buttonLoad");
+		buttonDD.innerHTML = "Import";
 		divDD.appendChild(buttonDD);
 		
 		//
 		divContent.appendChild(span);
 		divContent.appendChild(p);
+		divContent.appendChild(imgDD);
 		divContent.appendChild(divDD);
 		divModal.appendChild(divContent);
 
 		document.body.appendChild(divModal);
+
+		setFormatImg("imgDD");
 
 		span.onclick = function() {
 		    divModal.style.display = "none";
 		}
 	}
 
+	function checkFormatType(){
+		var wh = root.img.width/root.img.height;
+		var type = WHRatio.lastIndexOf(wh);
+		//Accurated check
+		if(type >= 0){
+			root.defIndex = type;
+		}
+		//Approx check
+		else{
+			for(var n = 0; n<WHRatio.length; n++){
+				var dif = Math.abs(wh-WHRatio[n]);
+				if (dif<=0.1) {
+					root.defIndex = n;
+				}
+			}
+		}
+		
+		
+	}
+
 
 	function onSelFormat(index,name){
-		console.log(index);
-		console.log(name);
+		//console.log(index);
+		//console.log(name);
+
+		root.defIndex = index;
+		setFormatImg("imgDD");
+
 	}
 
 
@@ -159,12 +223,93 @@ SCFL_LoadPanorama = function ( imgFile ) {
   <option value="saabcar">Saab</option>
 </select>
 */
+
+
+	/////////////////////////////////////////////////////////////
+
+	function UpdateRTT(){
+		//var texturezzz = new THREE.TextureLoader().load( "textures/water.jpg", function ( texture ) {
+		for (var i = 0; i < 6; i++){
+			materialRTT.uniforms.nFace.value = i;
+			renderer.render( sceneRTT, camRTT, RTTtextures[i], true );
+
+		}
+		camCube.updateCubeMap( renderer, sceneCube );
+	}
+
+
+	function initRTT() {
+
+		var container, skyBox;
+
+		//texCube = new THREE.SC_CubeMap(RTTSize);
+
+		camCube = new THREE.CubeCamera( 1, 100000, RTTSize );
+
+		//raycaster = new THREE.Raycaster();
+
+
+		for ( var i = 0; i < 6; i ++ ) {
+
+			RTTtextures[ i ] = new THREE.WebGLRenderTarget( RTTSize, RTTSize, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBFormat } );
+
+		}
+
+		sceneRTT = new THREE.Scene();
+		sceneCube = new THREE.Scene();
+		sceneCube.add( camCube );
+		
+		//RTT
+		var TexRTT = new THREE.TextureLoader().load( 'textures/2294472375_24a3b8ef46_o.jpg', function() {
+			UpdateRTT();
+		});
+
+		shaderRTT = THREE.ShaderLib[ In_ShaderNames[root.defIndex] ];
+		uniformsRTT = THREE.UniformsUtils.clone( shaderRTT.uniforms );
+		uniformsRTT.tSampler.value = TexRTT;
+		uniformsRTT.nFace.value = 0;
+		//No need flip for mesh cubebox
+		//uniformsRTT.vUvFlip.value = new THREE.Vector2(0.0,1.0);
+		materialRTT = new THREE.ShaderMaterial( {
+			uniforms: uniformsRTT,
+			vertexShader: shaderRTT.vertexShader,
+			fragmentShader: shaderRTT.fragmentShader
+		} );
+
+		camRTT = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
+		//camRTT.up.set( 0, - 1, 0 );
+		camRTT.position.z = 100;
+
+		RTTex = new THREE.WebGLRenderTarget( RTTSize, RTTSize, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBFormat } );
+
+		var plane = new THREE.PlaneBufferGeometry( window.innerWidth, window.innerHeight );
+
+		var quad = new THREE.Mesh( plane, materialRTT );
+		quad.position.z = -100;
+		sceneRTT.add( quad );
+		
+
+		//updateTex = true;
+
+		
+		for ( var i = 0; i < 6; i ++ ) {
+
+			materialsCube.push( new THREE.MeshBasicMaterial( { map: RTTtextures[ i ].texture} ) );
+			//materialsCube2.push( new THREE.MeshBasicMaterial( { map: RTTtextures[ i ].texture} ) );
+		}
+
+		var skyBoxCube = new THREE.Mesh( new THREE.CubeGeometry( 1000, 1000, 1000 ), new THREE.MeshFaceMaterial( materialsCube ) );
+		skyBoxCube.applyMatrix( new THREE.Matrix4().makeScale( 1, 1,  -1 ) );
+		sceneCube.add( skyBoxCube );
+
+
+	}
 	
 
 	function activate() {
 		loadjscssfile("js/skycube/CSS/SC_InputPanoramaFormatModal.css","css");
-
-		selFormatWindow();
+		checkFormatType();
+		setupFormatWindow();
 		divModal.style.display = "block";
 
 	}
@@ -183,3 +328,4 @@ SCFL_LoadPanorama = function ( imgFile ) {
 	this.dispose = dispose;
 
 };
+
