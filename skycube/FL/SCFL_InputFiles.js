@@ -32,6 +32,13 @@ SCFL_InputFiles = function ( idName, typeName ) {
 	        document.getElementsByTagName("head")[0].appendChild(fileRef)
 	}
 
+	function removeElements(elements) {
+	  for (var i=0; i<elements.length; i++) {
+	    elements[i].parentNode.removeChild(elements[i]);
+	  }
+	}
+
+
 	//Move it to THREE
 	function type2Array(){
 		loadType = typeName.split(",");
@@ -127,15 +134,18 @@ SCFL_InputFiles = function ( idName, typeName ) {
 	}
 
 	function removeInputZone(){
-		if(div !== undefined && div.id === "_DropZone"){
+		if(div !== undefined && div.id == idName){
 			document.getElementById("file").removeEventListener('change', onFileSelect, false );
+			removeElements(div);
 			document.body.removeChild(div);
 			div = undefined;
 		}
+
+
 	}
 
 	function shownInputZone(){
-		if(div !== undefined && div.id === "_DropZone"){
+		if(div !== undefined && div.id == idName){
 			//document.getElementById("file").addEventListener('change', onFileSelect, false );
 			//document.body.removeChild(div);
 			//div = undefined;
@@ -144,7 +154,7 @@ SCFL_InputFiles = function ( idName, typeName ) {
 	}
 
 	function hiddenInputZone(){
-		if(div !== undefined && div.id === "_DropZone"){
+		if(div !== undefined && div.id == idName){
 			//document.getElementById("file").removeEventListener('change', onFileSelect, false );
 			//document.body.removeChild(div);
 			//div = undefined;
