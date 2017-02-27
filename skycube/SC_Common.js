@@ -38,7 +38,26 @@ THREE.SC_Common = function() {
 	        document.getElementsByTagName("head")[0].appendChild(fileRef)
 	}
 
+
+	function checkloadjscssfile(filename, filetype){
+	    if (filesadded.indexOf("["+filename+"]")==-1){
+	        loadjscssfile(filename, filetype)
+	        filesadded+="["+filename+"]" //List of files added in the form "[filename1],[filename2],etc"
+	    }
+	    else
+	        alert("file already added!")
+	}
+
+
+	function removeElements(elements) {
+	  for (var i=0; i<elements.length; i++) {
+	    elements[i].parentNode.removeChild(elements[i]);
+	  }
+	}
+
+
 };
+
 THREE.SC_Common.prototype = Object.create( THREE.EventDispatcher.prototype );
 THREE.SC_Common.prototype.constructor = THREE.SC_Common;
 //export{SCFL_Common};
