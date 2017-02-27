@@ -20,7 +20,30 @@ h3{
 
 
 
+
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+
+<style>
+
+h3{
+	text-align: right;
+	margin-right: 50px;
+	color: #cccccc;
+}
+
+
+</style>
+</head>
+<body>
+
+
+
 <h3>ALPHA</h3>
+<div id="container"></div>
 <div id="input"></div>
 
 <script src="../build/three.js"></script>
@@ -29,6 +52,8 @@ h3{
 <script src="js/skycube/FL/SCFL_GrabAndDropFiles.js"></script>
 <script src="js/skycube/FL/SCFL_LoadFiles.js"></script>
 <script src="js/skycube/FL/SCFL_LoadPanorama.js"></script>
+<script src="js/controls/OrbitControls.js"></script>
+<script src="js/skycube/SC_CubeViewport.js"></script>
 <script>
 
 	function checkCompatible(){
@@ -45,6 +70,12 @@ h3{
 		return false;
 	}
 
+	/*var controls = new THREE.OrbitControls( camera, renderer.domElement );
+	controls.enableDamping = true;
+	controls.dampingFactor = 0.3;
+	controls.enableZoom = true;
+	controls.enablePan = false;*/
+
 	///////////////////////////////////////////////////////////////////////////////
 	var type = ".jpg,.png,.tga,.tif";
 	var loader = new SCFL_LoadFiles();
@@ -55,6 +86,8 @@ h3{
 
 
 	var loadStatus = false;
+
+	var renderer;
 
 
 	inputPage.activate();
@@ -80,6 +113,58 @@ h3{
 	loader.onLoaded = function(){
 		test();
 	}
+
+	///////////////////////////TEST////////////////////////////
+	function test(){
+		//console.log(loader.rImgWidth[0]);
+		console.log(loader.rSelData.width);
+		init();
+		var panaorama = new SCFL_LoadPanorama(loader.rSelData, renderer);
+		inputPage.hidden();
+		panaorama.onRTTUpdated = function(cubeMap) {
+			// body...
+			inputPage.deactivate();
+			dropZone.deactivate();
+			var cubeView = THREE.SC_CubeViewport( cubeMap, window.innerWidth, window.innerHeight, 75);
+			console.log("cubeView");
+		}
+
+		panaorama.activate();
+
+	}
+
+	function init() {
+		// body...
+		var container, skyBox;
+
+		container = document.getElementById( 'container' );
+		renderer = new THREE.WebGLRenderer({ alpha: true });
+		renderer.autoClear = false;//MUst turn it off if you want add multi renders in same buffer
+		renderer.setPixelRatio( window.devicePixelRatio );
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		container.appendChild( renderer.domElement );
+
+		//camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1100 );
+		//camera.position.z = 100;
+		///camera.target = new THREE.Vector3( 0, 0, 0 );
+
+		//controls = new THREE.OrbitControls( camera, renderer.domElement );
+		//controls.enableDamping = true;
+		//controls.dampingFactor = 0.3;
+		//controls.enableZoom = true;
+		//controls.enablePan = false;
+
+		//scene = new THREE.Scene();
+		//sceneRTT = new THREE.Scene();
+		//sceneCube = new THREE.Scene();
+		//sceneCube.add( camCube );
+	}
+
+
+</script>
+
+</body>
+</html>
 
 	///////////////////////////TEST////////////////////////////
 	function test(){
