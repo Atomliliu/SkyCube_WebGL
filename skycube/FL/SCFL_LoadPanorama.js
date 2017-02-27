@@ -6,7 +6,7 @@ SCFL_LoadPanorama = function ( imgFile, renderer ) {
 
 	//var imgWidth = this.img.width;
 	//var imgHeight = this.img.height;
-	var divModal;
+	var divModal = undefined;
 
 	var root = this;
 
@@ -56,14 +56,14 @@ SCFL_LoadPanorama = function ( imgFile, renderer ) {
 	];
 
 	var In_ShaderNames = [
-		"ENV2DP",
-		"ENV2HCC",
 		"LL2CUBE",
-		"ENV2SP",
-		"ENV2LP",
-		"ENV2HCUBE",
-		"ENV2VCC",
-		"ENV2VCUBE"
+		"LL2CUBE",
+		"LL2CUBE",
+		"LL2CUBE",
+		"LL2CUBE",
+		"LL2CUBE",
+		"LL2CUBE",
+		"LL2CUBE"
 	];
 
 
@@ -82,6 +82,13 @@ SCFL_LoadPanorama = function ( imgFile, renderer ) {
 	    }
 	    if (typeof fileRef!="undefined")
 	        document.getElementsByTagName("head")[0].appendChild(fileRef)
+	}
+
+
+	function removeElements(elements) {
+	  for (var i=0; i<elements.length; i++) {
+	    elements[i].parentNode.removeChild(elements[i]);
+	  }
 	}
 
 	/*function listDD() {
@@ -164,9 +171,21 @@ SCFL_LoadPanorama = function ( imgFile, renderer ) {
 		setFormatImg("imgDD");
 
 		span.onclick = function() {
-		    divModal.style.display = "none";
+		    root.deactivate();
+		}
+
+		buttonDD.onclick = function() {
+			// body...
+
+			initRTT();
+
+			UpdateRTT(root.onRTTUpdated);
+
+			root.deactivate();
 		}
 	}
+
+	this.onRTTUpdated = undefined;
 
 	function checkFormatType(){
 		var wh = root.img.width/root.img.height;
@@ -198,7 +217,7 @@ SCFL_LoadPanorama = function ( imgFile, renderer ) {
 
 	}
 
-
+/*
 	// Close the dropdown if the user clicks outside of it
 	window.onclick = function(event) {
 	  if (!event.target.matches('.dropbtn')) {
@@ -213,7 +232,7 @@ SCFL_LoadPanorama = function ( imgFile, renderer ) {
 	    }
 	  }
 	}
-
+*/
 
 
 /*
@@ -227,24 +246,30 @@ SCFL_LoadPanorama = function ( imgFile, renderer ) {
 
 	/////////////////////////////////////////////////////////////
 
-	function UpdateRTT(){
+	function UpdateRTT(onFinished){
 		//var texturezzz = new THREE.TextureLoader().load( "textures/water.jpg", function ( texture ) {
+		if(renderer == undefined){
+			return false;
+		}
 		for (var i = 0; i < 6; i++){
 			materialRTT.uniforms.nFace.value = i;
 			renderer.render( sceneRTT, camRTT, RTTtextures[i], true );
-
 		}
-		camCube.updateCubeMap( renderer, sceneCube );
+		//camCube.updateCubeMap( renderer, sceneCube );
+		//console.log(camCube.renderTarget.texture);
+
+		//if(onFinished){console.log("finish");onFinished(camCube.renderTarget.texture);}
+		if(onFinished){console.log("finish");onFinished(RTTtextures);}
 	}
 
 
 	function initRTT() {
 
-		var container, skyBox;
+		//var container, skyBox;
 
 		//texCube = new THREE.SC_CubeMap(RTTSize);
 
-		camCube = new THREE.CubeCamera( 1, 100000, RTTSize );
+		//camCube = new THREE.CubeCamera( 1, 100000, RTTSize );
 
 		//raycaster = new THREE.Raycaster();
 
@@ -257,12 +282,23 @@ SCFL_LoadPanorama = function ( imgFile, renderer ) {
 
 		sceneRTT = new THREE.Scene();
 		sceneCube = new THREE.Scene();
-		sceneCube.add( camCube );
+		//sceneCube.add( camCube );
 		
 		//RTT
-		var TexRTT = new THREE.TextureLoader().load( 'textures/2294472375_24a3b8ef46_o.jpg', function() {
-			UpdateRTT();
-		});
+		/*var TexRTT = new THREE.TextureLoader().load( 'textures/2294472375_24a3b8ef46_o.jpg', function() {
+			//UpdateRTT();
+		});*/
+
+		var TexRTT = new THREE.Texture();
+		//
+
+		// JPEGs can't have an alpha channel, so memory can be saved by storing them as RGB.
+		//var isJPEG = url.search( /\.(jpg|jpeg)$/ ) > 0 || url.search( /^data\:image\/jpeg/ ) === 0;
+
+		//TexRTT.format = isJPEG ? RGBFormat : RGBAFormat;
+		TexRTT.format = THREE.RGBAFormat;
+		TexRTT.image = root.img;
+		TexRTT.needsUpdate = true;
 
 		shaderRTT = THREE.ShaderLib[ In_ShaderNames[root.defIndex] ];
 		uniformsRTT = THREE.UniformsUtils.clone( shaderRTT.uniforms );
@@ -298,24 +334,33 @@ SCFL_LoadPanorama = function ( imgFile, renderer ) {
 			//materialsCube2.push( new THREE.MeshBasicMaterial( { map: RTTtextures[ i ].texture} ) );
 		}
 
-		var skyBoxCube = new THREE.Mesh( new THREE.CubeGeometry( 1000, 1000, 1000 ), new THREE.MeshFaceMaterial( materialsCube ) );
+		/*var skyBoxCube = new THREE.Mesh( new THREE.CubeGeometry( 1000, 1000, 1000 ), new THREE.MeshFaceMaterial( materialsCube ) );
 		skyBoxCube.applyMatrix( new THREE.Matrix4().makeScale( 1, 1,  -1 ) );
-		sceneCube.add( skyBoxCube );
+		sceneCube.add( skyBoxCube );*/
 
 
 	}
 	
 
 	function activate() {
-		loadjscssfile("js/skycube/CSS/SC_InputPanoramaFormatModal.css","css");
+		if(divModal === undefined){
+			loadjscssfile("js/skycube/CSS/SC_InputPanoramaFormatModal.css","css");
+		}
+		
 		checkFormatType();
 		setupFormatWindow();
-		divModal.style.display = "block";
+		shown();
 
 	}
 
-	function deactivate() {
+	function shown(){
+		divModal.style.display = "block";
+	}
 
+	function deactivate() {
+		divModal.style.display = "none";
+		removeElements(divModal);
+		document.body.removeChild(divModal);
 		//this.enabled = false;
 	}
 
