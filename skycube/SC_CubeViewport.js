@@ -18,7 +18,7 @@ THREE.SC_CubeViewport = function ( texCube, width, height, fov, renderer ) {
 	//camera.target = new THREE.Vector3( 0, 0, 0 );
 
 
-	this.controls = new THREE.OrbitControls( root.camera, renderer.domElement );
+	
 	/*controls.enableDamping = true;
 	controls.dampingFactor = 0.3;
 	controls.enableZoom = true;
@@ -34,6 +34,7 @@ THREE.SC_CubeViewport = function ( texCube, width, height, fov, renderer ) {
 	//animate();
 	//render();
 	
+
 	
 
 	function init() {
@@ -49,6 +50,45 @@ THREE.SC_CubeViewport = function ( texCube, width, height, fov, renderer ) {
 	}
 
 	this.renderView = renderView;
+	this.activate = activate;
+	this.deactivate = deactivate;
+	this.dispose = dispose;
+	this.disableControls = disableControls;
+	this.enableControls = enableControls;
+	this.asBackground = asBackground;
+
+	function activate(){
+		root.controls = new THREE.OrbitControls( root.camera, renderer.domElement );
+	}
+
+	function deactivate(){
+		root.controls.dispose();
+		
+	}
+
+	function dispose(){
+		deactivate();
+	}
+
+	function disableControls(){
+		root.controls.enabled = false;
+	}
+
+	function enableControls(){
+		root.controls.enabled = true;
+	}
+
+	function asBackground(){
+
+		for ( var i = 0; i < root.materialsCube.length; i ++ ) {
+			if(root.materialsCube[i] != undefined && root.materialsCube[i].isMaterial){
+				root.materialsCube[i].transparent = true;
+				root.materialsCube[i].opacity = 0.5;
+			}
+			
+		}
+
+	}
 
 
 	function animate() {
@@ -64,13 +104,12 @@ THREE.SC_CubeViewport = function ( texCube, width, height, fov, renderer ) {
 		//if (root.onRender) {root.onRender(renderer);}
 	}
 
-	function onResize(sizeUpdate) {
+	function onResize(width, height) {
 		root.camera.aspect = width / height;
 		root.camera.updateProjectionMatrix();
 
 		renderer.setSize( width, height );
 
-		if (sizeUpdate) {sizeUpdate(width, height);}
 	}
 
 };
