@@ -22,7 +22,7 @@ THREE.SC_Common = function() {
 	    return false;
 	}
 
-	function loadjscssfile(fileName, fileType){
+	this.loadjscssfile = function (fileName, fileType){
 	    if (fileType=="js"){ //if filename is a external JavaScript file
 	        var fileRef=document.createElement('script')
 	        fileRef.setAttribute("type","text/javascript")
