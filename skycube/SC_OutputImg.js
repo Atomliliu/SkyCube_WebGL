@@ -40,3 +40,6 @@ THREE.SC_OutputImg = function ( render, width, height ) {
 
 
 };
+
+THREE.SC_OutputImg.prototype = Object.create( THREE.EventDispatcher.prototype );
+THREE.SC_OutputImg.prototype.constructor = THREE.SC_OutputImg;
