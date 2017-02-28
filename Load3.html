@@ -6,6 +6,13 @@
 
 <style>
 
+body {
+	/*background-color: #000000;*/
+	font-family: Roboto, sans-serif;
+	margin: 0px;
+	overflow: hidden;
+}
+
 h3{
 	text-align: right;
 	margin-right: 50px;
@@ -18,10 +25,11 @@ h3{
 <body>
 
 
-
-<h3>ALPHA</h3>
+<div id="render">
+<!--h3>ALPHA</h3>-->
 <div id="container"></div>
 <div id="input"></div>
+</div>
 
 <script src="../build/three.js"></script>
 <script src="js/skycube/SC_Common.js"></script>
@@ -31,6 +39,8 @@ h3{
 <script src="js/skycube/FL/SCFL_LoadPanorama.js"></script>
 <script src="js/controls/OrbitControls.js"></script>
 <script src="js/skycube/SC_CubeViewport.js"></script>
+<script src="js/skycube/SC_Raster.js"></script>
+<script src="js/skycube/SC_OutputImg.js"></script>
 <script src="js/skycube/SC_OutHUD.js"></script>
 
 <script src="../examples/js/libs/dat.gui.min.js"></script>
@@ -62,6 +72,9 @@ h3{
 	var type = ".jpg,.png,.tga,.tif";
 	var loader = new SCFL_LoadFiles();
 
+	var width = window.innerWidth;
+  	var height = window.innerHeight;
+
 	var inputPage = new SCFL_InputFiles("input", type)
 
 	var dropZone = new SCFL_GrabAndDropFiles("", type);
@@ -81,14 +94,17 @@ h3{
 
 		gui: null,
 		export: function() {
-			console.log("Export");
-			console.log(panaorama.TestSize);
+			//console.log("Export");
+			//console.log(panaorama.TestSize);
 			outHUD = new THREE.SC_OutHUD(CM, window.innerWidth, window.innerHeight, renderer.domElement);
+			cubeView.disableControls();
+			cubeView.asBackground();
 		}
 
 	};
 
-	
+
+
 
 
 	inputPage.activate();
@@ -128,6 +144,7 @@ h3{
 			inputPage.deactivate();
 			dropZone.deactivate();
 			cubeView = new THREE.SC_CubeViewport(cubeRTTs, window.innerWidth, window.innerHeight, 75, renderer);
+			cubeView.activate();
 			//console.log("cubeView");
 			//console.log(cubeView);
 
@@ -163,11 +180,12 @@ h3{
 		// body...
 		var container, skyBox;
 
-		container = document.getElementById( 'container' );
+		container = document.getElementById( 'render' );
 		renderer = new THREE.WebGLRenderer({ alpha: true });
 		renderer.autoClear = false;//MUst turn it off if you want add multi renders in same buffer
 		renderer.setPixelRatio( window.devicePixelRatio );
 		renderer.setSize( window.innerWidth, window.innerHeight );
+		renderer.setClearColor( 0x000000, 0 ); // the default
 		container.appendChild( renderer.domElement );
 
 		//camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1100 );
@@ -184,6 +202,8 @@ h3{
 		//sceneRTT = new THREE.Scene();
 		//sceneCube = new THREE.Scene();
 		//sceneCube.add( camCube );
+
+		window.addEventListener( 'resize', onWindowResize, false );
 	}
 
 	function animate() {
@@ -203,6 +223,20 @@ h3{
 			outHUD.renderHUD(renderer);
 		}
 		
+
+	}
+
+
+	function onWindowResize() {
+
+		if(cubeView !== undefined && cubeView.enabled){
+			cubeView.onResize(window.innerWidth,window.innerHeight);
+		}
+
+		//Update HUD size here
+		if(outHUD !== undefined && outHUD.enabled){
+			outHUD.updateHUD( window.innerWidth, window.innerHeight );
+		}
 
 	}
 
