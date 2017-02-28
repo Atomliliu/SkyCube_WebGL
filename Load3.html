@@ -31,6 +31,7 @@ h3{
 <script src="js/skycube/FL/SCFL_LoadPanorama.js"></script>
 <script src="js/controls/OrbitControls.js"></script>
 <script src="js/skycube/SC_CubeViewport.js"></script>
+<script src="js/skycube/SC_OutHUD.js"></script>
 
 <script src="../examples/js/libs/dat.gui.min.js"></script>
 
@@ -65,18 +66,29 @@ h3{
 
 	var dropZone = new SCFL_GrabAndDropFiles("", type);
 
+	var panaorama;
+
+	var CM;
+	var cubeView;
+
 
 	var loadStatus = false;
 
 	var renderer;
+	var outHUD;
 
 	var controls = {
 
-		gui: null
+		gui: null,
+		export: function() {
+			console.log("Export");
+			console.log(panaorama.TestSize);
+			outHUD = new THREE.SC_OutHUD(CM, window.innerWidth, window.innerHeight, renderer.domElement);
+		}
 
 	};
 
-	var outHUD;
+	
 
 
 	inputPage.activate();
@@ -109,15 +121,26 @@ h3{
 		//console.log(loader.rImgWidth[0]);
 		console.log(loader.rSelData.width);
 		init();
-		var panaorama = new SCFL_LoadPanorama(loader.rSelData, renderer);
+		panaorama = new SCFL_LoadPanorama(loader.rSelData, renderer);
 		inputPage.hidden();
-		panaorama.onRTTUpdated = function(cubeMap) {
+		panaorama.onRTTUpdated = function(cubeRTTs,cubeMap) {
 			// body...
 			inputPage.deactivate();
 			dropZone.deactivate();
-			var cubeView = THREE.SC_CubeViewport( cubeMap, window.innerWidth, window.innerHeight, 75);
-			console.log("cubeView");
+			cubeView = new THREE.SC_CubeViewport(cubeRTTs, window.innerWidth, window.innerHeight, 75, renderer);
+			//console.log("cubeView");
+			//console.log(cubeView);
 
+			animate();
+
+			/*cubeView.onRender = function(){
+				if(outHUD !== undefined && outHUD.enabled){
+					outHUD.renderHUD(renderer);
+				}
+			};
+			cubeView.activate();*/
+			
+			CM = cubeMap;
 
 
 			controls.gui = new dat.GUI();
@@ -125,7 +148,7 @@ h3{
 
 			out.add( controls, "export" );
 
-			
+			controls.gui.open();
 
 
 		}
@@ -134,12 +157,7 @@ h3{
 
 	}
 
-	controls.export = function() {
-
-		console.log("Export");
-		//outHUD = new THREE.SC_OutHUD(camCube.renderTarget.texture, window.innerWidth, window.innerHeight, renderer.domElement);
-
-	};
+	
 
 	function init() {
 		// body...
@@ -167,6 +185,38 @@ h3{
 		//sceneCube = new THREE.Scene();
 		//sceneCube.add( camCube );
 	}
+
+	function animate() {
+		requestAnimationFrame( animate );
+		update();
+	}
+
+
+	function update() {
+		//root.controls.update();
+		//renderer.render( root.scene, root.camera );
+		if(cubeView !== undefined && cubeView.enabled){
+			cubeView.renderView();
+		}
+		
+		if(outHUD !== undefined && outHUD.enabled){
+			outHUD.renderHUD(renderer);
+		}
+		
+
+	}
+
+	/*function onResize() {
+		root.camera.aspect = width / height;
+		root.camera.updateProjectionMatrix();
+
+		renderer.setSize( width, height );
+		if(outHUD !== undefined && outHUD.enabled){
+			outHUD.updateHUD( window.innerWidth, window.innerHeight );
+		}
+	}*/
+
+
 
 
 </script>
