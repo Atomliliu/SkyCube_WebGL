@@ -17,7 +17,8 @@ SCFL_LoadPanorama = function ( imgFile, renderer ) {
 	//var updateTex = false;
 	var materialsCube = [];
 	var RTTtextures = [];
-	var RTTSize = 1024;
+	var RTTSize = 1024;//?
+	this.TestSize = 1024;//?
 	var camCube, sceneCube;
 
 	//
@@ -255,11 +256,12 @@ SCFL_LoadPanorama = function ( imgFile, renderer ) {
 			materialRTT.uniforms.nFace.value = i;
 			renderer.render( sceneRTT, camRTT, RTTtextures[i], true );
 		}
-		//camCube.updateCubeMap( renderer, sceneCube );
+
+		camCube.updateCubeMap( renderer, sceneCube );
 		//console.log(camCube.renderTarget.texture);
 
 		//if(onFinished){console.log("finish");onFinished(camCube.renderTarget.texture);}
-		if(onFinished){console.log("finish");onFinished(RTTtextures);}
+		if(onFinished){console.log("finish");onFinished(RTTtextures,camCube.renderTarget.texture);}
 	}
 
 
@@ -269,7 +271,7 @@ SCFL_LoadPanorama = function ( imgFile, renderer ) {
 
 		//texCube = new THREE.SC_CubeMap(RTTSize);
 
-		//camCube = new THREE.CubeCamera( 1, 100000, RTTSize );
+		camCube = new THREE.CubeCamera( 1, 100000, RTTSize );
 
 		//raycaster = new THREE.Raycaster();
 
@@ -282,7 +284,7 @@ SCFL_LoadPanorama = function ( imgFile, renderer ) {
 
 		sceneRTT = new THREE.Scene();
 		sceneCube = new THREE.Scene();
-		//sceneCube.add( camCube );
+		sceneCube.add( camCube );
 		
 		//RTT
 		/*var TexRTT = new THREE.TextureLoader().load( 'textures/2294472375_24a3b8ef46_o.jpg', function() {
@@ -334,9 +336,9 @@ SCFL_LoadPanorama = function ( imgFile, renderer ) {
 			//materialsCube2.push( new THREE.MeshBasicMaterial( { map: RTTtextures[ i ].texture} ) );
 		}
 
-		/*var skyBoxCube = new THREE.Mesh( new THREE.CubeGeometry( 1000, 1000, 1000 ), new THREE.MeshFaceMaterial( materialsCube ) );
+		var skyBoxCube = new THREE.Mesh( new THREE.CubeGeometry( 1000, 1000, 1000 ), new THREE.MeshFaceMaterial( materialsCube ) );
 		skyBoxCube.applyMatrix( new THREE.Matrix4().makeScale( 1, 1,  -1 ) );
-		sceneCube.add( skyBoxCube );*/
+		sceneCube.add( skyBoxCube );
 
 
 	}
