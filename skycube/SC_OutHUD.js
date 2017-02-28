@@ -12,6 +12,7 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 
 	var root = this; // for Events Func
 
+
 	//var options = { minFilter: LinearFilter, magFilter: NearestFilter, format: RGBFormat };
 
 	//this.renderTarget = new WebGLRenderTargetCube( cubeResolution, cubeResolution, options );
@@ -331,7 +332,7 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 	//Update HUD rendering
 	this.updateHUD = function ( width, height ) {
 
-		if ( this.parent === null ) this.updateMatrixWorld();
+		if ( root.cameraHUD.parent === null ) root.cameraHUD.updateMatrixWorld();
 
 		if ((UI_width != width) || (UI_height != height)){
 			UI_width = Math.abs(width);
@@ -341,12 +342,12 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 			updateIconPlaneSize();
 
 			//-UI_width/2, UI_width/2, UI_height/2, -UI_height/2, 0, 100
-			this.cameraHUD.left = -UI_width/2;
-			this.cameraHUD.right = UI_width/2;
-			this.cameraHUD.top = UI_height/2;
-			this.cameraHUD.bottom  = -UI_height/2;
-			this.cameraHUD.far = iconSize*2;
-			this.cameraHUD.updateProjectionMatrix ();
+			root.cameraHUD.left = -UI_width/2;
+			root.cameraHUD.right = UI_width/2;
+			root.cameraHUD.top = UI_height/2;
+			root.cameraHUD.bottom  = -UI_height/2;
+			root.cameraHUD.far = iconSize*2;
+			root.cameraHUD.updateProjectionMatrix ();
 		}
 		
 
@@ -504,20 +505,34 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 				rtt.RTT(Out_Mat);
 				
 				Out.OutputRT2PNG(renderer,rtt.rtRTT);
+				hudSnackbarExport();
+				console.log("Export!");
 			}
 			else{
 				console.log("Size is wrong!");
 			}
 		}
 		
-		console.log("Export!");
+		
 
 		domElement.style.cursor = 'auto';
 
 	}
 
+	var scc = new THREE.SC_Common();
+	scc.loadjscssfile("js/skycube/CSS/SC_ExportPage.css","css");
+
+	function hudSnackbarExport(){
+		var div = document.createElement("div");
+		div.id = "snackbar";
+		div.innerHTML = "Test";
+    	div.className = "show";
+    	document.body.appendChild(div);
+    	setTimeout(function(){ div.className = div.className.replace("show", ""); }, 3000);
+	}
 
 
+	this.hudSnackbarExport = hudSnackbarExport;
 
 };
 
