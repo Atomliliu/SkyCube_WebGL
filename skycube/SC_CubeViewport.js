@@ -1,5 +1,6 @@
-THREE.SC_CubeViewport = function ( texCube, width, height, fov ) {
+THREE.SC_CubeViewport = function ( texCube, width, height, fov, renderer ) {
 	var root = this;
+	this.enabled = true;
 
 	this.camera; 
 	this.scene; 
@@ -24,12 +25,16 @@ THREE.SC_CubeViewport = function ( texCube, width, height, fov ) {
 	controls.enablePan = false;*/
 
 	this.scene = new THREE.Scene();
-
+	this.onRender;
+	/*this.activate=function(){
+		
+	};*/
 
 	init();
+	//animate();
 	//render();
-
-	animate();
+	
+	
 
 	function init() {
 
@@ -37,11 +42,13 @@ THREE.SC_CubeViewport = function ( texCube, width, height, fov ) {
 			root.materialsCube.push( new THREE.MeshBasicMaterial( { map: root.texCube[ i ].texture} ) );
 		}
 
-		var skyBox = new THREE.Mesh( new THREE.CubeGeometry( 1000, 1000, 1000 ), new THREE.MeshFaceMaterial( root.materialsCube ) );//new THREE.Mesh( skyGeo, materialSkyBox );
+		skyBox = new THREE.Mesh( new THREE.CubeGeometry( 1000, 1000, 1000 ), new THREE.MeshFaceMaterial( root.materialsCube ) );//new THREE.Mesh( skyGeo, materialSkyBox );
 		skyBox.applyMatrix( new THREE.Matrix4().makeScale( 1, 1,  -1 ) );
 
 		root.scene.add( skyBox );
 	}
+
+	this.renderView = renderView;
 
 
 	function animate() {
@@ -50,17 +57,23 @@ THREE.SC_CubeViewport = function ( texCube, width, height, fov ) {
 	}
 
 
-	function update() {
+	function renderView() {
 		root.controls.update();
 		renderer.render( root.scene, root.camera );
+
+		//if (root.onRender) {root.onRender(renderer);}
 	}
 
-	function onResize() {
+	function onResize(sizeUpdate) {
 		root.camera.aspect = width / height;
 		root.camera.updateProjectionMatrix();
 
 		renderer.setSize( width, height );
+
+		if (sizeUpdate) {sizeUpdate(width, height);}
 	}
 
 };
 
+THREE.SC_CubeViewport.prototype = Object.create( THREE.EventDispatcher.prototype );
+THREE.SC_CubeViewport.prototype.constructor = THREE.SC_CubeViewport;
