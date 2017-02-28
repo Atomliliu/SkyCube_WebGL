@@ -8,9 +8,9 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 
 	//this.type = 'SC_OutHUD';
 
-	this.enabled = true;
+	this.enabled = false;
 
-	var scope = this; // for Events Func
+	var root = this; // for Events Func
 
 	//var options = { minFilter: LinearFilter, magFilter: NearestFilter, format: RGBFormat };
 
@@ -147,6 +147,7 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 		domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
 		domElement.addEventListener( 'mousedown', onDocumentMouseDown, false );
 		domElement.addEventListener( 'mouseup', onDocumentMouseUp, false );
+		root.enabled = true;
 
 	}
 
@@ -155,7 +156,7 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 		domElement.removeEventListener( 'mousemove', onDocumentMouseMove, false );
 		domElement.removeEventListener( 'mousedown', onDocumentMouseDown, false );
 		domElement.removeEventListener( 'mouseup', onDocumentMouseUp, false );
-		this.enabled = false;
+		root.enabled = false;
 
 	}
 
@@ -386,8 +387,8 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 	function onDocumentMouseMove( event ) {
 		event.preventDefault();
 		mouse.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
-		//console.log(scope.sceneHUD);
-		var intersects = RaycasterSetup(mouse, scope.cameraHUD, scope.sceneHUD);
+		//console.log(HDR_EV.sceneHUD);
+		var intersects = RaycasterSetup(mouse, root.cameraHUD, root.sceneHUD);
 		if ( intersects.length > 0 ) {
 			
 
@@ -398,7 +399,7 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 				//cursor changed by hover
 				if ( hovered !== INTERSECTED ) {
 
-					scope.dispatchEvent( { type: 'hoveron', object: INTERSECTED } );
+					root.dispatchEvent( { type: 'hoveron', object: INTERSECTED } );
 
 					domElement.style.cursor = 'pointer';
 					hovered = INTERSECTED;
@@ -422,7 +423,7 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 		} else {
 			if ( hovered !== null ) {
 
-				scope.dispatchEvent( { type: 'hoveroff', object: hovered } );
+				root.dispatchEvent( { type: 'hoveroff', object: hovered } );
 
 				domElement.style.cursor = 'auto';
 				hovered = null;
@@ -449,7 +450,7 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 		event.preventDefault();
 		mouse.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
 
-		var intersects = RaycasterSetup(mouse, scope.cameraHUD, scope.sceneHUD);
+		var intersects = RaycasterSetup(mouse, root.cameraHUD, root.sceneHUD);
 		//console.log(intersects.length);
 		if ( intersects.length > 0 ) {
 			var picked = intersects[ 0 ].object;
@@ -473,7 +474,7 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 		/*
 		if ( _selected ) {
 
-			scope.dispatchEvent( { type: 'dragend', object: _selected } );
+			root.dispatchEvent( { type: 'dragend', object: _selected } );
 
 			_selected = null;
 
