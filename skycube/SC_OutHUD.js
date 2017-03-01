@@ -109,7 +109,8 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 	var layoutNum = new THREE.Vector2(0,0);
 	var iconSize = 1.0;
 	var iconEdgeSize = new THREE.Vector2(0,0);
-	var iconMinGap = 8.0;
+	var iconMinGap = 64.0;
+	var iconPadding= 10.0;
 
 	var boxUIGeo = new THREE.BoxGeometry( 1, 1, 1 );
 	var boxUIMats = [];
