@@ -33,15 +33,18 @@ h3{
 
 <script src="../build/three.js"></script>
 <script src="js/skycube/SC_Common.js"></script>
-<script src="js/skycube/FL/SCFL_InputFiles.js"></script>
-<script src="js/skycube/FL/SCFL_GrabAndDropFiles.js"></script>
-<script src="js/skycube/FL/SCFL_LoadFiles.js"></script>
-<script src="js/skycube/FL/SCFL_LoadPanorama.js"></script>
 <script src="js/controls/OrbitControls.js"></script>
 <script src="js/skycube/SC_CubeViewport.js"></script>
 <script src="js/skycube/SC_Raster.js"></script>
 <script src="js/skycube/SC_OutputImg.js"></script>
 <script src="js/skycube/SC_OutHUD.js"></script>
+
+<script src="js/skycube/FL/SCFL_HUDClose.js"></script>
+<script src="js/skycube/FL/SCFL_InputFiles.js"></script>
+<script src="js/skycube/FL/SCFL_GrabAndDropFiles.js"></script>
+<script src="js/skycube/FL/SCFL_LoadFiles.js"></script>
+<script src="js/skycube/FL/SCFL_LoadPanorama.js"></script>
+
 
 <script src="../examples/js/libs/dat.gui.min.js"></script>
 
@@ -97,6 +100,12 @@ h3{
 			//console.log("Export");
 			//console.log(panaorama.TestSize);
 			outHUD = new THREE.SC_OutHUD(CM, window.innerWidth, window.innerHeight, renderer.domElement);
+			var outHUDClose = new SCFL_HUDClose();
+			outHUDClose.onClick = function(){outHUD.deactivate();};
+			controls.gui.close();
+			outHUDClose.activate();
+
+
 			cubeView.disableControls();
 			cubeView.asBackground();
 		}
