@@ -1,3 +1,22 @@
+.close-global {
+    display: none; /* Hidden by default */
+    position: absolute; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    right: 0;
+    width: 95%; /* Full width */
+    height: 50px; /* Full height */
+
+    text-align: center;
+    margin: auto;
+    padding-top: 10px;
+
+    /*padding: 0px 0px;*/
+    /*border: 20px solid #888;*/
+}
+
+
 /* The Modal (background) */
 .modal {
     display: none; /* Hidden by default */
@@ -60,7 +79,7 @@
 .close {
     color: #aaaaaa;
     float: right;
-    font-size: 28px;
+    font-size: 32px;
     font-weight: bold;
 }
 
