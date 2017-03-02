@@ -110,7 +110,7 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 	var iconSize = 1.0;
 	var iconEdgeSize = new THREE.Vector2(0,0);
 	var iconMinGap = 64.0;
-	var iconPadding= 10.0;
+	var iconPadding= new THREE.Vector2(40,32);
 
 	var boxUIGeo = new THREE.BoxGeometry( 1, 1, 1 );
 	var boxUIMats = [];
@@ -122,6 +122,7 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 	var selected = null, hovered = null;
 	var outShaderName = "";
 	var INTERSECTED;
+	//var div;
 
 	//function getSelOutShaderName(){
 	//	return outShaderName;
@@ -250,7 +251,7 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 	updateIconPlaneSize();
 
 	// Create the camera and set the viewport to match the screen dimensions.
-	this.cameraHUD = new THREE.OrthographicCamera(-UI_width/2, UI_width/2, UI_height/2, -UI_height/2, 0, iconSize+50 );
+	this.cameraHUD = new THREE.OrthographicCamera(-UI_width/2, UI_width/2, UI_height/2, -UI_height/2, 0, iconSize+50 );//?
 
 	activate();
 	this.activate = activate;
@@ -284,8 +285,10 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 			layoutNum.y = largerSide;
 		}
 
-		iconEdgeSize.x = Math.floor(UI_width/layoutNum.x);
-		iconEdgeSize.y = Math.floor(UI_height/layoutNum.y);
+		var UI_Panel = new THREE.Vector2((UI_width-iconPadding.x*2),(UI_height-iconPadding.y*2));
+
+		iconEdgeSize.x = Math.floor(UI_Panel.x/layoutNum.x);
+		iconEdgeSize.y = Math.floor(UI_Panel.y/layoutNum.y);
 		//console.log(iconEdgeSize);
 
 		iconSize = Math.min(iconEdgeSize.x,iconEdgeSize.y) - iconMinGap;
@@ -298,8 +301,8 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 			for ( var ix = 0; ix < layoutNum.x; ix ++ ) {
 				UI_IconPos[index] = new THREE.Vector2(0,0);
 
-				UI_IconPos[index].x = Math.round(iconEdgeSize.x * (ix + 0.5) - (UI_width*0.5));
-				UI_IconPos[index].y = Math.round(iconEdgeSize.y * (iy + 0.5) - (UI_height*0.5));
+				UI_IconPos[index].x = Math.round(iconEdgeSize.x * (ix + 0.5) - (UI_Panel.x*0.5));
+				UI_IconPos[index].y = Math.round(iconEdgeSize.y * (iy + 0.5) - (UI_Panel.y*0.5));
 				index++;
 			}
 			
