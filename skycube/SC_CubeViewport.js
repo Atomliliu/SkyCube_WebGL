@@ -10,6 +10,22 @@ THREE.SC_CubeViewport = function ( texCube, width, height, fov, renderer ) {
 	this.texCube = texCube;
 	this.materialsCube = [];
 
+/*
+	if(width == undefined){
+		this.width = window.innerWidth;
+	}
+	else{
+		this.width = width;
+	}
+
+	if(height == undefined){
+		this.height = window.innerHeight;
+	}
+	else{
+		this.height = height;
+	}
+	*/
+
 	//Init
 	
 
@@ -56,6 +72,7 @@ THREE.SC_CubeViewport = function ( texCube, width, height, fov, renderer ) {
 	this.disableControls = disableControls;
 	this.enableControls = enableControls;
 	this.asBackground = asBackground;
+	this.asNormal = asNormal;
 
 	function activate(){
 		root.controls = new THREE.OrbitControls( root.camera, renderer.domElement );
@@ -84,6 +101,18 @@ THREE.SC_CubeViewport = function ( texCube, width, height, fov, renderer ) {
 			if(root.materialsCube[i] != undefined && root.materialsCube[i].isMaterial){
 				root.materialsCube[i].transparent = true;
 				root.materialsCube[i].opacity = 0.5;
+			}
+			
+		}
+
+	}
+
+	function asNormal(){
+
+		for ( var i = 0; i < root.materialsCube.length; i ++ ) {
+			if(root.materialsCube[i] != undefined && root.materialsCube[i].isMaterial){
+				root.materialsCube[i].transparent = false;
+				root.materialsCube[i].opacity = 1.0;
 			}
 			
 		}
