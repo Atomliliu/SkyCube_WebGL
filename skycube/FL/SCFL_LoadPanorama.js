@@ -173,7 +173,7 @@ SCFL_LoadPanorama = function ( imgFile, renderer ) {
 
 		span.onclick = function() {
 		    root.deactivate();
-		}
+		};
 
 		buttonDD.onclick = function() {
 			// body...
@@ -183,7 +183,7 @@ SCFL_LoadPanorama = function ( imgFile, renderer ) {
 			UpdateRTT(root.onRTTUpdated);
 
 			root.deactivate();
-		}
+		};
 	}
 
 	this.onRTTUpdated = undefined;
