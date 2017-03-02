@@ -20,6 +20,35 @@ h3{
 }
 
 
+.menu {
+  display: inline-block;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.bar1, .bar2, .bar3 {
+  width: 35px;
+  height: 5px;
+  background-color: #333;
+  margin: 6px 0;
+  transition: 0.4s;
+}
+
+.change .bar1 {
+  -webkit-transform: rotate(-45deg) translate(-9px, 6px) ;
+  transform: rotate(-45deg) translate(-9px, 6px) ;
+}
+
+.change .bar2 {
+  opacity: 0;
+}
+
+.change .bar3 {
+  -webkit-transform: rotate(45deg) translate(-8px, -8px) ;
+  transform: rotate(45deg) translate(-8px, -8px) ;
+}
+
+
 </style>
 </head>
 <body>
@@ -39,6 +68,8 @@ h3{
 <script src="js/skycube/SC_OutputImg.js"></script>
 <script src="js/skycube/SC_OutHUD.js"></script>
 
+
+<script src="js/skycube/FL/SCFL_CubeViewportHUD.js"></script>
 <script src="js/skycube/FL/SCFL_HUDClose.js"></script>
 <script src="js/skycube/FL/SCFL_InputFiles.js"></script>
 <script src="js/skycube/FL/SCFL_GrabAndDropFiles.js"></script>
@@ -92,6 +123,8 @@ h3{
 
 	var renderer;
 	var outHUD;
+	var cubeMenu = new SCFL_CubeViewportHUD();
+	cubeMenu.activate();
 
 	var controls = {
 
@@ -101,7 +134,11 @@ h3{
 			//console.log(panaorama.TestSize);
 			outHUD = new THREE.SC_OutHUD(CM, window.innerWidth, window.innerHeight, renderer.domElement);
 			var outHUDClose = new SCFL_HUDClose();
-			outHUDClose.onClick = function(){outHUD.deactivate();};
+			outHUDClose.onClick = function(){
+				outHUD.deactivate();
+				cubeView.enableControls();
+				cubeView.asNormal();
+			};
 			controls.gui.close();
 			outHUDClose.activate();
 
