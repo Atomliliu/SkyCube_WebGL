@@ -1,6 +1,12 @@
 //
 THREE.SC_Common = function() {
 
+	this.checkTypeAvailable = checkTypeAvailable;
+	this.checkTypeAvailableInFiles = checkTypeAvailableInFiles;
+	this.loadjscssfile = loadjscssfile;
+	this.checkloadjscssfile = checkloadjscssfile;
+	this.removeElements = removeElements;
+
 	//File Type Array with dot, ext .jpg .png .tif .tga
 	function checkTypeAvailable( fileCheck, fileTypeArray ){
 		var fileExt = fileCheck.name.split(".");
@@ -22,7 +28,7 @@ THREE.SC_Common = function() {
 	    return false;
 	}
 
-	this.loadjscssfile = function (fileName, fileType){
+	function loadjscssfile(fileName, fileType){
 	    if (fileType=="js"){ //if filename is a external JavaScript file
 	        var fileRef=document.createElement('script')
 	        fileRef.setAttribute("type","text/javascript")
@@ -39,13 +45,17 @@ THREE.SC_Common = function() {
 	}
 
 
+
+	var filesadded="" //list of files already added
+
 	function checkloadjscssfile(filename, filetype){
 	    if (filesadded.indexOf("["+filename+"]")==-1){
 	        loadjscssfile(filename, filetype)
 	        filesadded+="["+filename+"]" //List of files added in the form "[filename1],[filename2],etc"
 	    }
 	    else
-	        alert("file already added!")
+	    	return false;
+	        //alert("file already added!")
 	}
 
 
