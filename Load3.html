@@ -19,13 +19,29 @@ h3{
 	color: #cccccc;
 }
 
-
 .menu {
+	display: inline-block;
+	z-index: 0;
+	background-color: #000;
+	opacity: 0.7;
+	float: right;
+
+	/*width: 0;*/
+	/*position: fixed;*/
+	top: 0;
+	right: 0;
+	overflow-x: hidden;
+	transition: 0.5s;
+	/*padding-top: 60px;*/
+}
+
+
+.menu_icon {
   display: inline-block;
   cursor: pointer;
   z-index: 1;
   background-color: #000;
-  opacity: 0.7;
+  opacity: 1.0;
   float: right;
   padding: 25px;
 }
@@ -34,6 +50,7 @@ h3{
   width: 35px;
   height: 5px;
   background-color: #fff;
+  opacity: 1.0;
   margin: 6px 0;
   transition: 0.4s;
 }
