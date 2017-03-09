@@ -30,11 +30,15 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 	function setupMenuTab() {
 		divMenu = document.createElement("div");
 		divMenu.id = "cubeMenu";
-		//divMenu.setAttribute("class", "modal");
+		divMenu.setAttribute("class", "menu");
 
 		var divIcon = document.createElement("div");
-		divIcon.setAttribute("class", "menu");
-		divIcon.onclick=function(){this.classList.toggle("change");};
+		divIcon.setAttribute("class", "menu_icon");
+		divIcon.onclick=function(){
+			this.classList.toggle("change"); 
+			if (enabledMenu) {closeMenu();}
+			else {openMenu();}
+		};
 
 		var divIcon1 = document.createElement("div");
 		var divIcon2 = document.createElement("div");
@@ -59,7 +63,21 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 		if(divMenu === undefined) return false;
 	}
 
-	this.onRTTUpdated = undefined;
+	function openMenu(){
+		//;
+		document.getElementById("cubeMenu").style.width = "250px";
+		document.getElementById("cubeMenu").style.height = (root.height.toString()+"px");
+		enabledMenu = true;
+	}
+
+	function closeMenu(){
+		//;
+		document.getElementById("cubeMenu").style.width = "auto";
+		document.getElementById("cubeMenu").style.height = "auto";
+		enabledMenu = false;
+	}
+
+	//this.onRTTUpdated = undefined;
 
 
 
