@@ -4,7 +4,9 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 	//this.img = imgFile;
 	this.enabled = false;
 	this.console = undefined;
+	this.uiFlipULabel;
 	this.uiFlipU;
+	this.uiExport;
 
 	//var imgWidth = this.img.width;
 	//var imgHeight = this.img.height;
@@ -64,7 +66,11 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 	function setupMenu() {
 		if(divMenu === undefined) return false;
 		root.console = new THREE.SC_Controller(divMenu, "menu_console");
-		root.uiFlipU = root.console.CheckBox(divMenu,"menu_content",'checkbox',function(){console.log("chk");});
+
+		root.uiFlipULabel = root.console.addLabel(divMenu,"menu_content _inline", "", "Flip" );
+		root.uiFlipU = root.console.addCheckBox(divMenu,"menu_content _inline", "", false, function(){console.log("chk");});
+
+		root.uiExport = root.console.addButton(divMenu,"menu_content _block", "Export", false, function(){console.log("butt");});
 	}
 
 	var initWidth = "auto";
@@ -77,7 +83,9 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 
 		divMenu.style.width = "250px";
 		divMenu.style.height = (root.height.toString()+"px");
-		root.uiFlipU.style.display = "block";
+		root.uiFlipULabel.style.visibility = "visible";
+		root.uiFlipU.style.visibility = "visible";
+		root.uiExport.style.visibility = "visible";
 		enabledMenu = true;
 	}
 
@@ -85,7 +93,9 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 		//;
 		divMenu.style.width = initWidth;
 		divMenu.style.height = initHeight;
-		root.uiFlipU.style.display = "none";
+		root.uiFlipULabel.style.visibility = "hidden";
+		root.uiFlipU.style.visibility = "hidden";
+		root.uiExport.style.visibility = "hidden";
 		enabledMenu = false;
 	}
 
