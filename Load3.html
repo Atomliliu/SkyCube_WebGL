@@ -26,15 +26,25 @@ h3{
 	opacity: 0.7;
 	float: right;
 
-	/*width: 0;*/
-	/*position: fixed;*/
+	width: 85px;
+	height: 90px;
+	position: fixed;
 	top: 0;
 	right: 0;
 	overflow-x: hidden;
+	overflow-y: hidden;
 	transition: 0.5s;
+	-webkit-transition: 0.5s; /* Safari */
+	/*-moz-transition: 10.5s;*/
 	/*padding-top: 60px;*/
 }
 
+.menu_console {
+	padding-top: 60px;
+}
+.menu_content {
+	display: none;
+}
 
 .menu_icon {
   display: inline-block;
@@ -88,6 +98,7 @@ h3{
 <script src="js/skycube/SC_Raster.js"></script>
 <script src="js/skycube/SC_OutputImg.js"></script>
 <script src="js/skycube/SC_OutHUD.js"></script>
+<script src="js/skycube/SC_Controller.js"></script>
 
 
 <script src="js/skycube/FL/SCFL_CubeViewportHUD.js"></script>
