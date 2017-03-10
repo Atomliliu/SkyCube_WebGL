@@ -1,26 +1,33 @@
 
 
-THREE.SC_Controller = function ( dom, width, height ) {
+THREE.SC_Controller = function ( dom, css, width, height ) {
 	var root = this;
 	this.enabled = true;
 	this.controllers = [];
 	/* Outermost DOM Element*/
 	this.domElement = document.createElement('div');
 	dom.appendChild(this.domElement);
+	setCSS(this.domElement,css);
 
-	function addElement(parentDom, elemName, classType, callBack){
+	function setCSS(elem, css){
+		if(css!=undefined && css!="") elem.setAttribute('class', css);
+	}
+
+	function addElement(parentDom, css, elemName, classType, callBack){
 		var cb = document.createElement(elemName);
     	cb.setAttribute('type', classType);
+    	setCSS(cb,css);
 
     	if(parentDom==undefined) parentDom = dom;
     	parentDom.appendChild(cb);
     	cb.onchange = callBack;
     	root.controllers.push(cb);
+    	return cb;
 	}
 
-	this.CheckBox = function (parentDom, classType, callBack){
+	this.CheckBox = function (parentDom, css, classType, callBack){
 		if (classType==undefined) classType='checkbox';
-		addElement(parentDom, "input", classType, callBack);
+		return addElement(parentDom, css, "input", classType, callBack);
 		
 	};
 
