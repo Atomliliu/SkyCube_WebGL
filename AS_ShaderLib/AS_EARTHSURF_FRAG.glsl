@@ -1,23 +1,26 @@
-#include <as_common>
+//#include <as_common>
 
 uniform samplerCube tCube;
-varying vec3 vWorldPosition;
-varying vec2 vUv;
+uniform float _ESun;
 
-//uniform int nFace;
-uniform float fFlip;
+varying vec3 vWorldPosition;//? vec3
+varying vec2 vUv;
+varying vec3 vT0;
+varying vec3 vT1;
+varying vec3 vC0;
+varying vec3 vC1;
+
 
 void main() {
-	vec3 dir = getVecHCrossCubeMap(vUv);
-	vec4 result = vec4(0,0,0,0);
-	if (dir != vec3(0,0,0)) {
-		result = textureCube( tCube, vec3( fFlip * dir.x, dir.yz ) );
-	}
+
+	vec4 texSurfCol = vec4(0.0);//tex2D(_MainTex, IN.uv);
+	//half4 texCloudCol = tex2D(_CloudTex, float2(IN.uv.x + _CloudUOffset * _Time.x, IN.uv.y));
+	vec3 diff = vT0 * vC1 * _ESun;
+	vec3 col = vT1 * diff * vec3(0.3) * texSurfCol.a;
+	//col = IN.c0 + lerp(col.rgb, texCloudCol.rgb * diff, texCloudCol.a);
+	col = vC0 + col.rgb + vec3(0.5);
 	
-	//vec4 result = texture2D( tSampler,  getLLMapping_VEC2UV( getVec(vUv,nFace) ) );
-
-	gl_FragColor = result;
-
-	//gl_FragColor.a *= opacity;
+	gl_FragColor = vec4(col, 1.0);
+	//fColor.rgb *= SetEV(fHdrExposure);
 
 }
