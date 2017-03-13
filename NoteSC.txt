@@ -60,3 +60,40 @@ http://stackoverflow.com/questions/469059/button-vs-input-type-button-which-to-u
 
 https://www.peterbe.com/plog/button-tag-in-IE
 http://web.archive.org/web/20110721191046/http://particletree.com/features/rediscovering-the-button-element/
+
+
+2017 03 13
+Built-in Variable (GLSL)
+https://www.khronos.org/opengl/wiki/Built-in_Variable_(GLSL)
+Vertex shader inputs
+V · E
+Vertex Shaders have the following built-in input variables.
+
+in int gl_VertexID;
+in int gl_InstanceID;
+gl_VertexID
+the index of the vertex currently being processed. When using non-indexed rendering, it is the effective index of the current vertex (the number of vertices processed + the first​ value). For indexed rendering, it is the index used to fetch this vertex from the buffer.
+Note: gl_VertexID will have the base vertex applied to it.
+gl_InstanceID
+the index of the current instance when doing some form of instanced rendering. The instance count always starts at 0, even when using base instance calls. When not using instanced rendering, this value will be 0.
+Warning: This value does not follow the baseinstance​ provided by some instanced rendering functions. gl_InstanceID always falls on the half-open range [0, instancecount​).
+Vertex shader outputs
+V · E
+Vertex Shaders have the following predefined outputs.
+
+out gl_PerVertex
+{
+  vec4 gl_Position;
+  float gl_PointSize;
+  float gl_ClipDistance[];
+};
+gl_PerVertex defines an interface block for outputs. The block is defined without an instance name, so that prefixing the names is not required.
+
+These variables only take on the meanings below if this shader is the last active Vertex Processing stage, and if rasterization is still active (ie: GL_RASTERIZER_DISCARD is not enabled). The text below explains how the Vertex Post-Processing system uses the variables. These variables may not be redeclared with interpolation qualifiers.
+
+gl_Position
+the clip-space output position of the current vertex.
+gl_PointSize
+the pixel width/height of the point being rasterized. It only has a meaning when rendering point primitives. It will be clamped to the GL_POINT_SIZE_RANGE.
+gl_ClipDistance
+allows the shader to set the distance from the vertex to each user-defined clipping half-space. A non-negative distance means that the vertex is inside/behind the clip plane, and a negative distance means it is outside/in front of the clip plane. Each element in the array is one clip plane. In order to use this variable, the user must manually redeclare it with an explicit size.
