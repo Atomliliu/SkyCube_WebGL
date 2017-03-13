@@ -4,9 +4,12 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 	//this.img = imgFile;
 	this.enabled = false;
 	this.console = undefined;
+
 	this.uiFlipULabel;
 	this.uiFlipU;
 	this.uiExport;
+	this.uiRotateU;
+	this.uiRotateV;
 
 	//var imgWidth = this.img.width;
 	//var imgHeight = this.img.height;
@@ -70,11 +73,28 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 		root.uiFlipULabel = root.console.addLabel(divMenu,"menu_content _inline", "", "Flip" );
 		root.uiFlipU = root.console.addCheckBox(divMenu,"menu_content _inline", "", false, function(){console.log("chk");});
 
-		root.uiExport = root.console.addButton(divMenu,"menu_content _block", "Export", false, function(){console.log("butt");});
+		root.uiExport = root.console.addButton(divMenu,"menu_content _block menu_button", "Export", false, function(){console.log("butt");});
+
+		root.uiRotateU = root.console.addRange(divMenu,"menu_content _block", "0", false, function(){console.log("range");});
+		root.uiRotateU.setAttribute('max', "180");
+		root.uiRotateU.setAttribute('min', "-180");
+		root.uiRotateV = root.console.addRange(divMenu,"menu_content _block", "0", false, function(){console.log(root.uiRotateV.value);});
+		root.uiRotateV.setAttribute('max', "180");
+		root.uiRotateV.setAttribute('min', "-180");
 	}
 
 	var initWidth = "auto";
 	var initHeight = "auto";
+
+
+	function visibleMenu(vis){
+		var opa = 0.0;
+		if(vis == "visible") opa = 1.0;
+		for(var n=0;n<root.console.controllers.length;n++){
+			root.console.controllers[n].style.visibility = vis;
+			root.console.controllers[n].style.opacity = opa;
+		}
+	}
 
 	function openMenu(){
 		//;
@@ -83,9 +103,12 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 
 		divMenu.style.width = "250px";
 		divMenu.style.height = (root.height.toString()+"px");
+		/*
 		root.uiFlipULabel.style.visibility = "visible";
 		root.uiFlipU.style.visibility = "visible";
-		root.uiExport.style.visibility = "visible";
+		root.uiExport.style.visibility = "visible";*/
+
+		visibleMenu("visible");
 		enabledMenu = true;
 	}
 
@@ -93,9 +116,13 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 		//;
 		divMenu.style.width = initWidth;
 		divMenu.style.height = initHeight;
+
+		/*
 		root.uiFlipULabel.style.visibility = "hidden";
 		root.uiFlipU.style.visibility = "hidden";
-		root.uiExport.style.visibility = "hidden";
+		root.uiExport.style.visibility = "hidden";*/
+
+		visibleMenu("hidden");
 		enabledMenu = false;
 	}
 
