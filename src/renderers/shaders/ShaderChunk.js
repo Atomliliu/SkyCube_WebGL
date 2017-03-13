@@ -18,6 +18,7 @@ import color_vertex from './ShaderChunk/color_vertex.glsl';
 import common from './ShaderChunk/common.glsl';
 //////////////////////////////////////////////////////
 import sc_common from './SC_ShaderChunk/sc_common.glsl';
+import as_common from './AS_ShaderChunk/as_common.glsl';
 ///////////////////////////////////////////////////////
 import cube_uv_reflection_fragment from './ShaderChunk/cube_uv_reflection_fragment.glsl';
 import defaultnormal_vertex from './ShaderChunk/defaultnormal_vertex.glsl';
@@ -135,6 +136,12 @@ import SCSL_ENV2DP_HUD_FRAG from './SC_ShaderLib/SCSL_ENV2DP_HUD_FRAG.glsl';
 import SCSL_ENV2SP_HUD_FRAG from './SC_ShaderLib/SCSL_ENV2SP_HUD_FRAG.glsl';
 
 import SCSL_RASTER_VERT from './SC_ShaderLib/SCSL_RASTER_VERT.glsl';
+
+//
+
+import AS_EARTHSURF_VERT from './AS_ShaderLib/AS_EARTHSURF_VERT.glsl';
+import AS_EARTHSURF_FRAG from './AS_ShaderLib/AS_EARTHSURF_FRAG.glsl';
+
 //////////////////////////////////////////////////////
 
 export var ShaderChunk = {
@@ -158,6 +165,7 @@ export var ShaderChunk = {
 	common: common,
 	//////////////////////////////////////////////////////
 	sc_common: sc_common,
+	as_common: as_common,
 	//////////////////////////////////////////////////////
 	
 	cube_uv_reflection_fragment: cube_uv_reflection_fragment,
@@ -253,6 +261,12 @@ export var ShaderChunk = {
 	SCSL_ENV2SP_HUD_FRAG: SCSL_ENV2SP_HUD_FRAG,
 
 	SCSL_RASTER_VERT: SCSL_RASTER_VERT,
+
+	//
+
+	AS_EARTHSURF_VERT: AS_EARTHSURF_VERT,
+	AS_EARTHSURF_FRAG: AS_EARTHSURF_FRAG,
+
 
 
 	/////////////////////////////////////////////////////
