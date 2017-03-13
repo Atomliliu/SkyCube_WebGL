@@ -357,11 +357,11 @@ float getRayleighPhase(float fCos2)
 float getAltitude(float sampleHeight, float radius, float scaleHeight, float scale){
 	float alt = (sampleHeight - radius) * scale;
 	//alt = max(alt, 0.0f);
-	return max(exp(-alt / scaleHeight), 0.0f);
+	return max(exp(-alt / scaleHeight), 0.0);
 } 
 
 // Returns the near intersection point of a line and a sphere
-float getNearIntersection(float3 v3Pos, float3 v3Ray, float fDistance2, float fRadius2)
+float getNearIntersection(vec3 v3Pos, vec3 v3Ray, float fDistance2, float fRadius2)
 {
 	float B = 2.0 * dot(v3Pos, v3Ray);
 	float C = fDistance2 - fRadius2;
@@ -370,7 +370,7 @@ float getNearIntersection(float3 v3Pos, float3 v3Ray, float fDistance2, float fR
 }
 
 // Returns the far intersection point of a line and a sphere
-float getFarIntersection(float3 v3Pos, float3 v3Ray, float fDistance2, float fRadius2)
+float getFarIntersection(vec3 v3Pos, vec3 v3Ray, float fDistance2, float fRadius2)
 {
 	float B = 2.0 * dot(v3Pos, v3Ray);
 	float C = fDistance2 - fRadius2;
@@ -378,41 +378,41 @@ float getFarIntersection(float3 v3Pos, float3 v3Ray, float fDistance2, float fRa
 	return 0.5 * (-B + sqrt(fDet));
 }
 
-float3 getIntersection(float3 v3Pos, float3 v3Ray, float fDistance2, float fRadius2)
+vec3 getIntersection(vec3 v3Pos, vec3 v3Ray, float fDistance2, float fRadius2)
 {
 
 	float B = 2.0 * dot(v3Pos, v3Ray);
 	float C = fDistance2 - fRadius2;
 	float fDet = B*B - 4.0 * C;
-	bool bVisible = (fDet < 0 || (0.5f * (-B - sqrt(fDet)) <= 0) && (0.5f * (-B + sqrt(fDet)) <= 0));
+	bool bVisible = (fDet < 0 || (0.5 * (-B - sqrt(fDet)) <= 0) && (0.5 * (-B + sqrt(fDet)) <= 0));
 
-	return float3(fDet, (0.5f * (-B - sqrt(fDet))), (0.5f * (-B + sqrt(fDet))) );
+	return vec3(fDet, (0.5 * (-B - sqrt(fDet))), (0.5 * (-B + sqrt(fDet))) );
 
 }
 
 
-float DecodeRGBA2Float(half4 fColor, float fMax)
+float DecodeRGBA2Float(vec4 vColor, float fMax)
 {
 	//const float fromFixed = 256.0f/255.0f;
-	float4 vBitShift = float4(D_BIT3, D_BIT2, D_BIT, 1.0f);
-	float4 vCol = fColor;// * fromFixed;
+	vec4 vBitShift = vec4(D_BIT3, D_BIT2, D_BIT, 1.0);
+	vec4 vCol = vColor;// * fromFixed;
 	float fVal = dot(vCol, vBitShift);
-	fVal = (fVal >= 0.999999f) ? 1.0f : fVal ;
+	fVal = (fVal >= 0.999999) ? 1.0 : fVal ;
 	fVal *= fMax; // Scale float back to correct range
 
 	return fVal;
 }
 
 
-float Saturation(float3 v3Rgb)
+float Saturation(vec3 v3Rgb)
 {
     // Algorithm from Chapter 16 of OpenGL Shading Language
-    const float3 W = float3(0.2125f, 0.7154f, 0.0721f);
+    const vec3 W = vec3(0.2125, 0.7154, 0.0721);
     float intensity = dot(v3Rgb, W);
     //return mix(intensity, rgb, adjustment);
     return intensity;
 }
 
 float SetEV(float fEV){
-	return pow(0.5f,fEV);
+	return pow(0.5,fEV);
 }
