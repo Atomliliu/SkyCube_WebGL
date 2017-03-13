@@ -506,8 +506,37 @@ var ShaderLib = {
 		vertexShader: ShaderChunk.SCSL_RASTER_VERT,
 		fragmentShader: ShaderChunk.SCSL_ENV2CUBEFACE_HUD_FRAG
 
-	}
+	},
 	//////////////////////////////////////////////////
+	AS_EARTHSURF: {
+
+		uniforms: {
+			tCube: { value: null },
+			_ESun: { value: 1 },
+			
+			v3Translate: { value: new Vector3(0,0,0) },
+			v3LightPos: { value: new Vector3(0,0,0) },
+			v3InvWavelength: { value: new Vector3(0,0,0) },
+			fOuterRadius: { value: 1.0 },
+			fOuterRadius2: { value: 1.0 },
+			fInnerRadius: { value: 1.0 },
+			fInnerRadius2: { value: 1.0 },
+			fKrESun: { value: 1.0},
+			fKmESun: { value: 1.0 },
+			fKr4PI: { value: 1.0 },
+			fKm4PI: { value: 1.0 },
+			fScale: { value: 1.0 },
+			fScaleDepth: { value: 0 },
+			fScaleOverScaleDepth: { value: 1 },
+			fHdrExposure: { value: 1.0 }
+
+		},
+
+		vertexShader: ShaderChunk.AS_EARTHSURF_VERT,
+		fragmentShader: ShaderChunk.AS_EARTHSURF_FRAG
+
+	}
+
 
 };
 
