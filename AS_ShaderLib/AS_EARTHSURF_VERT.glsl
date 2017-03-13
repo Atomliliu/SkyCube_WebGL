@@ -1,6 +1,6 @@
 #include <as_common>
 
-varying vec3 vWorldPosition;
+varying vec4 vWorldPosition;//? vec3
 varying vec2 vUv;
 varying vec3 vT0;
 varying vec3 vT1;
@@ -28,9 +28,9 @@ uniform float fHdrExposure;		// HDR exposure
 
 
 void main() {
-
+	//Vertx 2 Fragment
 	vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
-	vWorldPosition = worldPosition.xyz;
+	vWorldPosition = worldPosition.xyzw;//? vec3
 
 	vUv = abs(vUvFlip-uv);
 	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
