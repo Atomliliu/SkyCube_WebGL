@@ -40,13 +40,23 @@ h3{
 }
 
 .menu_console {
-	padding-top: 60px;
+	padding-top: 100px;
 }
 .menu_content {
+	
 	margin-bottom: 16px;
 	margin-left: 32px;
 	color: #fff;
 	visibility: hidden;
+	opacity: 0.0;
+	/*transition-delay: 0.5s;*/
+	transition: 0.5s;
+}
+
+.menu_button {
+	border: 2px solid #fff;
+	/*background-color: #000;*/
+	background: rgba(0, 0, 0, 0.0)
 }
 ._block {
 	display: block;
@@ -69,8 +79,8 @@ h3{
 }
 
 .bar1, .bar2, .bar3 {
-  width: 35px;
-  height: 5px;
+  width: 36px;
+  height: 4px;
   background-color: #fff;
   opacity: 1.0;
   margin: 6px 0;
@@ -78,8 +88,8 @@ h3{
 }
 
 .change .bar1 {
-  -webkit-transform: rotate(-45deg) translate(-9px, 6px) ;
-  transform: rotate(-45deg) translate(-9px, 6px) ;
+  -webkit-transform: rotate(-45deg) translate(-9px, 5px) ;
+  transform: rotate(-45deg) translate(-9px, 5px) ;
 }
 
 .change .bar2 {
@@ -87,8 +97,8 @@ h3{
 }
 
 .change .bar3 {
-  -webkit-transform: rotate(45deg) translate(-8px, -8px) ;
-  transform: rotate(45deg) translate(-8px, -8px) ;
+  -webkit-transform: rotate(45deg) translate(-9px, -5px) ;
+  transform: rotate(45deg) translate(-9px, -5px) ;
 }
 
 
