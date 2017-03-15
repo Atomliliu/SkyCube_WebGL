@@ -516,7 +516,7 @@ var ShaderLib = {
 			
 			v3CamPos: { value: new Vector3(0,0,0) },
 			v3Translate: { value: new Vector3(0,0,0) },
-			v3LightPos: { value: new Vector3(0,0,0) },
+			v3LightDir: { value: new Vector3(0,0,0) },
 			v3InvWavelength: { value: new Vector3(0,0,0) },
 			fOuterRadius: { value: 1.0 },
 			fOuterRadius2: { value: 1.0 },
