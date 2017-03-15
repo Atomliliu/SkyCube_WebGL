@@ -71,16 +71,17 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 		root.console = new THREE.SC_Controller(divMenu, "menu_console");
 
 		root.uiFlipULabel = root.console.addLabel(divMenu,"menu_content _inline", "", "Flip" );
-		root.uiFlipU = root.console.addCheckBox(divMenu,"menu_content _inline", "", false, function(){console.log("chk");});
 
-		root.uiExport = root.console.addButton(divMenu,"menu_content _block menu_button", "Export", false, function(){console.log("butt");});
+		
 
-		root.uiRotateU = root.console.addRange(divMenu,"menu_content _block", "0", false, function(){console.log("range");});
-		root.uiRotateU.setAttribute('max', "180");
-		root.uiRotateU.setAttribute('min', "-180");
-		root.uiRotateV = root.console.addRange(divMenu,"menu_content _block", "0", false, function(){console.log(root.uiRotateV.value);});
-		root.uiRotateV.setAttribute('max', "180");
-		root.uiRotateV.setAttribute('min', "-180");
+		root.uiFlipU = root.console.addCheckBox(divMenu, {css: "menu_content _inline", checked: false, callBack: function(){console.log("chk");}});
+
+		root.uiExport = root.console.addButton(divMenu, {css: "menu_content _block menu_button", value: "Export", callBack: function(){console.log("butt");}});
+
+		root.uiRotateU = root.console.addRange(divMenu, {css: "menu_content _block", value: 0, min:-180, max:180, callBack: function(){console.log("range");}});
+
+		root.uiRotateV = root.console.addRange(divMenu, {css: "menu_content _block", value: 0, min:-180, max:180, callBack: function(){console.log(root.uiRotateV.value);}});
+
 	}
 
 	var initWidth = "auto";
