@@ -55,7 +55,7 @@ void main() {
 	
 	// Get the ray from the camera to the vertex and its length (which is the far point of the ray passing through the atmosphere)
 	//vec3 v3Pos = mul(_Object2World, v.vertex).xyz - v3Translate;
-	vec3 v3Pos = vWorldPosition.xyz - v3Translate;
+	vec3 v3Pos = worldPosition.xyz - v3Translate;
 	vec3 v3Ray = v3Pos - v3CameraPos;
 	float fFar = length(v3Ray);
 	v3Ray /= fFar;
