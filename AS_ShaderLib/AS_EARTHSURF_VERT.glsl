@@ -9,9 +9,9 @@ varying vec3 vC1;
 
 
 // vec3
-
+uniform vec3 v3CamPos;
 uniform vec3 v3Translate;		// The objects world pos
-uniform vec3 v3LightPos;		// The direction vector to the light source
+uniform vec3 v3LightDir;		// The direction vector to the light source
 uniform vec3 v3InvWavelength; // 1 / pow(wavelength, 4) for the red, green, and blue channels
 uniform float fOuterRadius;		// The outer (atmosphere) radius
 uniform float fOuterRadius2;	// fOuterRadius^2
@@ -68,12 +68,13 @@ void main() {
 	float fCameraAngle;
 	float fLightAngle;
 
+
 	if(fNear <= 0.0)//Camera inside atmosphere
 	{
 		fDepth = exp((fInnerRadius - fCameraHeight) * (1.0/fScaleDepth));
 		//fDepth = exp((fInnerRadius - fOuterRadius) / fScaleDepth);
 		fCameraAngle = dot(-v3Ray, v3Pos) / length(v3Pos);
-		fLightAngle = dot(v3LightPos, v3Pos) / length(v3Pos);
+		fLightAngle = dot(v3LightDir, v3Pos) / length(v3Pos);
 	}
 	else//Camera outside atmosphere
 	{
@@ -82,7 +83,7 @@ void main() {
 		fDepth = exp((fInnerRadius - fOuterRadius) / fScaleDepth);
 		//fDepth = exp((fInnerRadius - fCameraHeight) * (1.0/fScaleDepth));
 		fCameraAngle = dot(-v3Ray, v3Pos) / length(v3Pos);
-		fLightAngle = dot(v3LightPos, v3Pos) / length(v3Pos);
+		fLightAngle = dot(v3LightDir, v3Pos) / length(v3Pos);
 	}
 
 
@@ -93,7 +94,7 @@ void main() {
 	float fCameraOffset = fDepth*fCameraScale;
 	float fTemp = (fLightScale + fCameraScale);
 	
-	const int nSamples = 2;
+	const int nSamples = 8;
 
 	// Initialize the scattering loop variables
 	float fSampleLength = fFar / float(nSamples);
@@ -107,10 +108,10 @@ void main() {
 	for(int i=0; i<nSamples; i++)
 	{
 		float fHeight = length(v3SamplePoint);
-		float fDepth = exp(fScaleOverScaleDepth * (fInnerRadius - fHeight));
-		float fScatter = fDepth*fTemp - fCameraOffset;
+		float fDepth2 = exp(fScaleOverScaleDepth * (fInnerRadius - fHeight));
+		float fScatter = fDepth2*fTemp - fCameraOffset;
 		v3Attenuate = exp(vec3(-fScatter) * (v3InvWavelength * vec3(fKr4PI) + vec3(fKm4PI)));
-		v3FrontColor += v3Attenuate * vec3(fDepth * fScaledLength);
+		v3FrontColor += v3Attenuate * vec3(fDepth2 * fScaledLength);
 		v3SamplePoint += v3SampleRay;
 	}
 
@@ -121,13 +122,14 @@ void main() {
 	vUv = uv;
 	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );// = pos
 
-	vC0 = vec3(0.0);//v3FrontColor * (v3InvWavelength * fKrESun + fKmESun);
-	vC1 = vec3(0.0);//lerp(vec3(1.0), v3Attenuate, _Ratio);
-	vT0 = vec3(0.0);//pow(saturate(dot(v3LightPos, mul((float3x3)_Object2World, v.normal).xyz)+0.175),0.75);
+	vC0 = v3FrontColor * (v3InvWavelength * fKrESun + fKmESun);
+
+	vC1 = v3Attenuate;//? lerp(vec3(1.0), v3Attenuate, _Ratio);
+	vT0 = vec3(1.0);//pow(saturate(dot(v3LightDir, (modelMatrix*vec4(normal,1.0)).xyz)+vec3(0.175)),0.75);
 
 
 	//Specular
-	vec3 h = normalize (v3LightPos + normalize(v3CameraPos - v3Pos));
+	vec3 h = normalize (v3LightDir + normalize(v3CameraPos - v3Pos));
 	float nh = max (0.0, dot (normal, h));
 	float spec = 0.0;//pow (nh, _Glossiness * A_SPECPOWER);
 	vT1 = vec3(spec);
