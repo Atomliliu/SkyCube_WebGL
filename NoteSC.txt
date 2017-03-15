@@ -97,3 +97,24 @@ gl_PointSize
 the pixel width/height of the point being rasterized. It only has a meaning when rendering point primitives. It will be clamped to the GL_POINT_SIZE_RANGE.
 gl_ClipDistance
 allows the shader to set the distance from the vertex to each user-defined clipping half-space. A non-negative distance means that the vertex is inside/behind the clip plane, and a negative distance means it is outside/in front of the clip plane. Each element in the array is one clip plane. In order to use this variable, the user must manually redeclare it with an explicit size.
+
+
+2017 03 15
+webglLessonsUI.setupSlider("#x", {value: translation[0], slide: updatePosition(0), max: gl.canvas.width });
+
+function setupSlider(selector, options) {
+    var precision = options.precision || 0;
+    var min = options.min || 0;
+    var step = options.step || 1;
+    var value = options.value || 0;
+    var max = options.max || 1;
+    
+ Bunk html script in javascript:
+ parent.innerHTML = `
+      <div class="gman-slider-outer">
+        <div class="gman-slider-label">${selector.substring(1)}</div>
+        <div class="gman-slider-value"></div>
+        <input class="gman-slider-slider" type="range" min="${min}" max="${max}" value="${value}" />
+      </div>
+    `;
+    var fn = options.slide;
