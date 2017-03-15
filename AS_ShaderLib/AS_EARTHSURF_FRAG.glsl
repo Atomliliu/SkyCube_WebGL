@@ -16,9 +16,11 @@ void main() {
 	vec4 texSurfCol = vec4(0.0);//tex2D(_MainTex, IN.uv);
 	//half4 texCloudCol = tex2D(_CloudTex, float2(IN.uv.x + _CloudUOffset * _Time.x, IN.uv.y));
 	vec3 diff = vT0 * vC1 * _ESun;
-	vec3 col = vT1 * diff * vec3(0.3) * texSurfCol.a;
+	vec3 col = vT1 * diff * vec3(0.3);
 	//col = IN.c0 + lerp(col.rgb, texCloudCol.rgb * diff, texCloudCol.a);
-	col = vC0 + col.rgb + vec3(0.5);
+	col = vC0 + col.rgb ;
+	//col = vec3(0.5);
+	col = vC0;
 	
 	gl_FragColor = vec4(col, 1.0);
 	//fColor.rgb *= SetEV(fHdrExposure);
