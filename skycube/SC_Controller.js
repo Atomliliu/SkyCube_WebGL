@@ -13,24 +13,46 @@ THREE.SC_Controller = function ( dom, css, width, height ) {
 		if(css!=undefined && css!="") elem.setAttribute('class', css);
 	}
 
-	function addElement(parentDom, css, elemName, classType, value, id, eventID, callBack){
-		var cb = document.createElement(elemName);
-    	cb.setAttribute('type', classType);
-    	setCSS(cb,css);
-    	cb.value = value;
+	function addElement(parentDom, elemTag, elemType, eventType, options){
+		var cb = document.createElement(elemTag);
+    	cb.setAttribute('type', elemType);
+
+    	//var precision = options.precision || 0;
+    	var id = options.id;
+    	var css = options.css;
+	    var min = options.min;
+	    var step = options.step;
+	    var value = options.value;
+	    var max = options.max;
+	    var checked = options.checked;
+	    //var eventType = options.eventType || 1;
+	    var callBack = options.callBack;
+
+	    setCSS(cb,css);
+
+	    if (cb.value!=undefined) cb.value = value;
+    	
+    	//cb.precision = precision;
+	    if (cb.min!=undefined) cb.min = min;
+	    if (cb.step!=undefined) cb.step = step;
+	    if (cb.max!=undefined) cb.max = max;
+	    if (cb.checked!=undefined) cb.checked = checked;
+
+
 
     	if(id!=undefined && id!="" && id!=false) cb.id = id;
 
     	if(parentDom==undefined) parentDom = dom;
     	parentDom.appendChild(cb);
-    	if (eventID==0) cb.onchange = callBack;
-    	if (eventID==1) cb.onclick = callBack;
+    	if (eventType==0) cb.onchange = callBack;
+    	if (eventType==1) cb.onclick = callBack;
+    	if (eventType==2) cb.oninput = callBack;
     	root.controllers.push(cb);
     	return cb;
 	}
 
-	this.addCheckBox = function (parentDom, css, value, id, callBack){
-		return addElement(parentDom, css, "input", 'checkbox', value, id, 0, callBack);
+	this.addCheckBox = function (parentDom, options){
+		return addElement(parentDom, "input", 'checkbox', 0, options);
 		
 	};
 
@@ -40,28 +62,28 @@ THREE.SC_Controller = function ( dom, css, width, height ) {
 		
 	};*/
 
-	this.addButton = function (parentDom, css, value, id, callBack){
-		return addElement(parentDom, css, "input", 'button', value, id, 1, callBack);
+	this.addButton = function (parentDom, options){
+		return addElement(parentDom, "input", 'button', 1, options);
 		
 	};
 
-	this.addRadio = function (parentDom, css, value, id, callBack){
-		return addElement(parentDom, css, "input", 'radio', value, id, 0, callBack);
+	this.addRadio = function (parentDom, options){
+		return addElement(parentDom, "input", 'radio', 0, options);
 		
 	};
 
-	this.addNumber = function (parentDom, css, value, id, callBack){
-		return addElement(parentDom, css, "input", 'number', value, id, 0, callBack);
+	this.addNumber = function (parentDom, options){
+		return addElement(parentDom, "input", 'number', 0, options);
 		
 	};
 
-	this.addRange = function (parentDom, css, value, id, callBack){
-		return addElement(parentDom, css, "input", 'range', value, id, 0, callBack);
+	this.addRange = function (parentDom, options){
+		return addElement(parentDom, "input", 'range', 0, options);
 		
 	};
 
-	this.addText = function (parentDom, css, value, id, callBack){
-		return addElement(parentDom, css, "input", 'text', value, id, 0, callBack);
+	this.addText = function (parentDom, options){
+		return addElement(parentDom, "input", 'text', 0, options);
 		
 	};
 
@@ -76,8 +98,6 @@ THREE.SC_Controller = function ( dom, css, width, height ) {
     	root.controllers.push(lb);
     	return lb;
 	};
-
-
 
 };
 
