@@ -514,6 +514,7 @@ var ShaderLib = {
 			tCube: { value: null },
 			_ESun: { value: 1 },
 			
+			v3CamPos: { value: new Vector3(0,0,0) },
 			v3Translate: { value: new Vector3(0,0,0) },
 			v3LightPos: { value: new Vector3(0,0,0) },
 			v3InvWavelength: { value: new Vector3(0,0,0) },
