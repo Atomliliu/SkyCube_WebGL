@@ -42,9 +42,6 @@ SCFL_HUDClose = function ( idname ) {
 	
 
 	function activate() {
-		if(div === undefined){
-			scc.checkloadjscssfile("js/skycube/CSS/SC_InputPanoramaFormatModal.css","css");
-		}
 		this.enabled = true;
 		setupCloseIcon();
 		shown();

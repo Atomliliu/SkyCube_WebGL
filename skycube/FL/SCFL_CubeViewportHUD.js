@@ -5,6 +5,7 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 	this.enabled = false;
 	this.console = undefined;
 
+	this.uiCubeFormat;
 	this.uiFlipULabel;
 	this.uiFlipU;
 	this.uiExport;
@@ -66,23 +67,39 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 		
 	}
 
+	function setupBlock(css){
+		var divBlock = document.createElement("div");
+		
+		if(css) divBlock.setAttribute("class", css);
+		divMenu.appendChild(divBlock);
+		return divBlock;
+	}
+
 	function setupMenu() {
 		if(divMenu === undefined) return false;
 		root.console = new THREE.SC_Controller(divMenu, "menu_console");
 
-		root.uiFlipULabel = root.console.addLabel(divMenu,"menu_content _inline", "", "Flip" );
+
+		//root.uiCubeFormat = root.console.addList(divMenu,{id: "flip", "menu_content _inline"})
+		//root.console.addSpace(divMenu,2);
+
+		root.uiFlipULabel = root.console.addLabel(divMenu,"menu_content _inline", "flip", "Flip" );
+		root.uiFlipU = root.console.addCheckBox(divMenu, {id: "flip", css: "menu_content _inline", checked: false, callBack: function(){console.log("chk");}});
+		root.console.addSpace(divMenu,2);
+		
+		root.uiRotateULabel = root.console.addLabel(divMenu,"menu_content _inline", "rotate_u", "Rotate U" );
+		root.uiRotateU = root.console.addRange(divMenu, {id: "rotate_u",css: "menu_content _inline", value: 0, min:-180, max:180, callBack: function(){console.log("range");}});
+		root.console.addSpace(divMenu,1);
+
+		root.uiRotateVLabel = root.console.addLabel(divMenu,"menu_content", "rotate_v", "Rotate V" );
+		root.uiRotateV = root.console.addRange(divMenu, {id: "rotate_v",css: "menu_content _inline", value: 0, min:-180, max:180, callBack: function(){console.log(root.uiRotateV.value);}});
 
 		
-
-		root.uiFlipU = root.console.addCheckBox(divMenu, {css: "menu_content _inline", checked: false, callBack: function(){console.log("chk");}});
-
-		root.uiExport = root.console.addButton(divMenu, {css: "menu_content _block menu_button", value: "Export", callBack: function(){console.log("butt");}});
-
-		root.uiRotateU = root.console.addRange(divMenu, {css: "menu_content _block", value: 0, min:-180, max:180, callBack: function(){console.log("range");}});
-
-		root.uiRotateV = root.console.addRange(divMenu, {css: "menu_content _block", value: 0, min:-180, max:180, callBack: function(){console.log(root.uiRotateV.value);}});
+		root.uiExport = root.console.addButton(setupBlock("_buttom"), {css: "menu_content _block button buttonLoad menu_button", value: "Export", callBack: root.onExport});
 
 	}
+
+	this.onExport;
 
 	var initWidth = "auto";
 	var initHeight = "auto";
@@ -170,6 +187,8 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 	this.activate = activate;
 	this.deactivate = deactivate;
 	this.dispose = dispose;
+	this.shown = shown;
+	this.hide = hide;
 
 };
 

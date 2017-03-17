@@ -3,106 +3,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-
-<style>
-
-body {
-	/*background-color: #000000;*/
-	font-family: Roboto, sans-serif;
-	margin: 0px;
-	overflow: hidden;
-}
-
-h3{
-	text-align: right;
-	margin-right: 50px;
-	color: #cccccc;
-}
-
-.menu {
-	display: inline-block;
-	z-index: 0;
-	background-color: #000;
-	opacity: 0.7;
-	float: right;
-
-	width: 85px;
-	height: 90px;
-	position: fixed;
-	top: 0;
-	right: 0;
-	overflow-x: hidden;
-	overflow-y: hidden;
-	transition: 0.5s;
-	-webkit-transition: 0.5s; /* Safari */
-	/*-moz-transition: 10.5s;*/
-	/*padding-top: 60px;*/
-}
-
-.menu_console {
-	padding-top: 100px;
-}
-.menu_content {
-	
-	margin-bottom: 16px;
-	margin-left: 32px;
-	color: #fff;
-	visibility: hidden;
-	opacity: 0.0;
-	/*transition-delay: 0.5s;*/
-	transition: 0.5s;
-}
-
-.menu_button {
-	border: 2px solid #fff;
-	/*background-color: #000;*/
-	background: rgba(0, 0, 0, 0.0)
-}
-._block {
-	display: block;
-}
-._inline {
-	display: inline;
-}
-._inlineblock {
-	display: inline-block;
-}
-
-.menu_icon {
-  display: inline-block;
-  cursor: pointer;
-  z-index: 1;
-  background-color: #000;
-  opacity: 1.0;
-  float: right;
-  padding: 25px;
-}
-
-.bar1, .bar2, .bar3 {
-  width: 36px;
-  height: 4px;
-  background-color: #fff;
-  opacity: 1.0;
-  margin: 6px 0;
-  transition: 0.4s;
-}
-
-.change .bar1 {
-  -webkit-transform: rotate(-45deg) translate(-9px, 5px) ;
-  transform: rotate(-45deg) translate(-9px, 5px) ;
-}
-
-.change .bar2 {
-  opacity: 0;
-}
-
-.change .bar3 {
-  -webkit-transform: rotate(45deg) translate(-9px, -5px) ;
-  transform: rotate(45deg) translate(-9px, -5px) ;
-}
-
-
-</style>
+<link rel="stylesheet" type="text/css" href="js/skycube/CSS/SC_Default.css">
 </head>
 <body>
 
@@ -177,10 +78,9 @@ h3{
 
 	var renderer;
 	var outHUD;
-	var cubeMenu = new SCFL_CubeViewportHUD();
-	cubeMenu.activate();
+	var cubeMenu;
 
-	var controls = {
+	/*var controls = {
 
 		gui: null,
 		export: function() {
@@ -201,7 +101,7 @@ h3{
 			cubeView.asBackground();
 		}
 
-	};
+	};*/
 
 
 
@@ -259,13 +159,34 @@ h3{
 			
 			CM = cubeMap;
 
+			cubeMenu = new SCFL_CubeViewportHUD();
+			cubeMenu.onExport = function(){
+				outHUD = new THREE.SC_OutHUD(CM, window.innerWidth, window.innerHeight, renderer.domElement);
+				var outHUDClose = new SCFL_HUDClose();
+				outHUDClose.onClick = function(){
+					outHUD.deactivate();
+					cubeView.enableControls();
+					cubeView.asNormal();
+					cubeMenu.shown();
+				};
+				//controls.gui.close();
+				cubeMenu.hide();
+				outHUDClose.activate();
 
+
+				cubeView.disableControls();
+				cubeView.asBackground();
+
+			};
+			cubeMenu.activate();
+
+			/*
 			controls.gui = new dat.GUI();
 			var out = controls.gui.addFolder( 'Out' );
 
 			out.add( controls, "export" );
 
-			controls.gui.open();
+			controls.gui.open();*/
 
 
 		}

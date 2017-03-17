@@ -15,28 +15,7 @@ SCFL_InputFiles = function ( idName, typeName ) {
 		type2Array();
 	}
 
-	//Move this func to common
-	function loadjscssfile(fileName, fileType){
-	    if (fileType=="js"){ //if filename is a external JavaScript file
-	        var fileRef=document.createElement('script')
-	        fileRef.setAttribute("type","text/javascript")
-	        fileRef.setAttribute("src", fileName)
-	    }
-	    else if (fileType=="css"){ //if filename is an external CSS file
-	        var fileRef=document.createElement("link")
-	        fileRef.setAttribute("rel", "stylesheet")
-	        fileRef.setAttribute("type", "text/css")
-	        fileRef.setAttribute("href", fileName)
-	    }
-	    if (typeof fileRef!="undefined")
-	        document.getElementsByTagName("head")[0].appendChild(fileRef)
-	}
-
-	function removeElements(elements) {
-	  for (var i=0; i<elements.length; i++) {
-	    elements[i].parentNode.removeChild(elements[i]);
-	  }
-	}
+	var scc = new THREE.SC_Common();
 
 
 	//Move it to THREE
@@ -69,9 +48,6 @@ SCFL_InputFiles = function ( idName, typeName ) {
 
 	//var buttonCSS = new THREE.SC_Common();
 	//buttonCSS.loadjscssfile("../CSS/SC_InputPage.css","css");
-	
-	
-
 	function createInputZone(){
 		//div = document.createElement("div");
 		div.setAttribute("class", "container");
@@ -136,7 +112,7 @@ SCFL_InputFiles = function ( idName, typeName ) {
 	function removeInputZone(){
 		if(div !== undefined && div.id == idName){
 			document.getElementById("file").removeEventListener('change', onFileSelect, false );
-			removeElements(div);
+			scc.removeElements(div);
 			document.body.removeChild(div);
 			div = undefined;
 		}
@@ -163,7 +139,7 @@ SCFL_InputFiles = function ( idName, typeName ) {
 	}
 
 	function activate() {
-		loadjscssfile("js/skycube/CSS/SC_InputPage.css","css");
+		//loadjscssfile("js/skycube/CSS/SC_InputPage.css","css");
 		createInputZone();
 		setupFilesType(type);
 	}
