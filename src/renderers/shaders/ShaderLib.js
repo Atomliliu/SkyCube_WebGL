@@ -20,6 +20,7 @@ var ShaderLib = {
 
 			UniformsLib.common,
 			UniformsLib.aomap,
+			UniformsLib.lightmap,
 			UniformsLib.fog
 
 		] ),
@@ -77,6 +78,7 @@ var ShaderLib = {
 			UniformsLib.bumpmap,
 			UniformsLib.normalmap,
 			UniformsLib.displacementmap,
+			UniformsLib.gradientmap,
 			UniformsLib.fog,
 			UniformsLib.lights,
 
@@ -173,11 +175,15 @@ var ShaderLib = {
 
 	normal: {
 
-		uniforms: {
-
-			opacity : { value: 1.0 }
-
-		},
+		uniforms: UniformsUtils.merge( [
+			UniformsLib.common,
+			UniformsLib.bumpmap,
+			UniformsLib.normalmap,
+			UniformsLib.displacementmap,
+			{
+				opacity: { value: 1.0 }
+			}
+		] ),
 
 		vertexShader: ShaderChunk.normal_vert,
 		fragmentShader: ShaderChunk.normal_frag
@@ -243,6 +249,93 @@ var ShaderLib = {
 		fragmentShader: ShaderChunk.SCSL_LL2CUBE_FRAG
 
 	},
+
+	LP2CUBE: {
+
+		uniforms: {
+			vUvFlip: { value: new Vector2(0,0) },
+			tSampler: { value: null },
+			nFace: { value: 0 }
+		},
+
+		vertexShader: ShaderChunk.SCSL_RASTER_VERT,
+		fragmentShader: ShaderChunk.SCSL_LP2CUBE_FRAG
+
+	},
+	SP2CUBE: {
+
+		uniforms: {
+			vUvFlip: { value: new Vector2(0,0) },
+			tSampler: { value: null },
+			nFace: { value: 0 }
+		},
+
+		vertexShader: ShaderChunk.SCSL_RASTER_VERT,
+		fragmentShader: ShaderChunk.SCSL_SP2CUBE_FRAG
+
+	},
+	DP2CUBE: {
+
+		uniforms: {
+			vUvFlip: { value: new Vector2(0,0) },
+			tSampler: { value: null },
+			nFace: { value: 0 }
+		},
+
+		vertexShader: ShaderChunk.SCSL_RASTER_VERT,
+		fragmentShader: ShaderChunk.SCSL_DP2CUBE_FRAG
+
+	},
+	HL2CUBE: {
+
+		uniforms: {
+			vUvFlip: { value: new Vector2(0,0) },
+			tSampler: { value: null },
+			nFace: { value: 0 }
+		},
+
+		vertexShader: ShaderChunk.SCSL_RASTER_VERT,
+		fragmentShader: ShaderChunk.SCSL_HL2CUBE_FRAG
+
+	},
+	VC2CUBE: {
+
+		uniforms: {
+			vUvFlip: { value: new Vector2(0,0) },
+			tSampler: { value: null },
+			nFace: { value: 0 }
+		},
+
+		vertexShader: ShaderChunk.SCSL_RASTER_VERT,
+		fragmentShader: ShaderChunk.SCSL_VC2CUBE_FRAG
+
+	},
+	VL2CUBE: {
+
+		uniforms: {
+			vUvFlip: { value: new Vector2(0,0) },
+			tSampler: { value: null },
+			nFace: { value: 0 }
+		},
+
+		vertexShader: ShaderChunk.SCSL_RASTER_VERT,
+		fragmentShader: ShaderChunk.SCSL_VL2CUBE_FRAG
+
+	},
+	HC2CUBE: {
+
+		uniforms: {
+			vUvFlip: { value: new Vector2(0,0) },
+			tSampler: { value: null },
+			nFace: { value: 0 }
+		},
+
+		vertexShader: ShaderChunk.SCSL_RASTER_VERT,
+		fragmentShader: ShaderChunk.SCSL_HC2CUBE_FRAG
+
+	},
+
+	///////////////////////OUT//////////////////////
 
 	ENV2HCUBE: {
 
@@ -505,36 +598,6 @@ var ShaderLib = {
 
 		vertexShader: ShaderChunk.SCSL_RASTER_VERT,
 		fragmentShader: ShaderChunk.SCSL_ENV2CUBEFACE_HUD_FRAG
-
-	},
-	//////////////////////////////////////////////////
-	AS_EARTHSURF: {
-
-		uniforms: {
-			tCube: { value: null },
-			_ESun: { value: 1 },
-			
-			v3CamPos: { value: new Vector3(0,0,0) },
-			v3Translate: { value: new Vector3(0,0,0) },
-			v3LightDir: { value: new Vector3(0,0,0) },
-			v3InvWavelength: { value: new Vector3(0,0,0) },
-			fOuterRadius: { value: 1.0 },
-			fOuterRadius2: { value: 1.0 },
-			fInnerRadius: { value: 1.0 },
-			fInnerRadius2: { value: 1.0 },
-			fKrESun: { value: 1.0},
-			fKmESun: { value: 1.0 },
-			fKr4PI: { value: 1.0 },
-			fKm4PI: { value: 1.0 },
-			fScale: { value: 1.0 },
-			fScaleDepth: { value: 0 },
-			fScaleOverScaleDepth: { value: 1 },
-			fHdrExposure: { value: 1.0 }
-
-		},
-
-		vertexShader: ShaderChunk.AS_EARTHSURF_VERT,
-		fragmentShader: ShaderChunk.AS_EARTHSURF_FRAG
 
 	}
 

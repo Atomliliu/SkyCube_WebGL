@@ -73,14 +73,28 @@ THREE.SC_CubeViewport = function ( texCube, width, height, fov, renderer ) {
 	this.enableControls = enableControls;
 	this.asBackground = asBackground;
 	this.asNormal = asNormal;
+	this.onResize= onResize;
+
+	this.setCubeQuaternion = function(axis,angle){
+		var quaternion = new THREE.Quaternion();
+		quaternion.setFromAxisAngle( axis, THREE.Math.degToRad(angle) );
+		skyBox.quaternion = quaternion;
+	};
+
+	this.setCubeRotation = function(axis,angle){
+		skyBox.rotateOnAxis( skyBox.worldToLocal(axis), THREE.Math.degToRad(angle) );
+	};
 
 	function activate(){
+		root.enabled = true;
 		root.controls = new THREE.OrbitControls( root.camera, renderer.domElement );
 	}
 
 	function deactivate(){
 		root.controls.dispose();
-		
+		root.enabled = false;
+		//root = undefined;
+		renderer.clear();
 	}
 
 	function dispose(){
@@ -127,6 +141,7 @@ THREE.SC_CubeViewport = function ( texCube, width, height, fov, renderer ) {
 
 
 	function renderView() {
+		if (root.enabled == false) return;
 		root.controls.update();
 		renderer.render( root.scene, root.camera );
 

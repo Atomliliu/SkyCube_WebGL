@@ -6,6 +6,7 @@ THREE.SC_Common = function() {
 	this.loadjscssfile = loadjscssfile;
 	this.checkloadjscssfile = checkloadjscssfile;
 	this.removeElements = removeElements;
+	this.removeCildren = removeCildren;
 
 	//File Type Array with dot, ext .jpg .png .tif .tga
 	function checkTypeAvailable( fileCheck, fileTypeArray ){
@@ -63,6 +64,12 @@ THREE.SC_Common = function() {
 	  for (var i=0; i<elements.length; i++) {
 	    elements[i].parentNode.removeChild(elements[i]);
 	  }
+	}
+
+	function removeCildren(element){
+		while (element.firstChild) {
+    		element.removeChild(element.firstChild);
+		}
 	}
 
 

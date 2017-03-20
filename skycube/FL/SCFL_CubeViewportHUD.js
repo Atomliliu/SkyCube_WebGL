@@ -14,7 +14,9 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 
 	//var imgWidth = this.img.width;
 	//var imgHeight = this.img.height;
+	var scc = new THREE.SC_Common();
 	var divMenu = undefined;
+	var backicon;
 	var enabledMenu = false;
 
 	var root = this; 
@@ -77,29 +79,62 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 
 	function setupMenu() {
 		if(divMenu === undefined) return false;
+		//Back icon
+		backicon = setupBlock("menu_backicon");
+		backicon.innerHTML = "\xAB";
+		backicon.onclick = root.onBackToInput;
+
+		//Menu
 		root.console = new THREE.SC_Controller(divMenu, "menu_console");
 
 
 		//root.uiCubeFormat = root.console.addList(divMenu,{id: "flip", "menu_content _inline"})
 		//root.console.addSpace(divMenu,2);
 
-		root.uiFlipULabel = root.console.addLabel(divMenu,"menu_content _inline", "flip", "Flip" );
+		root.uiExport = root.console.addButton(divMenu, {css: "menu_content _block buttonLoad menu_button", value: "Change Cube Layout", callBack: root.onChangeCubeLayout});
+		root.console.addSpace(divMenu,1);
+
+		
 		root.uiFlipU = root.console.addCheckBox(divMenu, {id: "flip", css: "menu_content _inline", checked: false, callBack: function(){console.log("chk");}});
+		root.uiFlipULabel = root.console.addLabel(divMenu,"menu_content _inline", "flip", "Mirror" );
 		root.console.addSpace(divMenu,2);
 		
 		root.uiRotateULabel = root.console.addLabel(divMenu,"menu_content _inline", "rotate_u", "Rotate U" );
-		root.uiRotateU = root.console.addRange(divMenu, {id: "rotate_u",css: "menu_content _inline", value: 0, min:-180, max:180, callBack: function(){console.log("range");}});
+		root.uiRotateU = root.console.addRange(divMenu, {id: "rotate_u",css: "menu_content _inline", value: 0, min:-180, max:180, callBack: root.onRotateU});
 		root.console.addSpace(divMenu,1);
 
 		root.uiRotateVLabel = root.console.addLabel(divMenu,"menu_content", "rotate_v", "Rotate V" );
-		root.uiRotateV = root.console.addRange(divMenu, {id: "rotate_v",css: "menu_content _inline", value: 0, min:-180, max:180, callBack: function(){console.log(root.uiRotateV.value);}});
+		root.uiRotateV = root.console.addRange(divMenu, {id: "rotate_v",css: "menu_content _inline", value: 0, min:-180, max:180, callBack: root.onRotateV});
+		root.console.addSpace(divMenu,2);
+
+		
+		root.uiShowFace = root.console.addCheckBox(divMenu, {id: "showface", css: "menu_content _inline", checked: false, callBack: function(){console.log("chk");}});
+		root.uiShowFaceLabel = root.console.addLabel(divMenu,"menu_content _inline", "showface", "Show Face" );
+		root.console.addSpace(divMenu,1);
+
+		root.uiExposureLabel = root.console.addLabel(divMenu,"menu_content", "exposure", "Exposure" );
+		root.uiExposure = root.console.addRange(divMenu, {id: "exposure",css: "menu_content _inline", value: 0, min:-16, max:16, callBack: function(){console.log(root.uiExposure.value);}});
 
 		
 		root.uiExport = root.console.addButton(setupBlock("_buttom"), {css: "menu_content _block button buttonLoad menu_button", value: "Export", callBack: root.onExport});
 
 	}
 
+	//Over writeable callback functions
+	this.onBackToInput;
+	this.onChangeCubeLayout;
 	this.onExport;
+
+	this.onRotateU;
+	this.onRotateV;
+
+	this.getRotationU = function(){
+		return root.uiRotateU.value;
+	};
+	this.getRotationV = function(){
+		return root.uiRotateV.value;
+	};
+
 
 	var initWidth = "auto";
 	var initHeight = "auto";
@@ -112,6 +147,9 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 			root.console.controllers[n].style.visibility = vis;
 			root.console.controllers[n].style.opacity = opa;
 		}
+
+		backicon.style.visibility = vis;
+		backicon.style.opacity = opa;
 	}
 
 	function openMenu(){
@@ -174,10 +212,10 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 	}
 
 	function deactivate() {
-		hide();
-		//removeElements(divModal);
-		//document.body.removeChild(divModal);
-		//this.enabled = false;
+		//hide();
+		scc.removeCildren(divMenu);
+		document.body.removeChild(divMenu);
+		this.enabled = false;
 	}
 
 	function dispose() {

@@ -58,7 +58,7 @@ SCFL_HUDClose = function ( idname ) {
 
 	function deactivate() {
 		div.style.display = "none";
-		scc.removeElements(div);
+		scc.removeCildren(div);
 		document.body.removeChild(div);
 		this.enabled = false;
 	}

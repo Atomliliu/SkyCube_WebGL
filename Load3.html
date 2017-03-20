@@ -60,6 +60,7 @@
 	///////////////////////////////////////////////////////////////////////////////
 	var type = ".jpg,.png,.tga,.tif";
 	var loader = new SCFL_LoadFiles();
+	var container;
 
 	var width = window.innerWidth;
   	var height = window.innerHeight;
@@ -72,36 +73,13 @@
 
 	var CM;
 	var cubeView;
-
+	var renderLoop;
 
 	var loadStatus = false;
 
 	var renderer;
 	var outHUD;
 	var cubeMenu;
-
-	/*var controls = {
-
-		gui: null,
-		export: function() {
-			//console.log("Export");
-			//console.log(panaorama.TestSize);
-			outHUD = new THREE.SC_OutHUD(CM, window.innerWidth, window.innerHeight, renderer.domElement);
-			var outHUDClose = new SCFL_HUDClose();
-			outHUDClose.onClick = function(){
-				outHUD.deactivate();
-				cubeView.enableControls();
-				cubeView.asNormal();
-			};
-			controls.gui.close();
-			outHUDClose.activate();
-
-
-			cubeView.disableControls();
-			cubeView.asBackground();
-		}
-
-	};*/
 
 
 
@@ -128,6 +106,7 @@
 	}
 
 	loader.onLoaded = function(){
+
 		test();
 	}
 
@@ -145,17 +124,8 @@
 			dropZone.deactivate();
 			cubeView = new THREE.SC_CubeViewport(cubeRTTs, window.innerWidth, window.innerHeight, 75, renderer);
 			cubeView.activate();
-			//console.log("cubeView");
-			//console.log(cubeView);
 
 			animate();
-
-			/*cubeView.onRender = function(){
-				if(outHUD !== undefined && outHUD.enabled){
-					outHUD.renderHUD(renderer);
-				}
-			};
-			cubeView.activate();*/
 			
 			CM = cubeMap;
 
@@ -178,16 +148,41 @@
 				cubeView.asBackground();
 
 			};
+
+			cubeMenu.onBackToInput = function(){
+				cubeMenu.dispose();
+				cubeView.dispose();
+
+				cubeMenu = undefined;
+				cubeView = undefined;
+				panaorama = undefined;
+				stop();
+
+				inputPage.activate();
+				dropZone.activate();
+			};
+
+			cubeMenu.onChangeCubeLayout = function(){
+				cubeMenu.dispose();
+				cubeView.dispose();
+
+				cubeMenu = undefined;
+				cubeView = undefined;
+				//stop();
+
+				panaorama.activateModal();
+			};
+
+			cubeMenu.onRotateU = function(){
+				//cubeView.setCubeQuaternion(new THREE.Vector3( 0, 1, 0 ),cubeMenu.getRotationU());
+				cubeView.setCubeRotation(new THREE.Vector3( 0, 1, 0 ),cubeMenu.getRotationU());
+			};
+			cubeMenu.onRotateV = function(){
+				//cubeView.setCubeQuaternion(new THREE.Vector3( 1, 0, 0 ),cubeMenu.getRotationV());
+				cubeView.setCubeRotation(new THREE.Vector3( 1, 0, 0 ),cubeMenu.getRotationV());
+			};
+
 			cubeMenu.activate();
-
-			/*
-			controls.gui = new dat.GUI();
-			var out = controls.gui.addFolder( 'Out' );
-
-			out.add( controls, "export" );
-
-			controls.gui.open();*/
-
 
 		}
 
@@ -199,7 +194,6 @@
 
 	function init() {
 		// body...
-		var container, skyBox;
 
 		container = document.getElementById( 'render' );
 		renderer = new THREE.WebGLRenderer({ alpha: true });
@@ -209,32 +203,37 @@
 		renderer.setClearColor( 0x000000, 0 ); // the default
 		container.appendChild( renderer.domElement );
 
-		//camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1100 );
-		//camera.position.z = 100;
-		///camera.target = new THREE.Vector3( 0, 0, 0 );
-
-		//controls = new THREE.OrbitControls( camera, renderer.domElement );
-		//controls.enableDamping = true;
-		//controls.dampingFactor = 0.3;
-		//controls.enableZoom = true;
-		//controls.enablePan = false;
-
-		//scene = new THREE.Scene();
-		//sceneRTT = new THREE.Scene();
-		//sceneCube = new THREE.Scene();
-		//sceneCube.add( camCube );
 
 		window.addEventListener( 'resize', onWindowResize, false );
 	}
 
 	function animate() {
-		requestAnimationFrame( animate );
+		renderLoop = requestAnimationFrame( animate );
 		update();
+		
+	}
+
+
+	function stop() {
+	    if (renderLoop) {
+	       cancelAnimationFrame(renderLoop);
+	       renderLoop = undefined;
+	    }
+	    if(renderer){
+	    	if(container) container.removeChild(renderer.domElement);
+	    	renderer.dispose();
+	    	renderer = undefined;
+	    }
+	    
+
+
+	    window.removeEventListener( 'resize', onWindowResize, false );
 	}
 
 
 	function update() {
 		//root.controls.update();
+		//console.log("!");
 		//renderer.render( root.scene, root.camera );
 		if(cubeView !== undefined && cubeView.enabled){
 			cubeView.renderView();
@@ -261,15 +260,11 @@
 
 	}
 
-	/*function onResize() {
-		root.camera.aspect = width / height;
-		root.camera.updateProjectionMatrix();
 
-		renderer.setSize( width, height );
-		if(outHUD !== undefined && outHUD.enabled){
-			outHUD.updateHUD( window.innerWidth, window.innerHeight );
-		}
-	}*/
+	window.onbeforeunload = function() {
+  		return "Data will be lost if you leave the page, are you sure?";
+	};
+
 
 
 

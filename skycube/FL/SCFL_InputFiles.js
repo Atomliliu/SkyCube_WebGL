@@ -2,7 +2,7 @@
 
 SCFL_InputFiles = function ( idName, typeName ) {
 	var root = this;
-	var div = document.getElementById(idName);
+	var divInput = document.getElementById(idName);
 	//var input;
 	var type = "file";
 	var loadType = [];
@@ -49,22 +49,22 @@ SCFL_InputFiles = function ( idName, typeName ) {
 	//var buttonCSS = new THREE.SC_Common();
 	//buttonCSS.loadjscssfile("../CSS/SC_InputPage.css","css");
 	function createInputZone(){
-		//div = document.createElement("div");
-		div.setAttribute("class", "container");
-		var divDropText = document.createElement("div");
-		divDropText.id = "drop_zonetext";
+		//divInput = document.createElement("div");
+		divInput.setAttribute("class", "container");
+		var divInputDropText = document.createElement("div");
+		divInputDropText.id = "drop_zonetext";
 		
 
 		var h1 = document.createElement("h1");
 		var textDrop = document.createTextNode("Drop files to upload");
 		h1.appendChild(textDrop);
-		divDropText.appendChild(h1);
-		div.appendChild(divDropText);
+		divInputDropText.appendChild(h1);
+		divInput.appendChild(divInputDropText);
 
 		var p = document.createElement("P");
 		var textOr = document.createTextNode("OR");
 		p.appendChild(textOr);
-		div.appendChild(p);
+		divInput.appendChild(p);
 
 		var label = document.createElement("label");
 		label.setAttribute("class", "button buttonLoad");
@@ -80,9 +80,9 @@ SCFL_InputFiles = function ( idName, typeName ) {
 		span.appendChild(textButton);
 		label.appendChild(input);
 		label.appendChild(span);
-		div.appendChild(label);
+		divInput.appendChild(label);
 
-		document.body.appendChild(div);
+		document.body.appendChild(divInput);
 
 		label.addEventListener('change', onFileSelect, false );
 	}
@@ -110,44 +110,46 @@ SCFL_InputFiles = function ( idName, typeName ) {
 	}
 
 	function removeInputZone(){
-		if(div !== undefined && div.id == idName){
+		if(divInput !== undefined && divInput.id == idName){
 			document.getElementById("file").removeEventListener('change', onFileSelect, false );
-			scc.removeElements(div);
-			document.body.removeChild(div);
-			div = undefined;
-		}
+			scc.removeCildren(divInput);
+			//document.body.removeChild(divInput);
+			divInput = undefined;
 
+		}
+		
+		//console.log(idName);
 
 	}
 
 	function shownInputZone(){
-		if(div !== undefined && div.id == idName){
-			//document.getElementById("file").addEventListener('change', onFileSelect, false );
-			//document.body.removeChild(div);
-			//div = undefined;
-			div.style.display = true;
+		if(divInput !== undefined && divInput.id == idName){
+			divInput.style.visibility = "visible";
 		}
 	}
 
 	function hiddenInputZone(){
-		if(div !== undefined && div.id == idName){
-			//document.getElementById("file").removeEventListener('change', onFileSelect, false );
-			//document.body.removeChild(div);
-			//div = undefined;
-			div.style.display = false;
+		if(divInput !== undefined && divInput.id == idName){
+			divInput.style.visibility = "hidden";
 		}
 	}
 
 	function activate() {
+		
 		//loadjscssfile("js/skycube/CSS/SC_InputPage.css","css");
+		if(divInput === undefined) {divInput = document.getElementById(idName);}
+		shownInputZone();
 		createInputZone();
 		setupFilesType(type);
+		root.enabled = true;
 	}
 
 	function deactivate() {
 		// body...
 		//removeEventListener
 		removeInputZone();
+		hiddenInputZone();
+		root.enabled = false;
 	}
 
 	function shown() {

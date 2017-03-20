@@ -57,14 +57,14 @@ SCFL_LoadPanorama = function ( imgFile, renderer ) {
 	];
 
 	var In_ShaderNames = [
+		"DP2CUBE",
+		"HC2CUBE",
 		"LL2CUBE",
-		"LL2CUBE",
-		"LL2CUBE",
-		"LL2CUBE",
-		"LL2CUBE",
-		"LL2CUBE",
-		"LL2CUBE",
-		"LL2CUBE"
+		"SP2CUBE",
+		"LP2CUBE",
+		"HL2CUBE",
+		"VC2CUBE",
+		"VL2CUBE"
 	];
 
 
@@ -146,7 +146,7 @@ SCFL_LoadPanorama = function ( imgFile, renderer ) {
 		setFormatImg("imgDD");
 
 		span.onclick = function() {
-		    root.deactivate();
+		    disposeModal();
 		};
 
 		buttonDD.onclick = function() {
@@ -156,7 +156,7 @@ SCFL_LoadPanorama = function ( imgFile, renderer ) {
 
 			UpdateRTT(root.onRTTUpdated);
 
-			root.deactivate();
+			disposeModal();
 		};
 	}
 
@@ -273,6 +273,8 @@ SCFL_LoadPanorama = function ( imgFile, renderer ) {
 
 		//TexRTT.format = isJPEG ? RGBFormat : RGBAFormat;
 		TexRTT.format = THREE.RGBAFormat;
+		TexRTT.magFilter = THREE.NearestFilter;
+		TexRTT.minFilter = THREE.LinearFilter;
 		TexRTT.image = root.img;
 		TexRTT.needsUpdate = true;
 
@@ -321,25 +323,36 @@ SCFL_LoadPanorama = function ( imgFile, renderer ) {
 	function activate() {
 		checkFormatType();
 		setupFormatWindow();
-		shown();
+		shownModal();
 
 	}
 
-	function shown(){
+	function activateModal() {
+		setupFormatWindow();
+		shownModal();
+	}
+
+	function shownModal(){
 		divModal.style.display = "block";
 	}
 
-	function deactivate() {
+	function disposeModal() {
 		divModal.style.display = "none";
-		scc.removeElements(divModal);
+		scc.removeCildren(divModal);
 		document.body.removeChild(divModal);
-		//this.enabled = false;
+		divModal = undefined;
+	}
+
+	function deactivate() {
+		disposeModal();
 	}
 
 	function dispose() {
 		deactivate();
 	}
 
+	this.activateModal = activateModal;
+	this.disposeModal = disposeModal;
 	this.activate = activate;
 	this.deactivate = deactivate;
 	this.dispose = dispose;

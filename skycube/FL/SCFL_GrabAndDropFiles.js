@@ -65,46 +65,46 @@ SCFL_GrabAndDropFiles = function ( idName, typeName ) {
 	}
 
 	function createDropZone(){
-		div = document.createElement("div");
-		div.style.width = "100%";
-		div.style.height = "100%";
-		div.style.background = "#555555";
+		root.div = document.createElement("div");
+		root.div.style.width = "100%";
+		root.div.style.height = "100%";
+		root.div.style.background = "#555555";
 		//div.style.color = "white";
 		//div.innerHTML = "";
-		div.style.visibility = "hidden";
-		div.style.opacity = "0.5";
-		div.style.position = "absolute";
-		div.style.margin = "auto";
-		div.style.top= "0";
-		div.style.right= "0";
-		div.style.bottom= "0";
-		div.style.left= "0";
-		div.style.textAlign = "center";
-		div.style.outline= "4px dashed #ffffff";
-    	div.style.outlineOffset= "-15px";
-    	div.id = "_DropZone";
+		root.div.style.visibility = "hidden";
+		root.div.style.opacity = "0.5";
+		root.div.style.position = "absolute";
+		root.div.style.margin = "auto";
+		root.div.style.top= "0";
+		root.div.style.right= "0";
+		root.div.style.bottom= "0";
+		root.div.style.left= "0";
+		root.div.style.textAlign = "center";
+		root.div.style.outline= "4px dashed #ffffff";
+    	root.div.style.outlineOffset= "-15px";
+    	root.div.id = "_DropZone";
 
-		document.body.appendChild(div);
+		document.body.appendChild(root.div);
 		//document.getElementById("myList").appendChild(node); 
 		//return div;
 	}
 
 	function removeDropZone(){
-		if(div !== undefined && div.id === "_DropZone"){
-			document.body.removeChild(div);
-			div = undefined;
+		if(root.div !== undefined && root.div.id === "_DropZone"){
+			document.body.removeChild(root.div);
+			root.div = undefined;
 		}
 	}
 
 	function showZone() {
-		if(div !== undefined && div.id === "_DropZone"){
-    		div.style.visibility = "visible";
+		if(root.div !== undefined && root.div.id === "_DropZone"){
+    		root.div.style.visibility = "visible";
     	}
 	}
 
 	function hideZone() {
-		if(div !== undefined && div.id === "_DropZone"){
-	   		div.style.visibility = "hidden";
+		if(root.div !== undefined && root.div.id === "_DropZone"){
+	   		root.div.style.visibility = "hidden";
 	   	}
 	}
 
@@ -180,25 +180,29 @@ SCFL_GrabAndDropFiles = function ( idName, typeName ) {
 		createDropZone();
 
 		window.addEventListener('dragenter', onDragEnter, false );
-		div.addEventListener('dragleave', onDragLeave, false );
-		div.addEventListener('dragstart', onDragStart, false );
+		root.div.addEventListener('dragleave', onDragLeave, false );
+		root.div.addEventListener('dragstart', onDragStart, false );
 
-		div.addEventListener('dragover', onDragOver, false);
-		div.addEventListener('drop', onFileDrop, false);
+		root.div.addEventListener('dragover', onDragOver, false);
+		root.div.addEventListener('drop', onFileDrop, false);
+		root.enabled = true;
 
 		//div.addEventListener('dragend');
 	}
 
 	function deactivate() {
-		window.removeEventListener( 'dragenter', onDragEnter, false );
-		div.removeEventListener('dragleave', onDragLeave, false );
-		div.removeEventListener('dragstart', onDragStart, false );
+		if(root.enabled){
+			window.removeEventListener( 'dragenter', onDragEnter, false );
+			root.div.removeEventListener('dragleave', onDragLeave, false );
+			root.div.removeEventListener('dragstart', onDragStart, false );
 
-		div.removeEventListener('dragover', onDragOver, false);
-		div.removeEventListener('drop', onFileDrop, false);
+			root.div.removeEventListener('dragover', onDragOver, false);
+			root.div.removeEventListener('drop', onFileDrop, false);
 
-		removeZone();
-		//this.enabled = false;
+			removeZone();
+			root.enabled = false;
+		}
+		
 	}
 
 	function dispose() {

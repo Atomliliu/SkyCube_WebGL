@@ -18,7 +18,7 @@ import color_vertex from './ShaderChunk/color_vertex.glsl';
 import common from './ShaderChunk/common.glsl';
 //////////////////////////////////////////////////////
 import sc_common from './SC_ShaderChunk/sc_common.glsl';
-import as_common from './AS_ShaderChunk/as_common.glsl';
+//import as_common from './AS_ShaderChunk/as_common.glsl';
 ///////////////////////////////////////////////////////
 import cube_uv_reflection_fragment from './ShaderChunk/cube_uv_reflection_fragment.glsl';
 import defaultnormal_vertex from './ShaderChunk/defaultnormal_vertex.glsl';
@@ -32,8 +32,11 @@ import envmap_fragment from './ShaderChunk/envmap_fragment.glsl';
 import envmap_pars_fragment from './ShaderChunk/envmap_pars_fragment.glsl';
 import envmap_pars_vertex from './ShaderChunk/envmap_pars_vertex.glsl';
 import envmap_vertex from './ShaderChunk/envmap_vertex.glsl';
+import fog_vertex from './ShaderChunk/fog_vertex.glsl';
+import fog_pars_vertex from './ShaderChunk/fog_pars_vertex.glsl';
 import fog_fragment from './ShaderChunk/fog_fragment.glsl';
 import fog_pars_fragment from './ShaderChunk/fog_pars_fragment.glsl';
+import gradientmap_pars_fragment from './ShaderChunk/gradientmap_pars_fragment.glsl';
 import lightmap_fragment from './ShaderChunk/lightmap_fragment.glsl';
 import lightmap_pars_fragment from './ShaderChunk/lightmap_pars_fragment.glsl';
 import lights_lambert_vertex from './ShaderChunk/lights_lambert_vertex.glsl';
@@ -113,7 +116,15 @@ import shadow_vert from './ShaderLib/shadow_vert.glsl';
 
 
 import SCSL_LL2CUBE_FRAG from './SC_ShaderLib/SCSL_LL2CUBE_FRAG.glsl';
-import SCSL_LL2CUBE_VERT from './SC_ShaderLib/SCSL_LL2CUBE_VERT.glsl';
+//import SCSL_LL2CUBE_VERT from './SC_ShaderLib/SCSL_LL2CUBE_VERT.glsl';
+import SCSL_LP2CUBE_FRAG from './SC_ShaderLib/SCSL_LP2CUBE_FRAG.glsl';
+import SCSL_SP2CUBE_FRAG from './SC_ShaderLib/SCSL_SP2CUBE_FRAG.glsl';
+import SCSL_DP2CUBE_FRAG from './SC_ShaderLib/SCSL_DP2CUBE_FRAG.glsl';
+import SCSL_HL2CUBE_FRAG from './SC_ShaderLib/SCSL_HL2CUBE_FRAG.glsl';
+import SCSL_VL2CUBE_FRAG from './SC_ShaderLib/SCSL_VL2CUBE_FRAG.glsl';
+import SCSL_HC2CUBE_FRAG from './SC_ShaderLib/SCSL_HC2CUBE_FRAG.glsl';
+import SCSL_VC2CUBE_FRAG from './SC_ShaderLib/SCSL_VC2CUBE_FRAG.glsl';
+
 
 import SCSL_ENV2CUBEFACE_FRAG from './SC_ShaderLib/SCSL_ENV2CUBEFACE_FRAG.glsl';
 import SCSL_ENV2HCUBE_FRAG from './SC_ShaderLib/SCSL_ENV2HCUBE_FRAG.glsl';
@@ -139,8 +150,8 @@ import SCSL_RASTER_VERT from './SC_ShaderLib/SCSL_RASTER_VERT.glsl';
 
 //
 
-import AS_EARTHSURF_VERT from './AS_ShaderLib/AS_EARTHSURF_VERT.glsl';
-import AS_EARTHSURF_FRAG from './AS_ShaderLib/AS_EARTHSURF_FRAG.glsl';
+//import AS_EARTHSURF_VERT from './AS_ShaderLib/AS_EARTHSURF_VERT.glsl';
+//import AS_EARTHSURF_FRAG from './AS_ShaderLib/AS_EARTHSURF_FRAG.glsl';
 
 //////////////////////////////////////////////////////
 
@@ -165,7 +176,7 @@ export var ShaderChunk = {
 	common: common,
 	//////////////////////////////////////////////////////
 	sc_common: sc_common,
-	as_common: as_common,
+	//as_common: as_common,
 	//////////////////////////////////////////////////////
 	
 	cube_uv_reflection_fragment: cube_uv_reflection_fragment,
@@ -180,8 +191,11 @@ export var ShaderChunk = {
 	envmap_pars_fragment: envmap_pars_fragment,
 	envmap_pars_vertex: envmap_pars_vertex,
 	envmap_vertex: envmap_vertex,
+	fog_vertex: fog_vertex,
+	fog_pars_vertex: fog_pars_vertex,
 	fog_fragment: fog_fragment,
 	fog_pars_fragment: fog_pars_fragment,
+	gradientmap_pars_fragment: gradientmap_pars_fragment,
 	lightmap_fragment: lightmap_fragment,
 	lightmap_pars_fragment: lightmap_pars_fragment,
 	lights_lambert_vertex: lights_lambert_vertex,
@@ -235,7 +249,15 @@ export var ShaderChunk = {
 	//////////////////////////////////////////////////////
 	
 	SCSL_LL2CUBE_FRAG: SCSL_LL2CUBE_FRAG,
-	SCSL_LL2CUBE_VERT: SCSL_LL2CUBE_VERT,
+	//SCSL_LL2CUBE_VERT: SCSL_LL2CUBE_VERT,
+	SCSL_LP2CUBE_FRAG: SCSL_LP2CUBE_FRAG,
+	SCSL_SP2CUBE_FRAG: SCSL_SP2CUBE_FRAG,
+	SCSL_DP2CUBE_FRAG: SCSL_DP2CUBE_FRAG,
+	SCSL_HL2CUBE_FRAG: SCSL_HL2CUBE_FRAG,
+	SCSL_VL2CUBE_FRAG: SCSL_VL2CUBE_FRAG,
+	SCSL_HC2CUBE_FRAG: SCSL_HC2CUBE_FRAG,
+	SCSL_VC2CUBE_FRAG: SCSL_VC2CUBE_FRAG,
+
 
 
 
@@ -264,8 +286,8 @@ export var ShaderChunk = {
 
 	//
 
-	AS_EARTHSURF_VERT: AS_EARTHSURF_VERT,
-	AS_EARTHSURF_FRAG: AS_EARTHSURF_FRAG,
+	//AS_EARTHSURF_VERT: AS_EARTHSURF_VERT,
+	//AS_EARTHSURF_FRAG: AS_EARTHSURF_FRAG,
 
 
 

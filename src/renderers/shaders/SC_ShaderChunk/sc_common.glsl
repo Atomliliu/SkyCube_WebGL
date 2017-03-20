@@ -9,6 +9,7 @@
 #define SC_4D6		0.666666666667
 #define SC_5D6		0.833333333333
 
+#define SC_1D4		0.25
 #define SC_3D4		0.75
 
 
@@ -94,7 +95,7 @@ vec3 getVecHorizonCubeMap(vec2 UV, int mode){
 vec3 getVecVerticalCubeMap(vec2 UV, int mode){
 	vec2 UV2 = UV;
 	UV2 = clamp(UV2,0.0,1.0);
-	UV2.y *= 6.0;
+	UV2.y = (1.0-UV2.y)*6.0; //Upside down
 	float face = floor(UV2.y);
 
 	UV2.y = clamp(UV2.y - face,0.0,1.0);
@@ -287,11 +288,13 @@ vec3 getVecSPCubeMap(vec2 UV, int mode){
 	}
 	UV = UV * 2.0 - 1.0; // Range to -1 to 1
 
+	//Sin 2th == 2 * sin th * cos th == 2 * lr * z
+
 	float lr2 = UV.x * UV.x + UV.y * UV.y;
 	float lr = sqrt(lr2);
 	float z = sqrt(1.0-lr2);
-	vec2 xy_lr = vec2(UV.x/lr,UV.y/lr);
-	float vec_Lr = 2.0 * lr * z;
+	//vec2 xy_lr = vec2(UV.x/lr,UV.y/lr);
+	//float vec_Lr = 2.0 * lr * z;
 
 	if(lr == 0.0){
 		VEC.x = 0.0;
@@ -300,8 +303,9 @@ vec3 getVecSPCubeMap(vec2 UV, int mode){
 	}
 
 	else if(lr<=1.0){
-		VEC.x = xy_lr.x * vec_Lr;
-		VEC.y = xy_lr.y * vec_Lr;
+		//xy_lr * vec_Lr == UV/lr * 2.0 * lr * z == UV*2.0*z
+		VEC.x = UV.x*2.0*z;//xy_lr.x * vec_Lr;
+		VEC.y = UV.y*2.0*z;//xy_lr.y * vec_Lr;
 		VEC.z = 1.0 - 2.0*lr2;
 	}
 	else{//Back
@@ -315,11 +319,141 @@ vec3 getVecSPCubeMap(vec2 UV, int mode){
 
 }
 
+
+
 ///////////////////////////////////////////////////////////
 /////////////////////Vector to UV//////////////////////////
+vec2 getHCMapping_Cube(int face, vec2 uv, int mode)
+{
+	vec2 UV = vec2(0.0);
+	UV.x = uv.x*SC_1D4;
+	UV.y = uv.y*SC_2D6;
+
+	if(face == 0){//+X
+		UV.x = UV.x+SC_3D6;
+		UV.y = UV.y+SC_2D6;
+	}
+	else if(face == 1){//-X
+		//UV.x = UV.x;
+		UV.y = UV.y+SC_2D6;
+	}
+	else if(face == 2){//+Y
+		UV.x = UV.x+SC_1D4;
+		UV.y = UV.y+SC_4D6;
+	}
+	else if(face == 3){//-Y
+		UV.x = UV.x+SC_1D4;
+		UV.y = UV.y;
+	}
+	else if(face == 4){//+Z
+		UV.x = UV.x+SC_1D4;
+		UV.y = UV.y+SC_2D6;
+	}
+	else{//-Z
+		UV.x = UV.x+SC_3D4;
+		UV.y = UV.y+SC_2D6;
+	}
+
+	return UV;
+}
+
+
+vec2 getVCMapping_Cube(int face, vec2 uv, int mode)
+{
+	vec2 UV = vec2(0.0);
+	UV.x = uv.x*SC_2D6;
+	UV.y = uv.y*SC_1D4;
+
+	if(face == 0){//+X
+		UV.x = UV.x+SC_4D6;
+		UV.y = UV.y+SC_3D6;
+	}
+	else if(face == 1){//-X
+		//UV.x = UV.x;
+		UV.y = UV.y+SC_3D6;
+	}
+	else if(face == 2){//+Y
+		UV.x = UV.x+SC_2D6;
+		UV.y = UV.y+SC_3D4;
+	}
+	else if(face == 3){//-Y
+		UV.x = UV.x+SC_2D6;
+		UV.y = UV.y+SC_1D4;
+	}
+	else if(face == 4){//+Z
+		UV.x = UV.x+SC_2D6;
+		UV.y = UV.y+SC_3D6;
+	}
+	else{//-Z
+		UV.x = UV.x+SC_2D6;
+		//UV.y = UV.y;
+	}
+	return UV;
+}
+
+vec2 getHLMapping_Cube(int face, vec2 uv, int mode)
+{
+	vec2 UV = vec2(0.0);
+	UV.x = uv.x*SC_1D6;
+	UV.y = uv.y;
+
+	if(face == 0){//+X
+		UV.x = UV.x;
+		//UV.y = UV.y+SC_3D6;
+	}
+	else if(face == 1){//-X
+		UV.x = UV.x+SC_1D6;
+		//UV.y = UV.y+SC_3D6;
+	}
+	else if(face == 2){//+Y
+		UV.x = UV.x+SC_2D6;
+		//UV.y = UV.y+SC_3D4;
+	}
+	else if(face == 3){//-Y
+		UV.x = UV.x+SC_3D6;
+		//UV.y = UV.y+SC_1D4;
+	}
+	else if(face == 4){//+Z
+		UV.x = UV.x+SC_4D6;
+		//UV.y = UV.y+SC_3D6;
+	}
+	else{//-Z
+		UV.x = UV.x+SC_5D6;
+		//UV.y = UV.y;
+	}
+	return UV;
+}
+
+vec2 getVLMapping_Cube(int face, vec2 uv, int mode)
+{
+	vec2 UV = vec2(0.0);
+	UV.x = uv.x;
+	UV.y = (1.0-uv.y)*SC_1D6;
+
+	if(face == 0){//+X
+		UV.y = UV.y;
+	}
+	else if(face == 1){//-X
+		UV.y = UV.y+SC_1D6;
+	}
+	else if(face == 2){//+Y
+		UV.y = UV.y+SC_2D6;
+	}
+	else if(face == 3){//-Y
+		UV.y = UV.y+SC_3D6;
+	}
+	else if(face == 4){//+Z
+		UV.y = UV.y+SC_4D6;
+	}
+	else{//-Z
+		UV.y = UV.y+SC_5D6;
+	}
+	return UV;
+}
+
 vec2 getLLMapping_VEC2UV(vec3 vec, int mode) //Use for create LP map",
 {
-	vec2 UV;
+	vec2 UV = vec2(0.0);
 
 	UV.y = acos(-vec.y) * SC_1D_PI; // y = 1 to -1, v = 0 to PI,
 
@@ -363,7 +497,7 @@ vec2 getLLMapping_VEC2UV(vec3 vec, int mode) //Use for create LP map",
 
 vec2 getLPMapping_VEC2UV(vec3 vec, int mode) //Use for create LP map
 {
-	vec2 UV;
+	vec2 UV = vec2(0.0);
 	float  th, la, lr, L, P;
 
 	//UV = UV * 2 - 1; // Range to -1 to 1
@@ -402,10 +536,53 @@ vec2 getLPMapping_VEC2UV(vec3 vec, int mode) //Use for create LP map
 }
 
 
-
-vec2 getDPUVByVec(vec3 vec, int mode)
+vec2 getSPMapping_VEC2UV(vec3 vec, int mode)
 {
-	vec2 uv;
+	vec2 UV = vec2(0.0);
+	float Lr, Lr2, lr, zz;
+
+	if(vec.z == 1.0){
+		UV.x = UV.y = 0.0;
+	}
+	else if(vec.z == -1.0){
+		UV.x = 1.0;
+		UV.y = 0.0;
+	}
+	else{
+		//Xuv = X/Lr * lr
+		//X = Xuv/lr * Lr
+
+		//sin 2th and vec.z == cos 2th
+		Lr2 = 1.0-vec.z*vec.z;
+		Lr = sqrt(Lr2);
+
+		//sin th
+		lr = sqrt((1.0-vec.z)/2.0);
+		//cos th
+		//zz = Lr/(2.0*lr);
+		float A = lr/Lr;
+		UV.x = vec.x*A;
+		UV.y = vec.y*A;
+
+		
+		
+	}
+
+	//From -1 to 1 move to 0 to 1 range
+	UV = (UV + 1.0) * 0.5;
+
+	if(mode >= 1){ //sky to cube
+		UV.x = (1.0 - UV.x);
+	}
+
+	return UV;
+}
+
+
+
+vec2 getDPMapping_VEC2UV(vec3 vec, int mode)
+{
+	vec2 uv = vec2(0.0);
 	if(vec.z < 0.0){ // Front
 		uv = vec.xy/(1.0 - vec.z);
 		uv = (uv + 1.0) * 0.5; // Range from -1 to 1 to 0 to 1
@@ -425,14 +602,12 @@ vec2 getDPUVByVec(vec3 vec, int mode)
 		uv.x = (uv.x * 0.5) + 0.5; // Move to right in texture
 	}
 
-
-
 	return uv;
 }
 
 
 
-
+/////////////////////////////////////////////////////////
 
 
 vec3 DecodeRGBM(vec4 rgbm, float maxRange, float lum)
