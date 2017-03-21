@@ -398,6 +398,5 @@ SCFL_LoadPanorama = function ( imgFile, renderer ) {
 	this.activate = activate;
 	this.deactivate = deactivate;
 	this.dispose = dispose;
-
 };
 
