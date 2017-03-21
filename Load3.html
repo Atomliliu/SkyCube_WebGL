@@ -177,11 +177,11 @@
 
 			cubeMenu.onRotateU = function(){
 				//cubeView.setCubeQuaternion(new THREE.Vector3( 0, 1, 0 ),cubeMenu.getRotationU());
-				cubeView.setCubeRotation(new THREE.Vector3( 0, 1, 0 ),cubeMenu.getRotationU());
+				cubeView.setCubeRotationY(cubeMenu.getRotationU());
 			};
 			cubeMenu.onRotateV = function(){
 				//cubeView.setCubeQuaternion(new THREE.Vector3( 1, 0, 0 ),cubeMenu.getRotationV());
-				cubeView.setCubeRotation(new THREE.Vector3( 1, 0, 0 ),cubeMenu.getRotationV());
+				cubeView.setCubeRotationX(cubeMenu.getRotationV());
 			};
 
 			cubeMenu.activate();
