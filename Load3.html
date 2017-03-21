@@ -127,10 +127,12 @@
 
 			animate();
 			
-			CM = cubeMap;
+			
 
 			cubeMenu = new SCFL_CubeViewportHUD();
 			cubeMenu.onExport = function(){
+				CM=panaorama.updateCube(cubeView.deltaSkyBoxMatrix);
+				//CM = cubeMap;
 				outHUD = new THREE.SC_OutHUD(CM, window.innerWidth, window.innerHeight, renderer.domElement);
 				var outHUDClose = new SCFL_HUDClose();
 				outHUDClose.onClick = function(){

@@ -9,6 +9,9 @@ THREE.SC_CubeViewport = function ( texCube, width, height, fov, renderer ) {
 	var container, skyBox;
 	this.texCube = texCube;
 	this.materialsCube = [];
+	this.intiSkyBoxMatrix = new THREE.Matrix4();
+	this.curSkyBoxMatrix = new THREE.Matrix4();
+	this.deltaSkyBoxMatrix = new THREE.Matrix4();
 
 /*
 	if(width == undefined){
@@ -50,7 +53,7 @@ THREE.SC_CubeViewport = function ( texCube, width, height, fov, renderer ) {
 	//animate();
 	//render();
 	
-
+	
 	
 
 	function init() {
@@ -61,6 +64,8 @@ THREE.SC_CubeViewport = function ( texCube, width, height, fov, renderer ) {
 
 		skyBox = new THREE.Mesh( new THREE.CubeGeometry( 1000, 1000, 1000 ), new THREE.MeshFaceMaterial( root.materialsCube ) );//new THREE.Mesh( skyGeo, materialSkyBox );
 		skyBox.applyMatrix( new THREE.Matrix4().makeScale( 1, 1,  -1 ) );
+		root.intiSkyBoxMatrix.copy(skyBox.matrix);
+		root.curSkyBoxMatrix.copy(skyBox.matrix);
 
 		root.scene.add( skyBox );
 	}
@@ -81,8 +86,12 @@ THREE.SC_CubeViewport = function ( texCube, width, height, fov, renderer ) {
 		skyBox.quaternion = quaternion;
 	};
 
+
 	this.setCubeRotation = function(axis,angle){
-		skyBox.rotateOnAxis( skyBox.worldToLocal(axis), THREE.Math.degToRad(angle) );
+		skyBox.matrix.copy(root.intiSkyBoxMatrix);
+		root.deltaSkyBoxMatrix = new THREE.Matrix4().makeRotationAxis( axis.normalize(), angle*Math.PI / 180 );
+		skyBox.applyMatrix(root.deltaSkyBoxMatrix);
+		root.curSkyBoxMatrix.copy(skyBox.matrix);
 	};
 
 	function activate(){

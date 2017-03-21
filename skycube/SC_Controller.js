@@ -89,7 +89,7 @@ THREE.SC_Controller = function ( dom, css, width, height ) {
 	};
 
 	this.addRange = function (parentDom, options){
-		return addElement(parentDom, "input", 'range', 0, options);
+		return addElement(parentDom, "input", 'range', 2, options);
 		
 	};
 
