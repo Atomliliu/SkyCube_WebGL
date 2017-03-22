@@ -236,7 +236,7 @@ SCFL_LoadPanorama = function ( imgFile, renderer ) {
 			materialRTT.uniforms.nFace.value = i;
 			renderer.render( sceneRTT, camRTT, RTTtextures[i], true );
 		}
-		clearCubeTarget();
+		//clearCubeTarget();
 		camCube.updateCubeMap( renderer, sceneCube );
 		//console.log(camCube.renderTarget.texture);
 
@@ -244,36 +244,19 @@ SCFL_LoadPanorama = function ( imgFile, renderer ) {
 		if(onFinished){onFinished(RTTtextures,camCube.renderTarget.texture);}
 	}
 
-	function clearCubeTarget()
-	{
-		for(var n = 0;n<6;n++){
-			camCube.renderTarget.activeCubeFace = n;
-			renderer.clearTarget (camCube.renderTarget, true, true, true);
-		}
-	}
 
 
-	function updateCube(matrixDelta,pause,goon){
+	function updateCube(matrixDelta){
 		if(renderer == undefined){
 			return false;
 		}
-		//if(pause) pause();
 
 		if(matrixDelta && matrixDelta.isMatrix4) {
-			//console.log(sceneCube.children);
-			//sceneCube.remove(skyBoxCube);
-			//console.log(sceneCube.children);
 			skyBoxCube.matrix.copy(root.intiSkyCubeMatrix);
 			skyBoxCube.applyMatrix(matrixDelta);
-			//sceneCube.add(skyBoxCube);
 			
 		}
-		clearCubeTarget();
-		//renderer.sortObjects=false;
 		camCube.updateCubeMap( renderer, sceneCube );
-		//renderer.sortObjects=true;
-		//sceneCube.remove(skyBoxCube);
-		//if(goon) goon();
 		return camCube.renderTarget.texture;
 	}
 
@@ -285,7 +268,7 @@ SCFL_LoadPanorama = function ( imgFile, renderer ) {
 
 		//texCube = new THREE.SC_CubeMap(RTTSize);
 
-		camCube = new THREE.CubeCamera( 1, 20000, RTTSize );
+		camCube = new THREE.SC_CubeCamera( 1, 20000, RTTSize );
 
 		//raycaster = new THREE.Raycaster();
 

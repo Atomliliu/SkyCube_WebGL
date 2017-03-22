@@ -10,7 +10,7 @@ import { Vector3 } from '../math/Vector3';
  *
  * @author alteredq / http://alteredqualia.com/
  */
-
+//Convert cube texture to cubemap target by shader rendering (issue with face upside down direction)
 function SC_CubeMap( cubeResolution ) {
 
 	Object3D.call( this );

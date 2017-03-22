@@ -131,7 +131,7 @@
 
 			cubeMenu = new SCFL_CubeViewportHUD();
 			cubeMenu.onExport = function(){
-				CM=panaorama.updateCube(cubeView.deltaSkyBoxMatrix,pause,animate);
+				CM=panaorama.updateCube(cubeView.deltaSkyBoxMatrix);
 				//CM=panaorama.updateCube2(cubeMenu.getRotationV());
 				//CM = cubeMap;
 				outHUD = new THREE.SC_OutHUD(CM, window.innerWidth, window.innerHeight, renderer.domElement);
