@@ -323,6 +323,9 @@ vec3 getVecSPCubeMap(vec2 UV, int mode){
 
 ///////////////////////////////////////////////////////////
 /////////////////////Vector to UV//////////////////////////
+
+const int _MaxSample = 64;
+
 vec2 getHCMapping_Cube(int face, vec2 uv, int mode)
 {
 	vec2 UV = vec2(0.0);
@@ -603,6 +606,18 @@ vec2 getDPMapping_VEC2UV(vec3 vec, int mode)
 	}
 
 	return uv;
+}
+
+
+float getPolarCoordTansor(vec2 UV){
+	UV = UV * 2.0 - 1.0; // Range to -1 to 1
+
+	float Lr = sqrt(UV.x * UV.x + UV.y * UV.y);
+	if(Lr<=0.5) return 0.0;
+	float lr = 1.0-Lr;
+	//return (2.0*SC_PI*(Lr-lr));
+	return (Lr-lr);
+
 }
 
 
