@@ -255,6 +255,8 @@ var ShaderLib = {
 		uniforms: {
 			vUvFlip: { value: new Vector2(0,0) },
 			tSampler: { value: null },
+			fPixelSize: { value: 0.0009765625 },
+			nSamples: { value: 16 },
 			nFace: { value: 0 }
 		},
 
