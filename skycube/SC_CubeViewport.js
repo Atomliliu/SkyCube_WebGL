@@ -33,7 +33,7 @@ THREE.SC_CubeViewport = function ( texCube, width, height, fov, renderer ) {
 	//Init
 	
 
-	this.camera = new THREE.PerspectiveCamera( fov, width / height, 1, 1100 );
+	this.camera = new THREE.PerspectiveCamera( fov, width / height, 1, 1500 );
 	this.camera.position.z = 100;
 	//camera.target = new THREE.Vector3( 0, 0, 0 );
 
