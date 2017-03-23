@@ -17,12 +17,23 @@ SCFL_LoadPanorama = function ( imgFile, renderer ) {
 	//var updateTex = false;
 	var materialsCube = [];
 	var RTTtextures = [];
-	var RTTSize = 1024;//?
-	this.TestSize = 1024;//?
+	var RTTSize = 128;//?
+	
 	var camCube, sceneCube, skyBoxCube;
 
 
 	//
+	var SizeByWRatio = [
+		4.0,
+		4.0,
+		4.0,
+		2.0,
+		2.0,
+		6.0,
+		3.0,
+		1.0
+	];
+
 	var WHRatio = [
 		2.0,
 		1.3333333333333333333333333333333,
@@ -150,6 +161,7 @@ SCFL_LoadPanorama = function ( imgFile, renderer ) {
 
 		span.onclick = function() {
 		    disposeModal();
+		    root.onBackToInput();
 		};
 
 		buttonDD.onclick = function() {
@@ -164,6 +176,7 @@ SCFL_LoadPanorama = function ( imgFile, renderer ) {
 	}
 
 	this.onRTTUpdated = undefined;
+	this.onBackToInput;
 	//this.onCubeUpdated = undefined;
 
 
@@ -184,7 +197,12 @@ SCFL_LoadPanorama = function ( imgFile, renderer ) {
 				}
 			}
 		}
-		
+		RTTSize = root.img.width/SizeByWRatio[root.defIndex]
+		if(!THREE.Math.isPowerOfTwo(RTTSize)){
+			RTTSize = THREE.Math.nextPowerOfTwo(RTTSize);
+		}
+
+		console.log(RTTSize);
 		
 	}
 
@@ -237,6 +255,23 @@ SCFL_LoadPanorama = function ( imgFile, renderer ) {
 			renderer.render( sceneRTT, camRTT, RTTtextures[i], true );
 		}
 		//clearCubeTarget();
+		//camCube.updateCubeMap( renderer, sceneCube );
+		//console.log(camCube.renderTarget.texture);
+
+		//if(onFinished){console.log("finish");onFinished(camCube.renderTarget.texture);}
+		if(onFinished){onFinished(RTTtextures);}
+	}
+
+	function updateRTT2(onFinished){
+		//var texturezzz = new THREE.TextureLoader().load( "textures/water.jpg", function ( texture ) {
+		if(renderer == undefined){
+			return false;
+		}
+		for (var i = 0; i < 6; i++){
+			materialRTT.uniforms.nFace.value = i;
+			renderer.render( sceneRTT, camRTT, RTTtextures[i], true );
+		}
+		//clearCubeTarget();
 		camCube.updateCubeMap( renderer, sceneCube );
 		//console.log(camCube.renderTarget.texture);
 
@@ -275,7 +310,7 @@ SCFL_LoadPanorama = function ( imgFile, renderer ) {
 
 		for ( var i = 0; i < 6; i ++ ) {
 
-			RTTtextures[ i ] = new THREE.WebGLRenderTarget( RTTSize, RTTSize, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBFormat } );
+			RTTtextures[ i ] = new THREE.WebGLRenderTarget( RTTSize, RTTSize, { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat } );
 
 		}
 
@@ -381,5 +416,6 @@ SCFL_LoadPanorama = function ( imgFile, renderer ) {
 	this.activate = activate;
 	this.deactivate = deactivate;
 	this.dispose = dispose;
+	this.RTTSize = RTTSize;//?
 };
 

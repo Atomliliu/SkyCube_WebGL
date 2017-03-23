@@ -8,6 +8,11 @@ THREE.SC_Common = function() {
 	this.removeElements = removeElements;
 	this.removeCildren = removeCildren;
 
+
+	function nearestPow2( aSize ){
+		return Math.pow( 2, Math.round( Math.log( aSize ) / Math.log( 2 ) ) ); 
+	}
+
 	//File Type Array with dot, ext .jpg .png .tif .tga
 	function checkTypeAvailable( fileCheck, fileTypeArray ){
 		var fileExt = fileCheck.name.split(".");

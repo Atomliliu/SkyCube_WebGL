@@ -114,11 +114,12 @@
 
 	function test(){
 		//console.log(loader.rImgWidth[0]);
-		console.log(loader.rSelData.width);
+		//Image size
+		//console.log(loader.rSelData.width);
 		init();
 		panaorama = new SCFL_LoadPanorama(loader.rSelData, renderer);
 		inputPage.hidden();
-		panaorama.onRTTUpdated = function(cubeRTTs,cubeMap) {
+		panaorama.onRTTUpdated = function(cubeRTTs) {
 			// body...
 			inputPage.deactivate();
 			dropZone.deactivate();
@@ -186,7 +187,13 @@
 
 			cubeMenu.activate();
 
-		}
+		};
+
+		panaorama.onBackToInput = function(){
+			inputPage.shown();
+			panaorama = undefined;
+			stop();
+		};
 
 		panaorama.activate();
 

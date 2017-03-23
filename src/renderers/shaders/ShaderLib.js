@@ -255,8 +255,6 @@ var ShaderLib = {
 		uniforms: {
 			vUvFlip: { value: new Vector2(0,0) },
 			tSampler: { value: null },
-			fPixelSize: { value: 0.0009765625 },
-			nSamples: { value: 16 },
 			nFace: { value: 0 }
 		},
 
@@ -264,6 +262,21 @@ var ShaderLib = {
 		fragmentShader: ShaderChunk.SCSL_LP2CUBE_FRAG
 
 	},
+	LP2CUBE_OS: {
+
+		uniforms: {
+			vUvFlip: { value: new Vector2(0,0) },
+			tSampler: { value: null },
+			fPixelSize: { value: 0.0009765625 },
+			nSamples: { value: 16 },
+			nFace: { value: 0 }
+		},
+
+		vertexShader: ShaderChunk.SCSL_RASTER_VERT,
+		fragmentShader: ShaderChunk.SCSL_LP2CUBE_OS_FRAG
+
+	},
+
 	SP2CUBE: {
 
 		uniforms: {
