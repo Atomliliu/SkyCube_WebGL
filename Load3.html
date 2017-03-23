@@ -153,6 +153,11 @@
 			};
 
 			cubeMenu.onBackToInput = function(){
+
+				var alertBack = confirm("Back to input page you will lose the current content!");
+				if (!alertBack) {
+				    return;
+				}
 				cubeMenu.dispose();
 				cubeView.dispose();
 
@@ -273,6 +278,12 @@
 		if(outHUD !== undefined && outHUD.enabled){
 			outHUD.updateHUD( window.innerWidth, window.innerHeight );
 		}
+
+		if(cubeMenu !== undefined && cubeMenu.enabled){
+			cubeMenu.onResize( window.innerWidth, window.innerHeight );
+		}
+
+		console.log("size update");
 
 	}
 
