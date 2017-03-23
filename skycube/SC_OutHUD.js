@@ -9,6 +9,7 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 	//this.type = 'SC_OutHUD';
 
 	this.enabled = false;
+	this.reviewMode = false;
 
 	var root = this; // for Events Func
 
@@ -97,6 +98,8 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 	var UI_IconPos = [];
 	var UI_IconPlane = [];
 
+	var reviewPlane;
+
 	var InitOpacity = 0.5;
 	var InitSaturation = 0.5;
 
@@ -173,6 +176,7 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 	
 	// Create also a custom scene for HUD.
 	this.sceneHUD = new THREE.Scene();
+	this.sceneReview = new THREE.Scene();
 
 	//Init
 	//Need update size first
@@ -207,46 +211,62 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 
 	}
 	
+	function initHUD(){
+		for ( var i = 0; i < UI_ShaderNames.length; i ++ ) {
+			if(UI_ShaderNames[i] == "ENV2CUBEFACE_HUD"){
+				UI_Shaders[i] = THREE.ShaderLib[ UI_ShaderNames[i] ];
+				setupBoxUI(i);
+				
+				//this.sceneHUD.add( UI_IconPlane[i] );
 
-	
+			}
+			else{
+				UI_Shaders[i] = THREE.ShaderLib[ UI_ShaderNames[i] ];
+				var uniformsUI = THREE.UniformsUtils.clone( UI_Shaders[i].uniforms );
+				uniformsUI.tCube.value = cubeMap;
+				//uniformsUI.fOpacity.value = 0.5;
 
-	for ( var i = 0; i < UI_ShaderNames.length; i ++ ) {
-		if(UI_ShaderNames[i] == "ENV2CUBEFACE_HUD"){
-			UI_Shaders[i] = THREE.ShaderLib[ UI_ShaderNames[i] ];
-			setupBoxUI(i);
+				UI_Materials[i] = new THREE.ShaderMaterial({uniforms: uniformsUI,
+							vertexShader: UI_Shaders[i].vertexShader,
+							fragmentShader: UI_Shaders[i].fragmentShader});
+
+				UI_Materials[i].transparent = true;
+				UI_Materials[i].opacity = 0.0;
+				UI_Materials[i].name = Out_ShaderNames[i]; //output shader name
+
+				//Out_Shaders[i] = ShaderLib[ Out_ShaderNames[i] ];
+
+				//UI_IconPos[i] = new Vector2(0,0);
+				UI_IconPlane[i] = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), UI_Materials[i] );
+				//UI_IconPlane[i] = new Mesh( new PlaneGeometry( iconSize*UI_IconsSizeX[i], iconSize*UI_IconsSizeY[i] ), UI_Materials[i] );
+				//UI_IconPlane[i].position.x = UI_IconPos[i].x;
+				//UI_IconPlane[i].position.y = UI_IconPos[i].y;
+
+				//console.log(UI_IconPlane[i].position);
+			}
+			root.sceneHUD.add( UI_IconPlane[i] );
 			
-			//this.sceneHUD.add( UI_IconPlane[i] );
-
+			
 		}
-		else{
-			UI_Shaders[i] = THREE.ShaderLib[ UI_ShaderNames[i] ];
-			var uniformsUI = THREE.UniformsUtils.clone( UI_Shaders[i].uniforms );
-			uniformsUI.tCube.value = cubeMap;
-			//uniformsUI.fOpacity.value = 0.5;
 
-			UI_Materials[i] = new THREE.ShaderMaterial({uniforms: uniformsUI,
-						vertexShader: UI_Shaders[i].vertexShader,
-						fragmentShader: UI_Shaders[i].fragmentShader});
-
-			UI_Materials[i].transparent = true;
-			UI_Materials[i].opacity = 0.0;
-			UI_Materials[i].name = Out_ShaderNames[i]; //output shader name
-
-			//Out_Shaders[i] = ShaderLib[ Out_ShaderNames[i] ];
-
-			//UI_IconPos[i] = new Vector2(0,0);
-			UI_IconPlane[i] = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), UI_Materials[i] );
-			//UI_IconPlane[i] = new Mesh( new PlaneGeometry( iconSize*UI_IconsSizeX[i], iconSize*UI_IconsSizeY[i] ), UI_Materials[i] );
-			//UI_IconPlane[i].position.x = UI_IconPos[i].x;
-			//UI_IconPlane[i].position.y = UI_IconPos[i].y;
-
-			//console.log(UI_IconPlane[i].position);
-		}
-		this.sceneHUD.add( UI_IconPlane[i] );
-		
-		
 	}
 
+
+	function initReview(){
+		if(!selected) {root.reviewMode=false; console.log("null"); return;}
+		var pSize = (UI_width>=UI_height)?UI_height:UI_width;
+		reviewPlane = new THREE.Mesh( new THREE.PlaneGeometry( pSize, pSize ), selected.material );
+		var maxSize = (UI_width>=UI_height)?UI_width:UI_height;
+		//reviewPlane.position.x -= (maxSize - pSize)/2.0;
+		reviewPlane.position.z = -10;
+		root.sceneReview.add( reviewPlane );
+		console.log(selected.material);
+	}
+	
+
+	
+	initHUD();
+	
 	updateHUDSize();
 	updateIconPlaneSize();
 
@@ -357,12 +377,19 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 
 	};
 
-	this.renderHUD = function (render) {
-		if(this.enabled == true){
-			render.render( this.sceneHUD, this.cameraHUD );
+	this.renderHUD = function (renderer) {
+		if(root.enabled == true){
+			if(root.reviewMode == true){
+				renderer.render( root.sceneReview, root.cameraHUD );
+				console.log("new plane");
+			}
+			else{
+				renderer.render( root.sceneHUD, root.cameraHUD );
+			}
+			
 		}
 		
-	}
+	};
 
 
 
@@ -472,6 +499,13 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 	}
 
 
+
+	function reviewCube(){
+		initReview();
+		root.reviewMode=true;
+	}
+
+
 	function onDocumentMouseUp( event ) {
 
 		event.preventDefault();
@@ -485,7 +519,14 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 
 		}
 		*/
+		reviewCube();
 
+		domElement.style.cursor = 'auto';
+
+	}
+
+
+	function onExport(){
 		//Do export here
 		if(outShaderName != ""){
 			Out_Shaders = THREE.ShaderLib[ outShaderName ];
@@ -516,10 +557,6 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 				console.log("Size is wrong!");
 			}
 		}
-		
-		
-
-		domElement.style.cursor = 'auto';
 
 	}
 
