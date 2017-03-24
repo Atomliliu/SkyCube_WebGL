@@ -111,6 +111,7 @@ THREE.SC_Controller = function ( dom, css, width, height ) {
 	};
 
 	this.addList = function(parentDom, options){
+		var id = options.id;
 		var ids = options.ids;
     	var css = options.css;
 	    var values = options.values;
@@ -122,16 +123,19 @@ THREE.SC_Controller = function ( dom, css, width, height ) {
 
 		//Add DD List
 		var lb = document.createElement('select');
+		lb.id = id;
 		setCSS(lb,css);
 		for (var i=0;i<texts.length;i++) {
 			var item = document.createElement("option");
 			item.innerHTML = texts[i];
-			if (ids!=undefined || ids.length==texts.length) item.id = ids[i];
-			if (values!=undefined || values.length==texts.length) item.value = values[i];
+			if (ids!=undefined && ids.length==texts.length) item.id = ids[i];
+			if (values!=undefined && values.length==texts.length) item.value = values[i];
 
 			lb.appendChild(item);
 			
 		}
+		if(parentDom==undefined) parentDom = dom;
+    	parentDom.appendChild(lb);
 
 		root.controllers.push(lb);
 		return lb;
