@@ -70,6 +70,7 @@ SCFL_HUDClose = function ( idname ) {
 	this.activate = activate;
 	this.deactivate = deactivate;
 	this.dispose = dispose;
-
+	this.hide = hide;
+	this.shown = shown;
 };
 

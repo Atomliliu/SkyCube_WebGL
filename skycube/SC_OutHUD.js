@@ -7,7 +7,7 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 	//Object3D.call( this );
 
 	//this.type = 'SC_OutHUD';
-
+	this.domElement = ( domElement !== undefined ) ? domElement : document;
 	this.enabled = false;
 	this.reviewMode = false;
 
@@ -99,6 +99,7 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 	var UI_IconPlane = [];
 
 	var reviewPlane;
+	var planeDis = 10;
 
 	var InitOpacity = 0.5;
 	var InitSaturation = 0.5;
@@ -121,6 +122,11 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 	//var boxUIMesh;
 
 	var mouse = new THREE.Vector2();
+	var panEnd = new THREE.Vector2();
+	var panDelta = new THREE.Vector2();
+	var panStart = new THREE.Vector2();
+	var panEnabled = false;
+
 	var raycaster = new THREE.Raycaster();
 	var selected = null, hovered = null;
 	var outShaderName = "";
@@ -135,8 +141,8 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 		var outSize = new THREE.Vector3(0,0,0);//X ratio, Y ratio, Scale
 		if(selected != null && outShaderName != ""){
 			var index = Out_ShaderNames.indexOf(outShaderName);//findIndex(getSelOutShaderName);
-			console.log(outShaderName);
-			console.log(index);
+			//console.log(outShaderName);
+			//console.log(index);
 			if(index != undefined){
 				outSize.x = UI_IconsSizeX[index];
 				outSize.y = UI_IconsSizeY[index];
@@ -145,6 +151,25 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 			
 		}
 		return outSize;
+	}
+
+	this.hidenHUD;
+	this.shownHUD;
+
+	function previewBackToHUD(){
+		domElement.removeEventListener( 'wheel', onDocumentMouseWheel, false );
+		domElement.style.cursor = 'auto';
+		root.reviewMode = false;
+		if(root.shownHUD) root.shownHUD();
+	}
+
+	function HUDToReview() {
+		
+		initReview();
+		domElement.addEventListener( 'wheel', onDocumentMouseWheel, false );
+		domElement.style.cursor = 'pointer';
+		root.reviewMode=true;
+		if(root.hidenHUD) root.hidenHUD();
 	}
 
 
@@ -254,13 +279,19 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 
 	function initReview(){
 		if(!selected) {root.reviewMode=false; console.log("null"); return;}
+		var index = Out_ShaderNames.indexOf(outShaderName);//findIndex(getSelOutShaderName); //selected.material.name
 		var pSize = (UI_width>=UI_height)?UI_height:UI_width;
-		reviewPlane = new THREE.Mesh( new THREE.PlaneGeometry( pSize, pSize ), selected.material );
-		var maxSize = (UI_width>=UI_height)?UI_width:UI_height;
-		//reviewPlane.position.x -= (maxSize - pSize)/2.0;
-		reviewPlane.position.z = -10;
-		root.sceneReview.add( reviewPlane );
-		console.log(selected.material);
+		if(selected.material.type == "MultiMaterial"){
+
+		}
+		else{
+			reviewPlane = new THREE.Mesh( new THREE.PlaneGeometry( pSize*UI_IconsSizeX[index], pSize*UI_IconsSizeY[index] ), selected.material );
+			var maxSize = (UI_width>=UI_height)?UI_width:UI_height;
+			//reviewPlane.position.x -= (maxSize - pSize)/2.0;
+			reviewPlane.position.z = -planeDis;
+			root.sceneReview.add( reviewPlane );
+			//console.log(selected.material.name);
+		} 
 	}
 	
 
@@ -312,7 +343,7 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 		//console.log(iconEdgeSize);
 
 		iconSize = Math.min(iconEdgeSize.x,iconEdgeSize.y) - iconMinGap;
-		if (iconSize <= 4) return; // Too small to render it
+		if (iconSize <= 16) return; // Too small to render it
 		//console.log(iconSize);
 
 		//Setup position (0,0) is left bottom
@@ -381,7 +412,7 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 		if(root.enabled == true){
 			if(root.reviewMode == true){
 				renderer.render( root.sceneReview, root.cameraHUD );
-				console.log("new plane");
+				//console.log("new plane");
 			}
 			else{
 				renderer.render( root.sceneHUD, root.cameraHUD );
@@ -414,11 +445,34 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 		}
 	}
 
+	function pan(deltaX, deltaY)
+	{
+		var element = root.domElement === document ? root.domElement.body : root.domElement;
+		var offset = new THREE.Vector2(deltaX,deltaY);
+		//?if (offset.x curZoom*reviewPlane) //limitation
+		reviewPlane.position.x +=  offset.x;
+		reviewPlane.position.y -=  offset.y;
+	}
 
 
 	function onDocumentMouseMove( event ) {
 		event.preventDefault();
+		//?innerWidth to element.clientWidth
 		mouse.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
+
+		if(root.reviewMode){
+			//domElement.style.cursor = 'pointer';
+			if(panEnabled){
+				panEnd.set( event.clientX, event.clientY );
+				panDelta.subVectors( panEnd, panStart );
+				domElement.style.cursor = 'move';
+				pan( panDelta.x, panDelta.y );
+				panStart.copy( panEnd );
+			}
+			
+			return;
+		}
+		
 		//console.log(HDR_EV.sceneHUD);
 		var intersects = RaycasterSetup(mouse, root.cameraHUD, root.sceneHUD);
 		if ( intersects.length > 0 ) {
@@ -452,7 +506,8 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 				
 
 			}
-		} else {
+		} 
+		else {
 			if ( hovered !== null ) {
 
 				root.dispatchEvent( { type: 'hoveroff', object: hovered } );
@@ -476,54 +531,90 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 
 	}
 
-
+	var exportSelected = false;
 
 	function onDocumentMouseDown( event ) {
 		event.preventDefault();
-		mouse.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
 
-		var intersects = RaycasterSetup(mouse, root.cameraHUD, root.sceneHUD);
-		//console.log(intersects.length);
-		if ( intersects.length > 0 ) {
-			var picked = intersects[ 0 ].object;
-			if(picked.material.type == "MultiMaterial"){
-				setupMultiMat(picked.material,"fOpacity",1.0)
-			}
-			else{
-				picked.material.uniforms.fOpacity.value = 1.0;
-			}
-			outShaderName = picked.material.name;
-			selected = picked;
+		if(root.reviewMode){
+			panStart.set( event.clientX, event.clientY );
+			panEnabled = true;
 		}
+		else{
+			mouse.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
+
+			var intersects = RaycasterSetup(mouse, root.cameraHUD, root.sceneHUD);
+			//console.log(intersects.length);
+			if ( intersects.length > 0 ) {
+				var picked = intersects[ 0 ].object;
+				if(picked.material.type == "MultiMaterial"){
+					setupMultiMat(picked.material,"fOpacity",1.0)
+				}
+				else{
+					picked.material.uniforms.fOpacity.value = 1.0;
+				}
+				outShaderName = picked.material.name;
+				selected = picked;
+				exportSelected = true;
+			}
+		}
+		
 	
 	}
 
+	//console.log( 'handleMouseMovePan' );
 
 
-	function reviewCube(){
-		initReview();
-		root.reviewMode=true;
-	}
 
 
 	function onDocumentMouseUp( event ) {
 
 		event.preventDefault();
 
-		/*
-		if ( _selected ) {
-
-			root.dispatchEvent( { type: 'dragend', object: _selected } );
-
-			_selected = null;
-
+		if(root.reviewMode){
+			
+			panEnabled = false;
+			domElement.style.cursor = 'pointer';
+			
 		}
-		*/
-		reviewCube();
-
-		domElement.style.cursor = 'auto';
-
+		else{
+			domElement.style.cursor = 'auto';
+			if(exportSelected){
+				HUDToReview();
+				exportSelected = false;
+			}
+		}
 	}
+
+	var zoomSpeed = 1.0;
+	var minZoom = 1.0;
+	var maxZoom = 4.0;
+	var curZoom = 1.0;
+	function getZoomScale() {
+		return Math.pow( 0.95, zoomSpeed );
+	}
+
+	function scale(deltaScale){
+		reviewPlane.scale.set(deltaScale,deltaScale,1.0);
+	}
+
+	function onDocumentMouseWheel( event ){
+		event.preventDefault();
+		event.stopPropagation();
+		curZoom = reviewPlane.scale.x;
+		if(root.reviewMode){
+			if ( event.deltaY < 0 ) {
+				//console.log(event.deltaY);
+				//zoom-out
+				curZoom = Math.max( minZoom, Math.min( maxZoom,curZoom / getZoomScale()));
+			} else if ( event.deltaY > 0 ) {
+				//zoom-in
+				curZoom = Math.max( minZoom, Math.min( maxZoom,curZoom * getZoomScale()));
+			}
+			scale(curZoom);
+		}
+	}
+
 
 
 	function onExport(){
