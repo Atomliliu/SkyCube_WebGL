@@ -25,6 +25,7 @@
 
 
 <script src="js/skycube/FL/SCFL_CubeViewportHUD.js"></script>
+<script src="js/skycube/FL/SCFL_OutReviewHUD.js"></script>
 <script src="js/skycube/FL/SCFL_HUDClose.js"></script>
 <script src="js/skycube/FL/SCFL_InputFiles.js"></script>
 <script src="js/skycube/FL/SCFL_GrabAndDropFiles.js"></script>
@@ -79,7 +80,9 @@
 
 	var renderer;
 	var outHUD;
+
 	var cubeMenu;
+	var exportHUD;
 
 
 
@@ -135,6 +138,7 @@
 				CM=panaorama.updateCube(cubeView.deltaSkyBoxMatrix);
 				//CM = cubeMap;
 				outHUD = new THREE.SC_OutHUD(CM, window.innerWidth, window.innerHeight, renderer.domElement);
+
 				var outHUDClose = new SCFL_HUDClose();
 				outHUDClose.onClick = function(){
 					outHUD.deactivate();
@@ -144,6 +148,19 @@
 				};
 				outHUD.hidenHUD = function(){outHUDClose.hide();};
 				outHUD.shownHUD = function(){outHUDClose.shown();};
+				outHUD.onReviewMode = function(){
+					exportHUD = new SCFL_OutReviewHUD();
+					
+					exportHUD.onBackToSelection = function(){
+						exportHUD.dispose();
+						exportHUD = undefined;
+						outHUD.previewBackToHUD();
+						console.log("back");
+					};
+
+					exportHUD.activate();
+				};
+
 				//controls.gui.close();
 				cubeMenu.hide();
 				outHUDClose.activate();
@@ -265,7 +282,6 @@
 		if(outHUD !== undefined && outHUD.enabled){
 			outHUD.renderHUD(renderer);
 		}
-		
 
 	}
 
