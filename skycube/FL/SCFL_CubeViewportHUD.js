@@ -97,7 +97,7 @@ SCFL_OutReviewHUD = function ( width, height, imgFile, renderer ) {
 		root.console = new THREE.SC_Controller(divMenu, "menu_console");
 
 
-		root.uiFileFormat = root.console.addList(divMenu,{ids: "filetype", css: "menu_content _inline", texts:UI_FileNames, values: UI_FileNames});
+		root.uiFileFormat = root.console.addList(divMenu,{id: "filetype", css: "menu_content _inline", texts:UI_FileNames, values: UI_FileNames});
 		root.console.addSpace(divMenu,1);
 
 		root.uiFileNameLabel = root.console.addLabel(divMenu,"menu_content _inline", "filename", "File Name" );
