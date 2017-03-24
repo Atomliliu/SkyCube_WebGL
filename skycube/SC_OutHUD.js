@@ -564,7 +564,8 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 
 	//console.log( 'handleMouseMovePan' );
 
-
+	this.onReviewMode;
+	this.previewBackToHUD = previewBackToHUD;
 
 
 	function onDocumentMouseUp( event ) {
@@ -581,6 +582,7 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 			domElement.style.cursor = 'auto';
 			if(exportSelected){
 				HUDToReview();
+				if(root.onReviewMode) root.onReviewMode();
 				exportSelected = false;
 			}
 		}
