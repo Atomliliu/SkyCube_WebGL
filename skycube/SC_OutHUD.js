@@ -328,6 +328,18 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 		root.previewMode = true;
 	};
 
+	this.PreviewHiden = function(){
+		root.enabled = false;
+		root.reviewMode = false;
+		root.previewMode = false;
+	};
+
+	this.PreviewShown = function(){
+		root.enabled = true;
+		root.reviewMode = true;
+		root.previewMode = true;
+	};
+
 	//Review before export
 	function initReview(){
 		if(!selected) {root.reviewMode=false; console.log("null"); return;}
