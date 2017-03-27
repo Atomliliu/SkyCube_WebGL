@@ -1,8 +1,12 @@
+
+
 body {
 	/*background-color: #000000;*/
 	font-family: Roboto, sans-serif;
 	margin: 0px;
 	overflow: hidden;
+    /*overflow: auto;*/
+
 }
 
 h3{
@@ -20,6 +24,10 @@ h3{
         background-color: #e5edf1;
         padding: 5rem 1.25rem;*/ /* 80 20 */
 /*    }*/
+
+#render {
+    overflow: hidden;
+}
 
 ._block {
 	display: block;
@@ -42,6 +50,8 @@ h3{
 }
 
 .container {
+    /*min-width: 800px;*/
+    /*min-height: 550px;*/
     text-align: center;
     position: absolute;
 	margin: auto;
@@ -162,6 +172,13 @@ label.buttonLoad input[type="file"] {
 	opacity: 0.0;
 	/*transition-delay: 0.5s;*/
 	transition: 0.5s;
+}
+
+.menu_controller {
+    min-height: 300px;
+    height: 300px;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 .menu_button {

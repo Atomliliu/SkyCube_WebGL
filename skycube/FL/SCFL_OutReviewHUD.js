@@ -5,12 +5,18 @@ SCFL_OutReviewHUD = function ( width, height, imgFile, renderer ) {
 	this.enabled = false;
 	this.console = undefined;
 
-	this.uiCubeFormat;
-	this.uiFlipULabel;
-	this.uiFlipU;
+	this.uiFileFormat;
+	this.uiFileNameLabel;
+	this.uiFileName;
 	this.uiExport;
-	this.uiRotateU;
-	this.uiRotateV;
+
+	var UI_FileNames = [
+		"PNG",
+		"JPG",
+		"TGA",
+		"TIFF",
+		"HDR"
+	];
 
 	//var imgWidth = this.img.width;
 	//var imgHeight = this.img.height;
@@ -42,6 +48,7 @@ SCFL_OutReviewHUD = function ( width, height, imgFile, renderer ) {
 		divMenu.id = "cubeMenu";
 		divMenu.setAttribute("class", "menu");
 
+		/*
 		var divIcon = document.createElement("div");
 		divIcon.setAttribute("class", "menu_icon");
 		divIcon.onclick=function(){
@@ -63,6 +70,7 @@ SCFL_OutReviewHUD = function ( width, height, imgFile, renderer ) {
 		divIcon.appendChild(divIcon3);
 
 		divMenu.appendChild(divIcon);
+		*/
 		
 		document.body.appendChild(divMenu);
 
@@ -82,57 +90,36 @@ SCFL_OutReviewHUD = function ( width, height, imgFile, renderer ) {
 		//Back icon
 		backicon = setupBlock("menu_backicon");
 		backicon.innerHTML = "\xAB";
-		backicon.onclick = root.onBackToInput;
+		//if(root.onBackToSelection)
+		backicon.onclick = root.onBackToSelection;
 
 		//Menu
 		root.console = new THREE.SC_Controller(divMenu, "menu_console");
 
 
-		//root.uiCubeFormat = root.console.addList(divMenu,{id: "flip", "menu_content _inline"})
-		//root.console.addSpace(divMenu,2);
+		root.uiFileFormat = root.console.addList(divMenu,{id: "filetype", css: "menu_content _inline", texts:UI_FileNames, values: UI_FileNames});
+		root.console.addSpace(divMenu,1);
 
-		root.uiExport = root.console.addButton(divMenu, {css: "menu_content _block buttonLoad menu_button", value: "Change Cube Layout", callBack: root.onChangeCubeLayout});
+		root.uiFileNameLabel = root.console.addLabel(divMenu,"menu_content _inline", "filename", "File Name" );
+		root.uiFileName = root.console.addText(divMenu, {id: "filename",css: "menu_content _inline", value: "x", callBack: root.onFileName});
 		root.console.addSpace(divMenu,1);
 
 		
-		root.uiFlipU = root.console.addCheckBox(divMenu, {id: "flip", css: "menu_content _inline", checked: false, callBack: function(){console.log("chk");}});
-		root.uiFlipULabel = root.console.addLabel(divMenu,"menu_content _inline", "flip", "Mirror" );
-		root.console.addSpace(divMenu,2);
-		
-		root.uiRotateULabel = root.console.addLabel(divMenu,"menu_content _inline", "rotate_u", "Rotate U" );
-		root.uiRotateU = root.console.addRange(divMenu, {id: "rotate_u",css: "menu_content _inline", value: 0, min:-180, max:180, callBack: root.onRotateU});
-		root.console.addSpace(divMenu,1);
-
-		root.uiRotateVLabel = root.console.addLabel(divMenu,"menu_content", "rotate_v", "Rotate V" );
-		root.uiRotateV = root.console.addRange(divMenu, {id: "rotate_v",css: "menu_content _inline", value: 0, min:-180, max:180, callBack: root.onRotateV});
-		root.console.addSpace(divMenu,2);
+		//root.uiExposureLabel = root.console.addLabel(divMenu,"menu_content", "exposure", "Exposure" );
+		//root.uiExposure = root.console.addRange(divMenu, {id: "exposure",css: "menu_content _inline", value: 0, min:-16, max:16, callBack: function(){console.log(root.uiExposure.value);}});
 
 		
-		root.uiShowFace = root.console.addCheckBox(divMenu, {id: "showface", css: "menu_content _inline", checked: false, callBack: function(){console.log("chk");}});
-		root.uiShowFaceLabel = root.console.addLabel(divMenu,"menu_content _inline", "showface", "Show Face" );
-		root.console.addSpace(divMenu,1);
-
-		root.uiExposureLabel = root.console.addLabel(divMenu,"menu_content", "exposure", "Exposure" );
-		root.uiExposure = root.console.addRange(divMenu, {id: "exposure",css: "menu_content _inline", value: 0, min:-16, max:16, callBack: function(){console.log(root.uiExposure.value);}});
-
-		
-		root.uiExport = root.console.addButton(setupBlock("_buttom"), {css: "menu_content _block button buttonLoad menu_button", value: "Export", callBack: root.onExport});
+		root.uiExport = root.console.addButton(setupBlock("_buttom"), {css: "menu_content _block button buttonLoad menu_button", value: "Save", callBack: root.onExport});
 
 	}
 
 	//Over writeable callback functions
-	this.onBackToInput;
+	this.onBackToSelection;
 	this.onChangeCubeLayout;
 	this.onExport;
 
-	this.onRotateU;
-	this.onRotateV;
-
-	this.getRotationU = function(){
+	this.onFileName = function(){
 		return root.uiRotateU.value;
-	};
-	this.getRotationV = function(){
-		return root.uiRotateV.value;
 	};
 
 
@@ -192,6 +179,7 @@ SCFL_OutReviewHUD = function ( width, height, imgFile, renderer ) {
 
 		setupMenuTab();
 		setupMenu();
+		openMenu();
 
 		//if(divModal === undefined){
 		//	loadjscssfile("js/skycube/CSS/SC_InputPanoramaFormatModal.css","css");
@@ -200,6 +188,8 @@ SCFL_OutReviewHUD = function ( width, height, imgFile, renderer ) {
 		//checkFormatType();
 		//setupFormatWindow();
 		//shown();
+
+		this.enabled = true;
 
 	}
 
@@ -230,18 +220,3 @@ SCFL_OutReviewHUD = function ( width, height, imgFile, renderer ) {
 
 };
 
-/*animation
-function move() {
-  var elem = document.getElementById("myBar");   
-  var width = 1;
-  var id = setInterval(frame, 10);
-  function frame() {
-    if (width >= 100) {
-      clearInterval(id);
-    } else {
-      width++; 
-      elem.style.width = width + '%'; 
-    }
-  }
-}
-*/

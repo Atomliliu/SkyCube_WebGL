@@ -121,7 +121,7 @@ THREE.SC_CubeViewport = function ( texCube, width, height, fov, renderer ) {
 		skyBox.matrix.copy(root.intiSkyBoxMatrix);
 		root.deltaSkyBoxMatrix = new THREE.Matrix4().makeRotationAxis( new THREE.Vector3( 1, 0, 0 ), root.deltaSkyBox.x*Math.PI / 180 );
 		root.deltaSkyBoxMatrix.multiplyMatrices(root.deltaSkyBoxMatrix, new THREE.Matrix4().makeRotationAxis( new THREE.Vector3( 0, 1, 0 ), root.deltaSkyBox.y*Math.PI / 180 ));
-		console.log(root.deltaSkyBoxMatrix);
+		//console.log(root.deltaSkyBoxMatrix);
 		skyBox.applyMatrix(root.deltaSkyBoxMatrix);
 		root.curSkyBoxMatrix.copy(skyBox.matrix);
 	};
@@ -150,12 +150,12 @@ THREE.SC_CubeViewport = function ( texCube, width, height, fov, renderer ) {
 		root.controls.enabled = true;
 	}
 
-	function asBackground(){
+	function asBackground(rate){
 
 		for ( var i = 0; i < root.materialsCube.length; i ++ ) {
 			if(root.materialsCube[i] != undefined && root.materialsCube[i].isMaterial){
 				root.materialsCube[i].transparent = true;
-				root.materialsCube[i].opacity = 0.5;
+				root.materialsCube[i].opacity = rate;
 			}
 			
 		}

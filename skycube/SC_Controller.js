@@ -137,6 +137,10 @@ THREE.SC_Controller = function ( dom, css, width, height ) {
 		if(parentDom==undefined) parentDom = dom;
     	parentDom.appendChild(lb);
 
+    	if(callBack){
+	    	lb.onchange = callBack;
+	    }
+
 		root.controllers.push(lb);
 		return lb;
 	}

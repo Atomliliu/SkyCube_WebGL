@@ -19,6 +19,8 @@ function SC_CubeCamera( near, far, cubeResolution ) {
 
 	var fov = 90, aspect = 1;
 
+	//this.cameraCube = [];
+
 	var cameraPX = new PerspectiveCamera( fov, aspect, near, far );
 	cameraPX.up.set( 0, - 1, 0 );
 	cameraPX.lookAt( new Vector3( 1, 0, 0 ) );
@@ -49,6 +51,7 @@ function SC_CubeCamera( near, far, cubeResolution ) {
 	cameraNZ.lookAt( new Vector3( 0, 0, - 1 ) );
 	this.add( cameraNZ );
 
+	this.cameraCube = [cameraPX,cameraNX,cameraPY,cameraNY,cameraPZ,cameraNZ];
 	var options = { format: RGBFormat, magFilter: LinearFilter, minFilter: LinearFilter };
 
 	this.renderTarget = new WebGLRenderTargetCube( cubeResolution, cubeResolution, options );
@@ -83,13 +86,28 @@ function SC_CubeCamera( near, far, cubeResolution ) {
 		renderer.render( scene, cameraPZ, renderTarget );
 
 		//renderTarget.texture.generateMipmaps = generateMipmaps;
-
 		renderTarget.activeCubeFace = 5;
 		renderer.clearTarget (renderTarget, true, true, true);
 		renderer.render( scene, cameraNZ, renderTarget );
 
 		renderer.setRenderTarget( null );
+	};
 
+	this.updateCubeMapByFrame = function ( renderer, scene, frameCount ) {
+
+		if ( this.parent === null ) this.updateMatrixWorld();
+
+		var renderTarget = this.renderTarget;
+		//var generateMipmaps = renderTarget.texture.generateMipmaps;
+
+		renderTarget.texture.generateMipmaps = false;
+
+		var faceToRender = frameCount%6;
+		renderTarget.activeCubeFace = faceToRender;
+		renderer.clearTarget (renderTarget, true, true, true);
+		renderer.render( scene, root.cameraCube[faceToRender], renderTarget );
+
+		renderer.setRenderTarget( null );
 	};
 
 }

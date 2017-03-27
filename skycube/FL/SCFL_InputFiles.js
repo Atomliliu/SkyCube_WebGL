@@ -82,7 +82,7 @@ SCFL_InputFiles = function ( idName, typeName ) {
 		label.appendChild(span);
 		divInput.appendChild(label);
 
-		document.body.appendChild(divInput);
+		//document.body.appendChild(divInput);
 
 		label.addEventListener('change', onFileSelect, false );
 	}

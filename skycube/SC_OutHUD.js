@@ -1,5 +1,7 @@
 
-
+//Preview mode (inside review mode)
+//Review mode
+//Default outHUD mode
 
 
 THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
@@ -10,6 +12,9 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 	this.domElement = ( domElement !== undefined ) ? domElement : document;
 	this.enabled = false;
 	this.reviewMode = false;
+	this.previewMode = false;
+
+	this.cubeMap = cubeMap;
 
 	var root = this; // for Events Func
 
@@ -98,6 +103,9 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 	var UI_IconPos = [];
 	var UI_IconPlane = [];
 
+	var previewPlane;
+	var previewIndex;
+
 	var reviewPlane;
 	var planeDis = 10;
 
@@ -132,6 +140,22 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 	var outShaderName = "";
 	var INTERSECTED;
 	//var div;
+	var enabledController = false;
+
+	var zoomSpeed = 1.0;
+	var minZoom = 1.0;
+	var maxZoom = 4.0;
+	var curZoom = 1.0;
+	var exportSelected = false;
+
+
+	// Create the camera and set the viewport to match the screen dimensions.
+	root.cameraHUD = new THREE.OrthographicCamera(-UI_width/2, UI_width/2, UI_height/2, -UI_height/2, 0, UI_height/2 );//?
+
+	//activate();
+	this.activate = activate;
+	this.deactivate = deactivate;
+	this.dispose = dispose;
 
 	//function getSelOutShaderName(){
 	//	return outShaderName;
@@ -148,60 +172,22 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 				outSize.y = UI_IconsSizeY[index];
 				outSize.z = Out_SizeScale[index];
 			}
-			
 		}
 		return outSize;
 	}
-
 	this.hidenHUD;
 	this.shownHUD;
 
-	function previewBackToHUD(){
-		domElement.removeEventListener( 'wheel', onDocumentMouseWheel, false );
-		domElement.style.cursor = 'auto';
-		root.reviewMode = false;
-		if(root.shownHUD) root.shownHUD();
-	}
-
-	function HUDToReview() {
-		
-		initReview();
-		domElement.addEventListener( 'wheel', onDocumentMouseWheel, false );
-		domElement.style.cursor = 'pointer';
-		root.reviewMode=true;
-		if(root.hidenHUD) root.hidenHUD();
-	}
 
 
-	function activate() {
-
-		domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
-		domElement.addEventListener( 'mousedown', onDocumentMouseDown, false );
-		domElement.addEventListener( 'mouseup', onDocumentMouseUp, false );
-		root.enabled = true;
-
-	}
-
-	function deactivate() {
-
-		domElement.removeEventListener( 'mousemove', onDocumentMouseMove, false );
-		domElement.removeEventListener( 'mousedown', onDocumentMouseDown, false );
-		domElement.removeEventListener( 'mouseup', onDocumentMouseUp, false );
-		root.enabled = false;
-
-	}
-
-	function dispose() {
-
-		deactivate();
-
-	}
+	
 
 	
 	
 	// Create also a custom scene for HUD.
 	this.sceneHUD = new THREE.Scene();
 	this.sceneReview = new THREE.Scene();
+	//this.scenePreview = new THREE.Scene();
 
 	//Init
 	//Need update size first
@@ -230,18 +216,23 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 
 		//boxUIMesh = new Mesh( boxUIGeo, new MultiMaterial( boxUIMats ) );
 		UI_IconPlane[index] = new THREE.Mesh( boxUIGeo, UI_Materials[index]);
+
 		UI_IconPlane[index].rotation.x = 0.5;
 		UI_IconPlane[index].rotation.y = 0.707106; // cos 45
 		//Better use push replace [index]
 
 	}
+
+	this.onCubeUpdated = function(index){
+		UI_Materials[index].uniforms.tCube.value.needsUpdate = true;
+	};
 	
 	function initHUD(){
 		for ( var i = 0; i < UI_ShaderNames.length; i ++ ) {
 			if(UI_ShaderNames[i] == "ENV2CUBEFACE_HUD"){
 				UI_Shaders[i] = THREE.ShaderLib[ UI_ShaderNames[i] ];
 				setupBoxUI(i);
-				
+				//console.log("box");
 				//this.sceneHUD.add( UI_IconPlane[i] );
 
 			}
@@ -274,18 +265,80 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 			
 		}
 
+		
+
+	}
+
+	function updateReviewSize(ratioX,ratioY){
+		var pSize = (UI_width>=UI_height)?UI_height:UI_width;
+		return new THREE.Vector2(pSize*ratioX, pSize*ratioY);
 	}
 
 
+	//Preview in Cube viewport
+	function initPreview(index,offsetX,offsetY){
+		//2,5,6
+		if(index == 0) return;
+
+		var shaderIndexList = [0,1,2,5];//? move to CubeViewportHUD
+		var indexShader = shaderIndexList[index];
+		root.previewIndex = indexShader;
+
+		var pre_Shaders = THREE.ShaderLib[ UI_ShaderNames[indexShader] ];
+		var pre_uniforms = THREE.UniformsUtils.clone( pre_Shaders.uniforms );
+		pre_uniforms.tCube.value = root.cubeMap;
+
+		UI_Materials[0] = new THREE.ShaderMaterial({uniforms: pre_uniforms,
+					vertexShader: pre_Shaders.vertexShader,
+					fragmentShader: pre_Shaders.fragmentShader});
+
+		UI_Materials[0].transparent = true;
+		UI_Materials[0].opacity = 0.0;
+		UI_Materials[0].name = Out_ShaderNames[index]; //output shader name
+
+		//var pSize = (UI_width>=UI_height)?UI_height:UI_width;
+		var size = updateReviewSize(UI_IconsSizeX[indexShader],UI_IconsSizeY[indexShader]);
+		previewPlane = new THREE.Mesh( new THREE.PlaneGeometry(1.0,1.0), UI_Materials[0] );
+		previewPlane.scale.copy(new THREE.Vector3(size.x,size.y,1.0));
+		//var maxSize = (UI_width>=UI_height)?UI_width:UI_height;
+
+		previewPlane.position.z = -planeDis;
+		if(offsetX) previewPlane.position.x += offsetX;
+		if(offsetY) previewPlane.position.y += offsetY;
+
+		root.sceneReview.add( previewPlane );
+		enabledController = false;
+
+
+	}
+
+	this.initPreview = initPreview;
+
+	this.PreviewOn = function(index,offsetX,offsetY){
+		initPreview(index,offsetX,offsetY);
+		root.enabled = true;
+		root.reviewMode = true;
+		root.previewMode = true;
+	};
+
+	this.PreviewOff = function(){
+		root.sceneReview.remove( previewPlane );
+		root.enabled = false;
+		root.reviewMode = false;
+		root.previewMode = true;
+	};
+
+	//Review before export
 	function initReview(){
 		if(!selected) {root.reviewMode=false; console.log("null"); return;}
 		var index = Out_ShaderNames.indexOf(outShaderName);//findIndex(getSelOutShaderName); //selected.material.name
-		var pSize = (UI_width>=UI_height)?UI_height:UI_width;
+		//var pSize = (UI_width>=UI_height)?UI_height:UI_width;
 		if(selected.material.type == "MultiMaterial"){
-
+			//? 6 pieces
 		}
 		else{
-			reviewPlane = new THREE.Mesh( new THREE.PlaneGeometry( pSize*UI_IconsSizeX[index], pSize*UI_IconsSizeY[index] ), selected.material );
+			var size = updateReviewSize(UI_IconsSizeX[indexShader],UI_IconsSizeY[indexShader]);
+			reviewPlane = new THREE.Mesh( new THREE.PlaneGeometry( size.x,size.y ), selected.material );
 			var maxSize = (UI_width>=UI_height)?UI_width:UI_height;
 			//reviewPlane.position.x -= (maxSize - pSize)/2.0;
 			reviewPlane.position.z = -planeDis;
@@ -294,20 +347,11 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 		} 
 	}
 	
+	
+	
+	
 
 	
-	initHUD();
-	
-	updateHUDSize();
-	updateIconPlaneSize();
-
-	// Create the camera and set the viewport to match the screen dimensions.
-	this.cameraHUD = new THREE.OrthographicCamera(-UI_width/2, UI_width/2, UI_height/2, -UI_height/2, 0, iconSize+50 );//?
-
-	activate();
-	this.activate = activate;
-	this.deactivate = deactivate;
-	this.dispose = dispose;
 
 
 
@@ -385,22 +429,36 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 	}
 
 	//Update HUD rendering
-	this.updateHUD = function ( width, height ) {
+	this.onResize = function ( width, height ) {
 
 		if ( root.cameraHUD.parent === null ) root.cameraHUD.updateMatrixWorld();
 
+
+
 		if ((UI_width != width) || (UI_height != height)){
+
 			UI_width = Math.abs(width);
 			UI_height = Math.abs(height);
+			root.cameraHUD.left = -UI_width/2;
+			root.cameraHUD.right = UI_width/2;
+			root.cameraHUD.top = UI_height/2;
+			root.cameraHUD.bottom  = -UI_height/2;
+
+			if(root.previewMode){
+				//root.cameraHUD.far = planeDis*2;
+				var size = updateReviewSize(UI_IconsSizeX[root.previewIndex],UI_IconsSizeY[root.previewIndex]);
+				previewPlane.scale.copy(new THREE.Vector3(size.x,size.y,1.0));
+
+				root.cameraHUD.updateProjectionMatrix ();
+				//console.log(size);
+				return;
+			}
 
 			updateHUDSize();
 			updateIconPlaneSize();
 
 			//-UI_width/2, UI_width/2, UI_height/2, -UI_height/2, 0, 100
-			root.cameraHUD.left = -UI_width/2;
-			root.cameraHUD.right = UI_width/2;
-			root.cameraHUD.top = UI_height/2;
-			root.cameraHUD.bottom  = -UI_height/2;
+			
 			root.cameraHUD.far = iconSize*2;
 			root.cameraHUD.updateProjectionMatrix ();
 		}
@@ -456,6 +514,7 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 
 
 	function onDocumentMouseMove( event ) {
+		if(!enabledController) return;
 		event.preventDefault();
 		//?innerWidth to element.clientWidth
 		mouse.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
@@ -531,9 +590,9 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 
 	}
 
-	var exportSelected = false;
 
 	function onDocumentMouseDown( event ) {
+		if(!enabledController) return;
 		event.preventDefault();
 
 		if(root.reviewMode){
@@ -565,11 +624,11 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 	//console.log( 'handleMouseMovePan' );
 
 	this.onReviewMode;
-	this.previewBackToHUD = previewBackToHUD;
+	this.ReviewBackToHUD = ReviewBackToHUD;
 
 
 	function onDocumentMouseUp( event ) {
-
+		if(!enabledController) return;
 		event.preventDefault();
 
 		if(root.reviewMode){
@@ -588,10 +647,7 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 		}
 	}
 
-	var zoomSpeed = 1.0;
-	var minZoom = 1.0;
-	var maxZoom = 4.0;
-	var curZoom = 1.0;
+	
 	function getZoomScale() {
 		return Math.pow( 0.95, zoomSpeed );
 	}
@@ -601,6 +657,7 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 	}
 
 	function onDocumentMouseWheel( event ){
+		if(!enabledController) return;
 		event.preventDefault();
 		event.stopPropagation();
 		curZoom = reviewPlane.scale.x;
@@ -653,8 +710,16 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 
 	}
 
-	var scc = new THREE.SC_Common();
-	scc.loadjscssfile("js/skycube/CSS/SC_ExportPage.css","css");
+	//var scc = new THREE.SC_Common();
+	//scc.loadjscssfile("js/skycube/CSS/SC_ExportPage.css","css");
+
+
+	this.setupHUD = function(){
+		initHUD();
+		updateHUDSize();
+		updateIconPlaneSize();
+		root.cameraHUD.far = iconSize*2;
+	};
 
 	function hudSnackbarExport(){
 		var div = document.createElement("div");
@@ -663,6 +728,55 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
     	div.className = "show";
     	document.body.appendChild(div);
     	setTimeout(function(){ div.className = div.className.replace("show", ""); }, 3000);
+	}
+
+
+
+	function ReviewBackToHUD(){
+		root.sceneReview.remove( reviewPlane );
+		domElement.removeEventListener( 'wheel', onDocumentMouseWheel, false );
+		domElement.style.cursor = 'auto';
+		root.reviewMode = false;
+		if(root.shownHUD) root.shownHUD();
+		//enabledController = true;
+	}
+
+	function HUDToReview() {
+		
+		initReview();
+		//renderer.clear(true,true,true);
+		domElement.addEventListener( 'wheel', onDocumentMouseWheel, false );
+		domElement.style.cursor = 'pointer';
+		root.reviewMode=true;
+		if(root.hidenHUD) root.hidenHUD();
+		//enabledController = true;
+	}
+
+
+	function activate() {
+
+
+		domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
+		domElement.addEventListener( 'mousedown', onDocumentMouseDown, false );
+		domElement.addEventListener( 'mouseup', onDocumentMouseUp, false );
+		root.enabled = true;
+		enabledController = true;
+
+	}
+
+	function deactivate() {
+
+		domElement.removeEventListener( 'mousemove', onDocumentMouseMove, false );
+		domElement.removeEventListener( 'mousedown', onDocumentMouseDown, false );
+		domElement.removeEventListener( 'mouseup', onDocumentMouseUp, false );
+		root.enabled = false;
+		enabledController = false;
+	}
+
+	function dispose() {
+
+		deactivate();
+
 	}
 
 
