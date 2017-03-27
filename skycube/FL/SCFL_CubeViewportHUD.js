@@ -103,18 +103,17 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 
 		//Menu
 		root.console = new THREE.SC_Controller(divMenu, "menu_console");
-		divControllers = setupBlock("menu_controller");
-
+		
 		//root.uiCubeFormat = root.console.addList(divControllers,{id: "flip", "menu_content _inline"})
 		//root.console.addSpace(divControllers,2);
 
-		root.uiExport = root.console.addButton(divControllers, {css: "menu_content _block buttonLoad menu_button", value: "Change Cube Layout", callBack: root.onChangeCubeLayout});
-		root.console.addSpace(divControllers,1);
+		root.uiExport = root.console.addButton(divMenu, {css: "menu_content _block buttonLoad menu_button", value: "Change Cube Layout", callBack: root.onChangeCubeLayout});
+		//root.console.addSpace(divMenu,1);
 
-		root.uiPreviewMode = root.console.addList(divControllers,{id: "preview_mode", css: "menu_content _inline", texts:UI_PreviewMode, values: UI_PreviewMode, callBack: root.updatePreviewMode});
-		root.console.addSpace(divControllers,1);
+		root.uiPreviewMode = root.console.addList(divMenu,{id: "preview_mode", css: "menu_content _inline", texts:UI_PreviewMode, values: UI_PreviewMode, callBack: root.updatePreviewMode});
+		//root.console.addSpace(divMenu,1);
 
-		
+		divControllers = setupBlock("menu_controller");
 		root.uiFlipU = root.console.addCheckBox(divControllers, {id: "flip", css: "menu_content _inline", checked: false, callBack: function(){console.log("chk");}});
 		root.uiFlipULabel = root.console.addLabel(divControllers,"menu_content _inline", "flip", "Mirror" );
 		root.console.addSpace(divControllers,2);
@@ -190,7 +189,7 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 		backicon.style.opacity = opa;
 	}
 
-	var diffSpace = 300;
+	var diffSpace = 400;
 
 	function openMenu(){
 		//;
