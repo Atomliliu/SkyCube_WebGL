@@ -155,11 +155,17 @@
 				else{
 					previewCube.PreviewOff();
 					previewCube.dispose();
+					cubeView.enableControls();
+					//renderer.clear();
 				}
 				
 			};
 
 			cubeMenu.onExport = function(){
+				if(previewCube!=undefined && previewCube.enabled){
+					previewCube.PreviewHiden();
+				}
+					
 				CM=panaorama.updateCube(cubeView.deltaSkyBoxMatrix);
 				//CM = cubeMap;
 				outHUD = new THREE.SC_OutHUD(CM, Width, Height, renderer.domElement);
@@ -183,6 +189,9 @@
 				var outHUDClose = new SCFL_HUDClose();
 				outHUDClose.onClick = function(){
 					outHUD.deactivate();
+					if (cubeMenu.previewMode && previewCube != undefined){
+						previewCube.PreviewShown();
+					}
 					cubeView.enableControls();
 					cubeView.asNormal();
 					cubeMenu.shown();
