@@ -162,10 +162,33 @@ input[type=range] {
     vertical-align: middle;
 }
 
+._topall{
+    z-index: 0;
+}
 
+
+._leftbottom{
+    position: fixed;
+    float: left;
+    bottom: 0;
+    left: 0;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+._lefttop {
+    float: right;
+    position: fixed;
+    top: 0;
+    left: 0;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
 
 
 /*Viewport & HUD*/
+
+
 
 #chkLabel{
     transform: translateY(-10px);
@@ -240,6 +263,9 @@ input[type=range] {
     height: 300px;
     overflow-x: hidden;
     overflow-y: auto;
+    top: 0;
+    margin-top: 0;
+
 }
 
 .menu_widthSS{
