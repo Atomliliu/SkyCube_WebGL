@@ -97,11 +97,11 @@ SCFL_OutReviewHUD = function ( width, height, imgFile, renderer ) {
 		root.console = new THREE.SC_Controller(divMenu, "menu_console");
 
 
-		root.uiFileFormat = root.console.addList(divMenu,{id: "filetype", css: "menu_content _inline", texts:UI_FileNames, values: UI_FileNames});
+		root.uiFileFormat = root.console.addList(divMenu,{id: "filetype", css: "menu_content _inline menu_list", texts:UI_FileNames, values: UI_FileNames});
 		root.console.addSpace(divMenu,1);
 
-		root.uiFileNameLabel = root.console.addLabel(divMenu,"menu_content _inline", "filename", "File Name" );
-		root.uiFileName = root.console.addText(divMenu, {id: "filename",css: "menu_content _inline", value: "x", callBack: root.onFileName});
+		root.uiFileNameLabel = root.console.addLabel(divMenu,"menu_content _inline _fontSS", "filename", "File Name" );
+		root.uiFileName = root.console.addText(divMenu, {id: "filename",css: "menu_content _inline menu_text menu_widthL", value: "x", callBack: root.onFileName});
 		root.console.addSpace(divMenu,1);
 
 		
@@ -109,7 +109,7 @@ SCFL_OutReviewHUD = function ( width, height, imgFile, renderer ) {
 		//root.uiExposure = root.console.addRange(divMenu, {id: "exposure",css: "menu_content _inline", value: 0, min:-16, max:16, callBack: function(){console.log(root.uiExposure.value);}});
 
 		
-		root.uiExport = root.console.addButton(setupBlock("_buttom"), {css: "menu_content _block button buttonLoad menu_button", value: "Save", callBack: root.onExport});
+		root.uiExport = root.console.addButton(setupBlock("_buttom"), {css: "menu_content _block button buttonLoad menu_button _fontM", value: "Save", callBack: root.onExport});
 
 	}
 

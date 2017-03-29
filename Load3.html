@@ -22,6 +22,7 @@
 <script src="js/skycube/SC_OutputImg.js"></script>
 <script src="js/skycube/SC_OutHUD.js"></script>
 <script src="js/skycube/SC_Controller.js"></script>
+<script src="js/skycube/SC_ViewportHelper.js"></script>
 
 
 <script src="js/skycube/FL/SCFL_CubeViewportHUD.js"></script>
@@ -85,6 +86,7 @@
 	var CM;
 	var cubeView;
 	var renderLoop;
+	var helper;
 
 	var loadStatus = false;
 
@@ -140,6 +142,11 @@
 			dropZone.deactivate();
 			cubeView = new THREE.SC_CubeViewport(cubeRTTs, Width, Height, 75, renderer);
 			cubeView.activate();
+			helper = new THREE.SC_ViewportHelper(renderer,cubeView.scene,cubeView.camera);
+			//helper.add3DGridSurface(100,10);
+			//helper.add3DGridPolarSurface(50,16,8,64,0x888888,0xffffff);
+			//helper.add3DAxis(50);
+			//helper.add3DBox(700,700,700,0xffffff);
 
 			animate();
 

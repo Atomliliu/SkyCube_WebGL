@@ -343,7 +343,7 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 	//Review before export
 	function initReview(){
 		if(!selected) {root.reviewMode=false; console.log("null"); return;}
-		var index = Out_ShaderNames.indexOf(outShaderName);//findIndex(getSelOutShaderName); //selected.material.name
+		var indexShader = Out_ShaderNames.indexOf(outShaderName);//findIndex(getSelOutShaderName); //selected.material.name
 		//var pSize = (UI_width>=UI_height)?UI_height:UI_width;
 		if(selected.material.type == "MultiMaterial"){
 			//? 6 pieces

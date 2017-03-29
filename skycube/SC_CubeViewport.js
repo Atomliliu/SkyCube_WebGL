@@ -129,6 +129,7 @@ THREE.SC_CubeViewport = function ( texCube, width, height, fov, renderer ) {
 	function activate(){
 		root.enabled = true;
 		root.controls = new THREE.OrbitControls( root.camera, renderer.domElement );
+		root.controls.enablePan = false;
 	}
 
 	function deactivate(){

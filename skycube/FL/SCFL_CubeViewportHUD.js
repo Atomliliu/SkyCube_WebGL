@@ -13,6 +13,9 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 	this.uiExport;
 	this.uiRotateU;
 	this.uiRotateV;
+	this.uiRotateUNum;
+	this.uiRotateVNum;
+
 	this.menuWidth = menuWidth;
 
 	this.previewMode = false;
@@ -86,11 +89,13 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 		
 	}
 
-	function setupBlock(css){
+	function setupBlock(css,parent){
 		var divBlock = document.createElement("div");
 		
 		if(css) divBlock.setAttribute("class", css);
-		divMenu.appendChild(divBlock);
+
+		if(parent) parent.appendChild(divBlock);
+		else divMenu.appendChild(divBlock);
 		return divBlock;
 	}
 
@@ -103,41 +108,44 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 
 		//Menu
 		root.console = new THREE.SC_Controller(divMenu, "menu_console");
-		
-		//root.uiCubeFormat = root.console.addList(divControllers,{id: "flip", "menu_content _inline"})
-		//root.console.addSpace(divControllers,2);
+	
 
-		root.uiExport = root.console.addButton(divMenu, {css: "menu_content _block buttonLoad menu_button", value: "Change Cube Layout", callBack: root.onChangeCubeLayout});
-		//root.console.addSpace(divMenu,1);
+		root.uiCubeFormat = root.console.addButton(divMenu, {css: "menu_content _block buttonLoad menu_button", value: "Change Cube Layout", callBack: root.updateCubeLayout});
+		root.console.addSpace(divMenu,1);
 
-		root.uiPreviewMode = root.console.addList(divMenu,{id: "preview_mode", css: "menu_content _inline", texts:UI_PreviewMode, values: UI_PreviewMode, callBack: root.updatePreviewMode});
-		//root.console.addSpace(divMenu,1);
+		root.uiPreviewMode = root.console.addList(divMenu,{id: "preview_mode", css: "menu_content _inline menu_list", texts:UI_PreviewMode, values: UI_PreviewMode, callBack: root.updatePreviewMode});
+		root.console.addSpace(divMenu,2);
 
 		divControllers = setupBlock("menu_controller");
+
 		root.uiFlipU = root.console.addCheckBox(divControllers, {id: "flip", css: "menu_content _inline", checked: false, callBack: function(){console.log("chk");}});
-		root.uiFlipULabel = root.console.addLabel(divControllers,"menu_content _inline", "flip", "Mirror" );
-		root.console.addSpace(divControllers,2);
+		root.uiFlipULabel = root.console.addLabel(divControllers,"menu_content _inline _fontSS", "flip", "Mirror","chkLabel" );
+		root.console.addSpace(divControllers,1);
 		
-		root.uiRotateULabel = root.console.addLabel(divControllers,"menu_content _inline", "rotate_u", "Rotate U" );
-		root.uiRotateU = root.console.addRange(divControllers, {id: "rotate_u",css: "menu_content _inline", value: 0, min:-180, max:180, callBack: root.onRotateU});
+		root.uiRotateULabel = root.console.addLabel(divControllers,"menu_content _inlineblock _fontSS", "rotate_u", "Rotate Yaw:" );
+
+		root.uiRotateU = root.console.addRange(divControllers, {id: "rotate_u",css: "menu_subcontent _inline menu_widthM", value: 0, min:-180, max:180, callBack: root.updateRotateU});
+		root.uiRotateUNum = root.console.addNumber(divControllers, {id: "rotate_u_num",css: "menu_postfixcontent _inline menu_text menu_widthSS", value: 0, min:-180, max:180, callBack: root.updateRotateUNum});
 		root.console.addSpace(divControllers,1);
 
-		root.uiRotateVLabel = root.console.addLabel(divControllers,"menu_content", "rotate_v", "Rotate V" );
-		root.uiRotateV = root.console.addRange(divControllers, {id: "rotate_v",css: "menu_content _inline", value: 0, min:-180, max:180, callBack: root.onRotateV});
-		root.console.addSpace(divControllers,2);
+		
+		root.uiRotateVLabel = root.console.addLabel(divControllers,"menu_content _inlineblock _fontSS", "rotate_v", "Rotate Pitch:" );
+		root.uiRotateV = root.console.addRange(divControllers, {id: "rotate_v",css: "menu_subcontent _inline menu_widthM", value: 0, min:-180, max:180, callBack: root.updateRotateV});
+		root.uiRotateVNum = root.console.addNumber(divControllers, {id: "rotate_v_num",css: "menu_postfixcontent _inlineblock menu_text menu_widthSS", value: 0, min:-180, max:180, callBack: root.updateRotateVNum});
+		root.console.addSpace(divControllers,1);
 
 		
 		root.uiShowFace = root.console.addCheckBox(divControllers, {id: "showface", css: "menu_content _inline", checked: false, callBack: function(){console.log("chk");}});
-		root.uiShowFaceLabel = root.console.addLabel(divControllers,"menu_content _inline", "showface", "Show Face" );
+		root.uiShowFaceLabel = root.console.addLabel(divControllers,"menu_content _inline _fontSS", "showface", "Show Face","chkLabel" );
 		root.console.addSpace(divControllers,1);
 
-		root.uiExposureLabel = root.console.addLabel(divControllers,"menu_content", "exposure", "Exposure" );
+		root.uiExposureLabel = root.console.addLabel(divControllers,"menu_content _fontSS", "exposure", "Exposure:" );
 		root.uiExposure = root.console.addRange(divControllers, {id: "exposure",css: "menu_content _inline", value: 0, min:-16, max:16, callBack: function(){console.log(root.uiExposure.value);}});
 		
 
 		root.console.addSpace(divMenu,2);
 		
-		root.uiExport = root.console.addButton(setupBlock(), {css: "menu_content _block button buttonLoad menu_button", value: "Export", callBack: root.onExport});
+		root.uiExport = root.console.addButton(setupBlock(), {css: "menu_content _block button buttonLoad menu_button _fontM", value: "Export", callBack: root.onExport});
 
 	}
 
@@ -148,8 +156,17 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 
 	this.onRotateU;
 	this.onRotateV;
+	this.onRotateUNum;
+	this.onRotateVNum;
 
 	this.onPreviewMode;
+
+
+	//Direct callback functions
+	this.updateCubeLayout = function(){
+		if (root.onChangeCubeLayout) root.onChangeCubeLayout();
+	}
+
 	this.getPreviewModeIndex = function(){
 		return root.uiPreviewMode.selectedIndex;
 	};
@@ -163,7 +180,24 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 		//console.log("mode");
 	};
 	
-	
+	this.updateRotateU = function(){
+		root.uiRotateUNum.value = root.uiRotateU.value;
+		if (root.onRotateU) root.onRotateU();
+	}
+	this.updateRotateUNum = function(){
+		root.uiRotateU.value = root.uiRotateUNum.value;
+		//if (root.onRotateUNum) root.onRotateUNum();
+		if (root.onRotateU) root.onRotateU();
+	}
+	this.updateRotateV = function(){
+		root.uiRotateVNum.value = root.uiRotateV.value;
+		if (root.onRotateV) root.onRotateV();
+	}
+	this.updateRotateVNum = function(){
+		root.uiRotateV.value = root.uiRotateVNum.value;
+		//if (root.onRotateVNum) root.onRotateVNum();
+		if (root.onRotateV) root.onRotateV();
+	}
 
 	this.getRotationU = function(){
 		return root.uiRotateU.value;

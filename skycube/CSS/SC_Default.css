@@ -49,6 +49,25 @@ h3{
 	text-align: center;
 }
 
+._fontSS{
+    font-size: 12px;
+}
+
+._fontM{
+    font-size: 16px;
+}
+
+._borderM{
+    /*box-sizing: border-box;*/
+    border: 2px solid white;
+}
+
+._center2{
+    vertical-align: middle
+}
+
+
+
 .container {
     /*min-width: 800px;*/
     /*min-height: 550px;*/
@@ -139,7 +158,19 @@ label.buttonLoad input[type="file"] {
     padding: 5% 0;
 }
 
+input[type=range] {
+    vertical-align: middle;
+}
+
+
+
+
 /*Viewport & HUD*/
+
+#chkLabel{
+    transform: translateY(-10px);
+    margin-left: 8px;
+}
 .menu {
 	display: inline-block;
 	z-index: 0;
@@ -161,17 +192,47 @@ label.buttonLoad input[type="file"] {
 }
 
 .menu_console {
-	padding-top: 200px;
+	padding-top: 100px;
 }
 .menu_content {
-	
-	margin-bottom: 16px;
+	margin-bottom: 0px;
 	margin-left: 32px;
 	color: #fff;
+    
 	visibility: hidden;
 	opacity: 0.0;
 	/*transition-delay: 0.5s;*/
 	transition: 0.5s;
+}
+
+.menu_subcontent {
+    padding: 0 0 0 0;
+    top: 0;
+    bottom: 0;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    margin-left: 32px;
+    color: #fff;
+    /*transform: translateY(-15px);*/
+    visibility: hidden;
+    opacity: 0.0;
+    /*transition-delay: 0.5s;*/
+    transition: 0.5s;
+}
+
+.menu_postfixcontent {
+    padding: 0 0 0 0;
+    top: 0;
+    bottom: 0;
+    margin-top: 0px;
+    margin-bottom: 8px;
+    margin-left: 4px;
+    color: #fff;
+    /*transform: translateY(-15px);*/
+    visibility: hidden;
+    opacity: 0.0;
+    /*transition-delay: 0.5s;*/
+    transition: 0.5s;
 }
 
 .menu_controller {
@@ -179,6 +240,45 @@ label.buttonLoad input[type="file"] {
     height: 300px;
     overflow-x: hidden;
     overflow-y: auto;
+}
+
+.menu_widthSS{
+    width: 40px;
+}
+
+.menu_widthS{
+    width: 70px;
+}
+
+.menu_widthM{
+    width: 125px;
+}
+
+.menu_widthL{
+    width: 185px;
+}
+
+
+
+.menu_list{
+    color: #000;
+    border: none;
+    border-radius: 0px;
+    background-color: #f1f1f1;
+}
+
+.menu_text{
+    color: #000;
+    border: none;
+    border-radius: 0px;
+    background-color: #f1f1f1;
+}
+
+.menu_num{
+    color: #000;
+    border: none;
+    border-radius: 0px;
+    background-color: #f1f1f1;
 }
 
 .menu_button {

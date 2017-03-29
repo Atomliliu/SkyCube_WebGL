@@ -98,13 +98,23 @@ THREE.SC_Controller = function ( dom, css, width, height ) {
 		
 	};
 
-	this.addLabel = function (parentDom, css, bound, text){
+
+	this.addRangNum = function(parentDom, options1,options2){
+		var group = [];
+		group[0] = root.addRange(parentDom, options1);
+		group[1] =root.addNumber(parentDom, options2);
+		return group;
+	}
+
+	this.addLabel = function (parentDom, css, bound, text, id){
 		var lb = document.createElement('label');
+		if(id!=undefined) lb.id = id.toString();
     	if(bound!=undefined && bound!="" && bound!=false) lb.setAttribute('for', bound);
     	setCSS(lb,css);
     	lb.innerHTML = text;
 
     	if(parentDom==undefined) parentDom = dom;
+
     	parentDom.appendChild(lb);
     	root.controllers.push(lb);
     	return lb;
