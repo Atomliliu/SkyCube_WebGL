@@ -7,14 +7,27 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 	var menuWidth = 250;
 
 	this.uiCubeFormat;
-	this.uiFlipULabel;
+	//this.uiFlipULabel;
 	this.uiPreviewMode;
 	this.uiFlipU;
+	this.uiFlipV;
+	this.uiFlipW;
 	this.uiExport;
 	this.uiRotateU;
 	this.uiRotateV;
+	this.uiRotateW;
 	this.uiRotateUNum;
 	this.uiRotateVNum;
+	this.uiRotateWNum;
+
+	this.uiExposure;
+
+	this.uiExposureNum;
+
+
+	this.uiShowFace;
+	this.uiShowGrid;
+	this.uiShowOffset;
 
 	this.menuWidth = menuWidth;
 
@@ -118,34 +131,60 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 
 		divControllers = setupBlock("menu_controller");
 
-		root.uiFlipU = root.console.addCheckBox(divControllers, {id: "flip", css: "menu_content _inline", checked: false, callBack: function(){console.log("chk");}});
-		root.uiFlipULabel = root.console.addLabel(divControllers,"menu_content _inline _fontSS", "flip", "Mirror","chkLabel" );
+		root.console.addLabel(divControllers,"menu_content _block _fontSS", "", "Flip Input Cube:","" );
+
+		root.uiFlipU = root.console.addCheckBox(divControllers, {id: "flipu", css: "menu_subcontent _inline", checked: false, callBack: function(){console.log("chk");}});
+		root.console.addLabel(divControllers,"menu_subcontent _inline _fontSS", "flipu", "X","chkLabel" );
+		root.uiFlipV = root.console.addCheckBox(divControllers, {id: "flipv", css: "menu_subcontent _inline", checked: false, callBack: function(){console.log("chk");}});
+		root.console.addLabel(divControllers,"menu_subcontent _inline _fontSS", "flipv", "Y","chkLabel" );
+		root.uiFlipW = root.console.addCheckBox(divControllers, {id: "flipw", css: "menu_subcontent _inline", checked: false, callBack: function(){console.log("chk");}});
+		root.console.addLabel(divControllers,"menu_subcontent _inline _fontSS", "flipw", "Z","chkLabel" );
 		root.console.addSpace(divControllers,1);
 		
-		root.uiRotateULabel = root.console.addLabel(divControllers,"menu_content _inlineblock _fontSS", "rotate_u", "Rotate Yaw:" );
-
+		root.console.addLabel(divControllers,"menu_content _inlineblock _fontSS", "rotate_u", "Rotate Yaw:" );
 		root.uiRotateU = root.console.addRange(divControllers, {id: "rotate_u",css: "menu_subcontent _inline menu_widthM", value: 0, min:-180, max:180, callBack: root.updateRotateU});
 		root.uiRotateUNum = root.console.addNumber(divControllers, {id: "rotate_u_num",css: "menu_postfixcontent _inline menu_text menu_widthSS", value: 0, min:-180, max:180, callBack: root.updateRotateUNum});
 		root.console.addSpace(divControllers,1);
 
 		
-		root.uiRotateVLabel = root.console.addLabel(divControllers,"menu_content _inlineblock _fontSS", "rotate_v", "Rotate Pitch:" );
+		root.console.addLabel(divControllers,"menu_content _inlineblock _fontSS", "rotate_v", "Rotate Pitch:" );
 		root.uiRotateV = root.console.addRange(divControllers, {id: "rotate_v",css: "menu_subcontent _inline menu_widthM", value: 0, min:-180, max:180, callBack: root.updateRotateV});
 		root.uiRotateVNum = root.console.addNumber(divControllers, {id: "rotate_v_num",css: "menu_postfixcontent _inlineblock menu_text menu_widthSS", value: 0, min:-180, max:180, callBack: root.updateRotateVNum});
 		root.console.addSpace(divControllers,1);
 
-		
-		root.uiShowFace = root.console.addCheckBox(divControllers, {id: "showface", css: "menu_content _inline", checked: false, callBack: function(){console.log("chk");}});
-		root.uiShowFaceLabel = root.console.addLabel(divControllers,"menu_content _inline _fontSS", "showface", "Show Face","chkLabel" );
+
+		root.console.addLabel(divControllers,"menu_content _inlineblock _fontSS", "rotate_w", "Rotate Roll:" );
+		root.uiRotateW = root.console.addRange(divControllers, {id: "rotate_w",css: "menu_subcontent _inline menu_widthM", value: 0, min:-180, max:180, callBack: root.updateRotateW});
+		root.uiRotateWNum = root.console.addNumber(divControllers, {id: "rotate_w_num",css: "menu_postfixcontent _inlineblock menu_text menu_widthSS", value: 0, min:-180, max:180, callBack: root.updateRotateWNum});
 		root.console.addSpace(divControllers,1);
 
-		root.uiExposureLabel = root.console.addLabel(divControllers,"menu_content _fontSS", "exposure", "Exposure:" );
-		root.uiExposure = root.console.addRange(divControllers, {id: "exposure",css: "menu_content _inline", value: 0, min:-16, max:16, callBack: function(){console.log(root.uiExposure.value);}});
+
+		root.console.addLabel(divControllers,"menu_content _fontSS", "exposure", "Exposure:" );
+		root.uiExposure = root.console.addRange(divControllers, {id: "exposure",css: "menu_subcontent _inline menu_widthM", value: 0, min:-16, max:16, callBack: function(){console.log(root.uiExposure.value);}});
+		root.uiExposureNum = root.console.addNumber(divControllers, {id: "exposure_num",css: "menu_postfixcontent _inlineblock menu_text menu_widthSS", value: 0, min:-16, max:16, callBack: root.uiExposureNum});
+		root.console.addSpace(divControllers,1);
+		
+		root.uiShowFace = root.console.addCheckBox(divControllers, {id: "showface", css: "menu_content _inline", checked: false, callBack: function(){console.log("chk");}});
+		root.console.addLabel(divControllers,"menu_subcontent _inline _fontSS", "showface", "Show Face","chkLabel" );
+		root.console.addSpace(divControllers,1);
+
+
+		root.uiShowGrid = root.console.addCheckBox(divControllers, {id: "showgrid", css: "menu_content _inline", checked: false, callBack: function(){console.log("chk");}});
+		root.console.addLabel(divControllers,"menu_subcontent _inline _fontSS", "showgrid", "Show Grid","chkLabel" );
+		root.console.addSpace(divControllers,1);
+
+
+		root.uiShowOffset = root.console.addCheckBox(divControllers, {id: "showoffset", css: "menu_content _inline", checked: false, callBack: function(){console.log("chk");}});
+		root.console.addLabel(divControllers,"menu_subcontent _inline _fontSS", "showoffset", "Show Offset","chkLabel" );
+		root.console.addSpace(divControllers,1);
+
+		
 		
 
 		root.console.addSpace(divMenu,2);
 		
 		root.uiExport = root.console.addButton(setupBlock(), {css: "menu_content _block button buttonLoad menu_button _fontM", value: "Export", callBack: root.onExport});
+		
 
 	}
 
@@ -156,8 +195,10 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 
 	this.onRotateU;
 	this.onRotateV;
+	this.onRotateW;
 	this.onRotateUNum;
 	this.onRotateVNum;
+	this.onRotateWNum;
 
 	this.onPreviewMode;
 
@@ -165,7 +206,7 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 	//Direct callback functions
 	this.updateCubeLayout = function(){
 		if (root.onChangeCubeLayout) root.onChangeCubeLayout();
-	}
+	};
 
 	this.getPreviewModeIndex = function(){
 		return root.uiPreviewMode.selectedIndex;
@@ -183,21 +224,31 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 	this.updateRotateU = function(){
 		root.uiRotateUNum.value = root.uiRotateU.value;
 		if (root.onRotateU) root.onRotateU();
-	}
+	};
 	this.updateRotateUNum = function(){
 		root.uiRotateU.value = root.uiRotateUNum.value;
 		//if (root.onRotateUNum) root.onRotateUNum();
 		if (root.onRotateU) root.onRotateU();
-	}
+	};
 	this.updateRotateV = function(){
 		root.uiRotateVNum.value = root.uiRotateV.value;
 		if (root.onRotateV) root.onRotateV();
-	}
+	};
 	this.updateRotateVNum = function(){
 		root.uiRotateV.value = root.uiRotateVNum.value;
 		//if (root.onRotateVNum) root.onRotateVNum();
 		if (root.onRotateV) root.onRotateV();
-	}
+	};
+	this.updateRotateW = function(){
+		root.uiRotateWNum.value = root.uiRotateW.value;
+		if (root.onRotateW) root.onRotateW();
+	};
+	this.updateRotateWNum = function(){
+		root.uiRotatW.value = root.uiRotateWnum.value;
+		//if (root.onRotateVNum) root.onRotateVNum();
+		if (root.onRotateW) root.onRotateW();
+	};
+
 
 	this.getRotationU = function(){
 		return root.uiRotateU.value;
@@ -205,6 +256,10 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 	this.getRotationV = function(){
 		return root.uiRotateV.value;
 	};
+	this.getRotationW = function(){
+		return root.uiRotateW.value;
+	};
+
 
 
 	var initWidth = "auto";
