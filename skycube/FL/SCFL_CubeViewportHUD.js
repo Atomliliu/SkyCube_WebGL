@@ -135,11 +135,11 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 
 		root.console.addLabel(divControllers,"menu_content _block _fontSS", "", "Flip Input Cube:","" );
 
-		root.uiFlipU = root.console.addCheckBox(divControllers, {id: "flipu", css: "menu_subcontent _inline", checked: false, callBack: function(){console.log("chk");}});
+		root.uiFlipU = root.console.addCheckBox(divControllers, {id: "flipu", css: "menu_subcontent _inline", checked: false, callBack: function(){if(root.onFlipU) root.onFlipU();}});
 		root.console.addLabel(divControllers,"menu_subcontent _inline _fontSS", "flipu", "X","chkLabel" );
-		root.uiFlipV = root.console.addCheckBox(divControllers, {id: "flipv", css: "menu_subcontent _inline", checked: false, callBack: function(){console.log("chk");}});
+		root.uiFlipV = root.console.addCheckBox(divControllers, {id: "flipv", css: "menu_subcontent _inline", checked: false, callBack: function(){if(root.onFlipV) root.onFlipV();}});
 		root.console.addLabel(divControllers,"menu_subcontent _inline _fontSS", "flipv", "Y","chkLabel" );
-		root.uiFlipW = root.console.addCheckBox(divControllers, {id: "flipw", css: "menu_subcontent _inline", checked: false, callBack: function(){console.log("chk");}});
+		root.uiFlipW = root.console.addCheckBox(divControllers, {id: "flipw", css: "menu_subcontent _inline", checked: false, callBack: function(){if(root.onFlipW) root.onFlipW();}});
 		root.console.addLabel(divControllers,"menu_subcontent _inline _fontSS", "flipw", "Z","chkLabel" );
 		root.console.addSpace(divControllers,1);
 		root.console.addBreak(divControllers);
@@ -164,22 +164,22 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 
 
 		root.console.addLabel(divControllers,"menu_content _block _fontSS", "exposure", "Exposure:" );
-		root.uiExposure = root.console.addRange(divControllers, {id: "exposure",css: "menu_subcontent _inline menu_widthM", value: 0, min:-16, max:16, callBack: function(){console.log(root.uiExposure.value);}});
+		root.uiExposure = root.console.addRange(divControllers, {id: "exposure",css: "menu_subcontent _inline menu_widthM", value: 0, min:-16, max:16, callBack: function(){if(root.onShowFace) root.onExposure();}});
 		root.uiExposureNum = root.console.addNumber(divControllers, {id: "exposure_num",css: "menu_postfixcontent _inlineblock menu_text menu_widthSS", value: 0, min:-16, max:16, callBack: root.uiExposureNum});
 		root.console.addSpace(divControllers,1);
 		root.console.addBreak(divControllers);
 		
-		root.uiShowFace = root.console.addCheckBox(divControllers, {id: "showface", css: "menu_content _inline", checked: false, callBack: function(){console.log("chk");}});
+		root.uiShowFace = root.console.addCheckBox(divControllers, {id: "showface", css: "menu_content _inline", checked: false, callBack: function(){if(root.onShowFace) root.onShowFace();}});
 		root.console.addLabel(divControllers,"menu_subcontent _inline _fontSS", "showface", "Show Face","chkLabel" );
 		root.console.addSpace(divControllers,1);
 
 
-		root.uiShowGrid = root.console.addCheckBox(divControllers, {id: "showgrid", css: "menu_content _inline", checked: false, callBack: function(){console.log("chk");}});
+		root.uiShowGrid = root.console.addCheckBox(divControllers, {id: "showgrid", css: "menu_content _inline", checked: false, callBack: function(){if(root.onShowFace) root.onShowGrid();}});
 		root.console.addLabel(divControllers,"menu_subcontent _inline _fontSS", "showgrid", "Show Grid","chkLabel" );
 		root.console.addSpace(divControllers,1);
 
 
-		root.uiShowOffset = root.console.addCheckBox(divControllers, {id: "showoffset", css: "menu_content _inline", checked: false, callBack: function(){console.log("chk");}});
+		root.uiShowOffset = root.console.addCheckBox(divControllers, {id: "showoffset", css: "menu_content _inline", checked: false, callBack: function(){if(root.onShowFace) root.onShowOffset();}});
 		root.console.addLabel(divControllers,"menu_subcontent _inline _fontSS", "showoffset", "Show Offset","chkLabel" );
 		root.console.addSpace(divControllers,1);
 
@@ -197,6 +197,12 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 	this.onBackToInput;
 	this.onChangeCubeLayout;
 	this.onExport;
+	this.onExposure;
+
+	this.onFlipU;
+	this.onFlipV;
+	this.onFlipW;
+
 
 	this.onRotateU;
 	this.onRotateV;
@@ -206,6 +212,10 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 	this.onRotateWNum;
 
 	this.onPreviewMode;
+
+	this.onShowGrid;
+	this.onShowOffset;
+	this.onShowFace;
 
 
 	//Direct callback functions
@@ -263,6 +273,17 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 	};
 	this.getRotationW = function(){
 		return root.uiRotateW.value;
+	};
+
+	this.getShowGrid = function(){
+		return root.uiShowGrid.checked;
+	};
+	this.getShowOffset = function(){
+		return root.uiShowOffset.checked;
+	};
+	this.getShowFace = function(){
+		
+		return root.uiShowFace.checked;
 	};
 
 
