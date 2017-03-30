@@ -167,11 +167,14 @@ input[type=range] {
 }
 
 
+
+
 ._leftbottom{
     position: fixed;
     float: left;
     bottom: 0;
     left: 0;
+
     overflow-x: hidden;
     overflow-y: hidden;
 }
@@ -187,8 +190,27 @@ input[type=range] {
 
 
 /*Viewport & HUD*/
+hr { 
+    display: block;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    margin-left: 4px;
+    margin-right: 4px;
+    border-style: solid;
+    border-width: 1px;
+    background-color:gray;
+    color:gray;
+}
 
-
+.hudinfo{
+    color: gray;
+    opacity: 0.5;
+    font-size: 16px;
+    font-weight: bold;
+    left:16px;
+    margin-bottom: 8px;
+    margin-left: 0;
+}
 
 #chkLabel{
     transform: translateY(-10px);

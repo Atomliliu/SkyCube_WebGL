@@ -92,6 +92,10 @@ SCFL_LoadPanorama = function ( imgFile, renderer ) {
 		modalImg.src=FormatImgURL[root.defIndex];
 	}
 
+	this.getPanoramaType=function(){
+		return FormatNames[root.defIndex];
+	}
+
 
 
 	function setupFormatWindow() {
@@ -202,7 +206,7 @@ SCFL_LoadPanorama = function ( imgFile, renderer ) {
 			RTTSize = THREE.Math.nextPowerOfTwo(RTTSize);
 		}
 
-		console.log(RTTSize);
+		//console.log(RTTSize);
 		
 	}
 
@@ -408,6 +412,10 @@ SCFL_LoadPanorama = function ( imgFile, renderer ) {
 	function dispose() {
 		deactivate();
 	}
+
+	this.getCubeSize = function(){
+		return RTTSize;
+	};
 
 
 	this.updateCube = updateCube;

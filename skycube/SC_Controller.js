@@ -73,6 +73,13 @@ THREE.SC_Controller = function ( dom, css, width, height ) {
 		}
 	};
 
+	this.addBreak = function(parentDom){
+		if(parentDom==undefined) parentDom = dom;
+
+		var lb = document.createElement('hr');
+    	parentDom.appendChild(lb);
+	};
+
 	this.addButton = function (parentDom, options){
 		return addElement(parentDom, "input", 'button', 1, options);
 		

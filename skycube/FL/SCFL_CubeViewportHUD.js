@@ -127,7 +127,9 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 		root.console.addSpace(divMenu,1);
 
 		root.uiPreviewMode = root.console.addList(divMenu,{id: "preview_mode", css: "menu_content _inline menu_list", texts:UI_PreviewMode, values: UI_PreviewMode, callBack: root.updatePreviewMode});
+		
 		root.console.addSpace(divMenu,2);
+		root.console.addBreak(divMenu);
 
 		divControllers = setupBlock("menu_controller");
 
@@ -140,29 +142,32 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 		root.uiFlipW = root.console.addCheckBox(divControllers, {id: "flipw", css: "menu_subcontent _inline", checked: false, callBack: function(){console.log("chk");}});
 		root.console.addLabel(divControllers,"menu_subcontent _inline _fontSS", "flipw", "Z","chkLabel" );
 		root.console.addSpace(divControllers,1);
+		root.console.addBreak(divControllers);
 		
-		root.console.addLabel(divControllers,"menu_content _inlineblock _fontSS", "rotate_u", "Rotate Yaw:" );
+		root.console.addLabel(divControllers,"menu_content _block _fontSS", "rotate_u", "Rotate Yaw:" );
 		root.uiRotateU = root.console.addRange(divControllers, {id: "rotate_u",css: "menu_subcontent _inline menu_widthM", value: 0, min:-180, max:180, callBack: root.updateRotateU});
 		root.uiRotateUNum = root.console.addNumber(divControllers, {id: "rotate_u_num",css: "menu_postfixcontent _inline menu_text menu_widthSS", value: 0, min:-180, max:180, callBack: root.updateRotateUNum});
 		root.console.addSpace(divControllers,1);
 
 		
-		root.console.addLabel(divControllers,"menu_content _inlineblock _fontSS", "rotate_v", "Rotate Pitch:" );
+		root.console.addLabel(divControllers,"menu_content _block _fontSS", "rotate_v", "Rotate Pitch:" );
 		root.uiRotateV = root.console.addRange(divControllers, {id: "rotate_v",css: "menu_subcontent _inline menu_widthM", value: 0, min:-180, max:180, callBack: root.updateRotateV});
 		root.uiRotateVNum = root.console.addNumber(divControllers, {id: "rotate_v_num",css: "menu_postfixcontent _inlineblock menu_text menu_widthSS", value: 0, min:-180, max:180, callBack: root.updateRotateVNum});
 		root.console.addSpace(divControllers,1);
 
 
-		root.console.addLabel(divControllers,"menu_content _inlineblock _fontSS", "rotate_w", "Rotate Roll:" );
+		root.console.addLabel(divControllers,"menu_content _block _fontSS", "rotate_w", "Rotate Roll:" );
 		root.uiRotateW = root.console.addRange(divControllers, {id: "rotate_w",css: "menu_subcontent _inline menu_widthM", value: 0, min:-180, max:180, callBack: root.updateRotateW});
 		root.uiRotateWNum = root.console.addNumber(divControllers, {id: "rotate_w_num",css: "menu_postfixcontent _inlineblock menu_text menu_widthSS", value: 0, min:-180, max:180, callBack: root.updateRotateWNum});
 		root.console.addSpace(divControllers,1);
+		root.console.addBreak(divControllers);
 
 
-		root.console.addLabel(divControllers,"menu_content _fontSS", "exposure", "Exposure:" );
+		root.console.addLabel(divControllers,"menu_content _block _fontSS", "exposure", "Exposure:" );
 		root.uiExposure = root.console.addRange(divControllers, {id: "exposure",css: "menu_subcontent _inline menu_widthM", value: 0, min:-16, max:16, callBack: function(){console.log(root.uiExposure.value);}});
 		root.uiExposureNum = root.console.addNumber(divControllers, {id: "exposure_num",css: "menu_postfixcontent _inlineblock menu_text menu_widthSS", value: 0, min:-16, max:16, callBack: root.uiExposureNum});
 		root.console.addSpace(divControllers,1);
+		root.console.addBreak(divControllers);
 		
 		root.uiShowFace = root.console.addCheckBox(divControllers, {id: "showface", css: "menu_content _inline", checked: false, callBack: function(){console.log("chk");}});
 		root.console.addLabel(divControllers,"menu_subcontent _inline _fontSS", "showface", "Show Face","chkLabel" );
@@ -380,6 +385,7 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 
 		setupMenuTab();
 		setupMenu();
+		root.showCubeInfo();
 
 		//if(divModal === undefined){
 		//	loadjscssfile("js/skycube/CSS/SC_InputPanoramaFormatModal.css","css");
@@ -387,16 +393,18 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 		
 		//checkFormatType();
 		//setupFormatWindow();
-		//shown();
+		//show();
 		this.enabled = true;
 	}
 
-	function shown(){
+	function show(){
 		divMenu.style.display = "block";
+		root.showCubeInfo();
 	}
 
 	function hide(){
 		divMenu.style.display = "none";
+		root.hideCubeInfo();
 	}
 
 	function deactivate() {
@@ -404,16 +412,43 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 		scc.removeCildren(divMenu);
 		document.body.removeChild(divMenu);
 		this.enabled = false;
+		root.hideCubeInfo();
 	}
 
 	function dispose() {
 		deactivate();
+		root.removeCubeInfo();
 	}
+
+	var cubeInfo;
+	this.initCubeInfo = function(imgW,imgH,cubeSize,typeName){
+		cubeInfo = document.createElement("p");
+		cubeInfo.setAttribute("class","_lefttop _topall hudinfo");
+		cubeInfo.innerHTML = ("Imported Panorama Type: " + typeName.toString() +"<br>");
+		cubeInfo.innerHTML += ("Imported Panorama Size: " + imgW.toString() + " x " + imgH.toString()+"<br>");
+		cubeInfo.innerHTML += ("CubeMap Size: " + cubeSize.toString()+ " x " + cubeSize.toString());
+		document.body.appendChild(cubeInfo);
+
+	};
+
+	this.removeCubeInfo = function(){
+		if(cubeInfo!=undefined) document.body.removeChild(cubeInfo);
+	};
+
+	this.showCubeInfo = function(){
+		if(cubeInfo!=undefined) cubeInfo.style.display = "block";;
+	}
+
+	this.hideCubeInfo = function(){
+		if(cubeInfo!=undefined) cubeInfo.style.display = "none";;
+	}
+
+	
 
 	this.activate = activate;
 	this.deactivate = deactivate;
 	this.dispose = dispose;
-	this.shown = shown;
+	this.show = show;
 	this.hide = hide;
 
 };
