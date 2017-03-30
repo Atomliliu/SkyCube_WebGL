@@ -18,7 +18,7 @@ THREE.SC_ViewportHelper = function ( renderer, scene, camera ) {
 		}
 	}
 	this.remove3DGridSurface = function(){
-		if(grid3d == undefined){
+		if(grid3d != undefined){
 			
 			root.sceneHelper.remove(grid3d);
 			grid3d = undefined;
@@ -33,7 +33,7 @@ THREE.SC_ViewportHelper = function ( renderer, scene, camera ) {
 		}
 	}
 	this.remove3DGridPolarSurface = function(){
-		if(gridPolar3d == undefined){	
+		if(gridPolar3d != undefined){	
 			root.sceneHelper.remove(gridPolar3d);
 			gridPolar3d = undefined;
 		}
@@ -46,7 +46,7 @@ THREE.SC_ViewportHelper = function ( renderer, scene, camera ) {
 		}
 	}
 	this.remove3DAxis = function(){
-		if(axis3d == undefined){
+		if(axis3d != undefined){
 			
 			root.sceneHelper.remove(axis3d);
 			axis3d = undefined;
@@ -55,14 +55,19 @@ THREE.SC_ViewportHelper = function ( renderer, scene, camera ) {
 
 	this.add3DArrow = function(start, end, color, headSize){
 		if(arrow3d == undefined){
-			var dir = end;
+			//console.log(end);
+			//console.log(start);
+			var dir = end.clone();
+			dir = dir.sub(start);
 			dir.normalize();
+			//console.log(end);
+			//console.log(dir);
 			arrow3d = new THREE.ArrowHelper(dir, start, end.length(), color, headSize,headSize);
 			root.sceneHelper.add(arrow3d);
 		}
 	}
 	this.remove3DArrow = function(){
-		if(arrow3d == undefined){
+		if(arrow3d != undefined){
 			root.sceneHelper.remove(arrow3d);
 			arrow3d = undefined;
 		}
@@ -76,7 +81,7 @@ THREE.SC_ViewportHelper = function ( renderer, scene, camera ) {
 		}
 	}
 	this.remove3DBox = function(){
-		if(box3d == undefined){
+		if(box3d != undefined){
 			root.sceneHelper.remove(box3d);
 			box3d = undefined;
 		}
