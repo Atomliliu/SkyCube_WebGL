@@ -121,6 +121,8 @@ THREE.SC_CubeViewport = function ( texCube, width, height, fov, renderer ) {
 		skyBox.matrix.copy(root.intiSkyBoxMatrix);
 		root.deltaSkyBoxMatrix = new THREE.Matrix4().makeRotationAxis( new THREE.Vector3( 1, 0, 0 ), root.deltaSkyBox.x*Math.PI / 180 );
 		root.deltaSkyBoxMatrix.multiplyMatrices(root.deltaSkyBoxMatrix, new THREE.Matrix4().makeRotationAxis( new THREE.Vector3( 0, 1, 0 ), root.deltaSkyBox.y*Math.PI / 180 ));
+		root.deltaSkyBoxMatrix.multiplyMatrices(root.deltaSkyBoxMatrix, new THREE.Matrix4().makeRotationAxis( new THREE.Vector3( 0, 0, 1 ), root.deltaSkyBox.z*Math.PI / 180 ));
+
 		//console.log(root.deltaSkyBoxMatrix);
 		skyBox.applyMatrix(root.deltaSkyBoxMatrix);
 		root.curSkyBoxMatrix.copy(skyBox.matrix);
@@ -198,6 +200,23 @@ THREE.SC_CubeViewport = function ( texCube, width, height, fov, renderer ) {
 
 	}
 
+	this.getCubeFaceDir = function(length){
+		var scale = 1.0;
+		var dir = new THREE.Vector3(0,0,1);
+		if(length != undefined) scale = length;
+		//root.deltaSkyBox = new THREE.Vector3(angleX,angleY,angleZ);
+
+
+		var dirMatrix = new THREE.Matrix4().makeRotationAxis( new THREE.Vector3( 1, 0, 0 ), root.deltaSkyBox.x*Math.PI / 180 );
+		dirMatrix.multiplyMatrices(dirMatrix, new THREE.Matrix4().makeRotationAxis( new THREE.Vector3( 0, 1, 0 ), root.deltaSkyBox.y*Math.PI / 180 ));
+		dirMatrix.multiplyMatrices(dirMatrix, new THREE.Matrix4().makeRotationAxis( new THREE.Vector3( 0, 0, 1 ), root.deltaSkyBox.z*Math.PI / 180 ));
+		
+		dir = dir.applyMatrix4(dirMatrix);
+		//console.log(dirMatrix);
+		//console.log(dir);
+		return dir.setLength(scale);
+
+	};
 };
 
 THREE.SC_CubeViewport.prototype = Object.create( THREE.EventDispatcher.prototype );
