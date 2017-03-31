@@ -16,14 +16,14 @@ THREE.SC_ViewportHelper = function ( renderer, scene, camera ) {
 			grid3d = new THREE.GridHelper(size, divisions,colorCL,color);
 			root.sceneHelper.add(grid3d);
 		}
-	}
+	};
 	this.remove3DGridSurface = function(){
 		if(grid3d != undefined){
 			
 			root.sceneHelper.remove(grid3d);
 			grid3d = undefined;
 		}
-	}
+	};
 
 
 	this.add3DGridPolarSurface = function(radius, radials, circles, divisions, color, colorCL){
@@ -31,27 +31,27 @@ THREE.SC_ViewportHelper = function ( renderer, scene, camera ) {
 			gridPolar3d = new THREE.PolarGridHelper(radius, radials, circles, divisions, color, colorCL);
 			root.sceneHelper.add(gridPolar3d);
 		}
-	}
+	};
 	this.remove3DGridPolarSurface = function(){
 		if(gridPolar3d != undefined){	
 			root.sceneHelper.remove(gridPolar3d);
 			gridPolar3d = undefined;
 		}
-	}
+	};
 
 	this.add3DAxis = function(size){
 		if(axis3d == undefined){
 			axis3d = new THREE.AxisHelper(size);
 			root.sceneHelper.add(axis3d);
 		}
-	}
+	};
 	this.remove3DAxis = function(){
 		if(axis3d != undefined){
 			
 			root.sceneHelper.remove(axis3d);
 			axis3d = undefined;
 		}
-	}
+	};
 
 	this.add3DArrow = function(start, end, color, headSize){
 		if(arrow3d == undefined){
@@ -65,13 +65,18 @@ THREE.SC_ViewportHelper = function ( renderer, scene, camera ) {
 			arrow3d = new THREE.ArrowHelper(dir, start, end.length(), color, headSize,headSize);
 			root.sceneHelper.add(arrow3d);
 		}
-	}
+	};
 	this.remove3DArrow = function(){
 		if(arrow3d != undefined){
 			root.sceneHelper.remove(arrow3d);
 			arrow3d = undefined;
 		}
-	}
+	};
+	this.update3DArrow = function(dir){
+		if(arrow3d != undefined){
+			arrow3d.setDirection(dir);
+		}
+	};
 
 	this.add3DBox = function(sizeX,sizeY,sizeZ, color){
 		if(box3d == undefined){
@@ -79,13 +84,13 @@ THREE.SC_ViewportHelper = function ( renderer, scene, camera ) {
 			box3d = new THREE.BoxHelper(objTmp,color);
 			root.sceneHelper.add(box3d);
 		}
-	}
+	};
 	this.remove3DBox = function(){
 		if(box3d != undefined){
 			root.sceneHelper.remove(box3d);
 			box3d = undefined;
 		}
-	}
+	};
 
 	
 
