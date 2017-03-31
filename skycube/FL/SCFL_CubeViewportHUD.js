@@ -5,6 +5,7 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 	this.enabled = false;
 	this.console = undefined;
 	var menuWidth = 250;
+	this.isHDR = false;
 
 	this.uiCubeFormat;
 	//this.uiFlipULabel;
@@ -166,6 +167,8 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 		root.console.addLabel(divControllers,"menu_content _block _fontSS", "exposure", "Exposure:" );
 		root.uiExposure = root.console.addRange(divControllers, {id: "exposure",css: "menu_subcontent _inline menu_widthM", value: 0, min:-16, max:16, callBack: function(){if(root.onShowFace) root.onExposure();}});
 		root.uiExposureNum = root.console.addNumber(divControllers, {id: "exposure_num",css: "menu_postfixcontent _inlineblock menu_text menu_widthSS", value: 0, min:-16, max:16, callBack: root.uiExposureNum});
+		root.uiExposure.disabled = !root.isHDR;
+		root.uiExposureNum.disabled = !root.isHDR;
 		root.console.addSpace(divControllers,1);
 		root.console.addBreak(divControllers);
 		
@@ -264,7 +267,7 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 		if (root.onRotateW) root.onRotateW();
 	};
 
-
+	//Get update
 	this.getRotationU = function(){
 		return root.uiRotateU.value;
 	};
@@ -284,6 +287,17 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 	this.getShowFace = function(){
 		
 		return root.uiShowFace.checked;
+	};
+
+	this.getFlipU = function(){
+		return root.uiFlipU.checked;
+	};
+	this.getFlipV = function(){
+		return root.uiFlipV.checked;
+	};
+	this.getFlipW = function(){
+		
+		return root.uiFlipW.checked;
 	};
 
 
