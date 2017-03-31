@@ -156,7 +156,7 @@
 			cubeMenu.initCubeInfo(panaorama.img.width,panaorama.img.height,panaorama.getCubeSize(),panaorama.getPanoramaType());
 			cubeMenu.onShowGrid = function(){
 				if(cubeMenu.getShowGrid()){
-					helper.add3DGridSurface(100,10);
+					helper.add3DGridSurface(100,10,0xffffff);
 					helper.add3DAxis(50);
 				}
 				else{
@@ -174,9 +174,9 @@
 				}
 			};
 			cubeMenu.onShowFace = function(){
-				console.log("s");
+				//console.log("s");
 				if(cubeMenu.getShowFace()){
-					helper.add3DBox(700,700,700,0xffffff);
+					helper.add3DBox(350,350,350,0xffffff);
 				}
 				else{
 					helper.remove3DBox();
@@ -185,13 +185,32 @@
 
 
 			cubeMenu.onFlipU = function(){
+				if(cubeMenu.getFlipU()){
+					if(cubeView) cubeView.setFlipSkyBox(-1,1,1);
+				}
+				else{
+					if(cubeView) cubeView.setFlipSkyBox(1,1,1);
+				}
 
+				if (cubeMenu.previewMode){CM=panaorama.updateCube(cubeView.deltaSkyBoxMatrix);}
 			};
 			cubeMenu.onFlipV = function(){
-
+				if(cubeMenu.getFlipV()){
+					if(cubeView) cubeView.setFlipSkyBox(1,-1,1);
+				}
+				else{
+					if(cubeView) cubeView.setFlipSkyBox(1,1,1);
+				}
+				if (cubeMenu.previewMode){CM=panaorama.updateCube(cubeView.deltaSkyBoxMatrix);}
 			};
 			cubeMenu.onFlipW = function(){
-
+				if(cubeMenu.getFlipW()){
+					if(cubeView) cubeView.setFlipSkyBox(1,1,-1);
+				}
+				else{
+					if(cubeView) cubeView.setFlipSkyBox(1,1,1);
+				}
+				if (cubeMenu.previewMode){CM=panaorama.updateCube(cubeView.deltaSkyBoxMatrix);}
 			};
 
 
@@ -295,15 +314,18 @@
 				//cubeView.setCubeQuaternion(new THREE.Vector3( 0, 1, 0 ),cubeMenu.getRotationU());
 				cubeView.setCubeRotationY(cubeMenu.getRotationU());
 				if (cubeMenu.previewMode){CM=panaorama.updateCube(cubeView.deltaSkyBoxMatrix);}
+				if (helper){helper.update3DArrow(cubeView.getCubeFaceDir());}
 			};
 			cubeMenu.onRotateV = function(){
 				//cubeView.setCubeQuaternion(new THREE.Vector3( 1, 0, 0 ),cubeMenu.getRotationV());
 				cubeView.setCubeRotationX(cubeMenu.getRotationV());
 				if (cubeMenu.previewMode){CM=panaorama.updateCube(cubeView.deltaSkyBoxMatrix);}
+				if (helper){helper.update3DArrow(cubeView.getCubeFaceDir());}
 			};
 			cubeMenu.onRotateW = function(){
 				cubeView.setCubeRotationZ(cubeMenu.getRotationW());
 				if (cubeMenu.previewMode){CM=panaorama.updateCube(cubeView.deltaSkyBoxMatrix);}
+				if (helper){helper.update3DArrow(cubeView.getCubeFaceDir());}
 
 			};
 
