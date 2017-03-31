@@ -7,12 +7,15 @@ THREE.SC_CubeViewport = function ( texCube, width, height, fov, renderer ) {
 	this.controls;// = controls;
 
 	var container, skyBox;
+
 	this.texCube = texCube;
 	this.materialsCube = [];
 	this.intiSkyBoxMatrix = new THREE.Matrix4();
 	this.curSkyBoxMatrix = new THREE.Matrix4();
+	this.deltaSkyBoxRotateMatrix = new THREE.Matrix4();
 	this.deltaSkyBoxMatrix = new THREE.Matrix4();
 	this.deltaSkyBox = new THREE.Vector3(0.0);
+	this.scaleSkyBox = new THREE.Vector3(0.0);
 
 /*
 	if(width == undefined){
@@ -60,16 +63,28 @@ THREE.SC_CubeViewport = function ( texCube, width, height, fov, renderer ) {
 	function init() {
 
 		for ( var i = 0; i < 6; i ++ ) {
-			root.materialsCube.push( new THREE.MeshBasicMaterial( { map: root.texCube[ i ].texture} ) );
+			root.materialsCube.push( new THREE.MeshBasicMaterial( { map: root.texCube[ i ].texture, side:THREE.DoubleSide} ) );
 		}
 
 		skyBox = new THREE.Mesh( new THREE.CubeGeometry( 1000, 1000, 1000 ), new THREE.MeshFaceMaterial( root.materialsCube ) );//new THREE.Mesh( skyGeo, materialSkyBox );
-		skyBox.applyMatrix( new THREE.Matrix4().makeScale( 1, 1,  -1 ) );
+		//skyBox.applyMatrix( new THREE.Matrix4().makeScale( 1, 1,  -1 ) );
 		root.intiSkyBoxMatrix.copy(skyBox.matrix);
 		root.curSkyBoxMatrix.copy(skyBox.matrix);
 
 		root.scene.add( skyBox );
 	}
+
+	this.setFlipSkyBox = function(x,y,z){
+		//if(skyBox) skyBox.applyMatrix( new THREE.Matrix4().makeScale( x,y,z ) );
+		if(skyBox) {
+			root.scaleSkyBox.set(x,y,z);
+			skyBox.matrix.copy(root.intiSkyBoxMatrix);
+			root.deltaSkyBoxMatrix.multiplyMatrices(root.deltaSkyBoxRotateMatrix, new THREE.Matrix4().makeScale( x,y,z ));
+			root.updateSkyBoxMatrix();
+			//root.deltaSkyBoxMatrix.
+			//console.log(root.deltaSkyBoxMatrix);
+		}
+	};
 
 	this.renderView = renderView;
 	this.activate = activate;
@@ -81,7 +96,7 @@ THREE.SC_CubeViewport = function ( texCube, width, height, fov, renderer ) {
 	this.asNormal = asNormal;
 	this.onResize= onResize;
 
-	this.setCubeQuaternion = function(axis,angle){
+	/*this.setCubeQuaternion = function(axis,angle){
 		var quaternion = new THREE.Quaternion();
 		quaternion.setFromAxisAngle( axis, THREE.Math.degToRad(angle) );
 		skyBox.quaternion = quaternion;
@@ -93,7 +108,7 @@ THREE.SC_CubeViewport = function ( texCube, width, height, fov, renderer ) {
 		root.deltaSkyBoxMatrix = new THREE.Matrix4().makeRotationAxis( axis.normalize(), angle*Math.PI / 180 );
 		skyBox.applyMatrix(root.deltaSkyBoxMatrix);
 		root.curSkyBoxMatrix.copy(skyBox.matrix);
-	};
+	};*/
 
 	this.updateCubeRotationValue = function(){
 		root.setCubeRotationXYZ(root.deltaSkyBox.x,root.deltaSkyBox.y,root.deltaSkyBox.z);
@@ -119,11 +134,17 @@ THREE.SC_CubeViewport = function ( texCube, width, height, fov, renderer ) {
 		root.deltaSkyBox = new THREE.Vector3(angleX,angleY,angleZ);
 
 		skyBox.matrix.copy(root.intiSkyBoxMatrix);
-		root.deltaSkyBoxMatrix = new THREE.Matrix4().makeRotationAxis( new THREE.Vector3( 1, 0, 0 ), root.deltaSkyBox.x*Math.PI / 180 );
-		root.deltaSkyBoxMatrix.multiplyMatrices(root.deltaSkyBoxMatrix, new THREE.Matrix4().makeRotationAxis( new THREE.Vector3( 0, 1, 0 ), root.deltaSkyBox.y*Math.PI / 180 ));
-		root.deltaSkyBoxMatrix.multiplyMatrices(root.deltaSkyBoxMatrix, new THREE.Matrix4().makeRotationAxis( new THREE.Vector3( 0, 0, 1 ), root.deltaSkyBox.z*Math.PI / 180 ));
+		skyBox.applyMatrix( new THREE.Matrix4().makeScale( root.scaleSkyBox.x,root.scaleSkyBox.y,root.scaleSkyBox.z ) );
 
+		root.deltaSkyBoxRotateMatrix = new THREE.Matrix4().makeRotationAxis( new THREE.Vector3( 1, 0, 0 ), root.deltaSkyBox.x*Math.PI / 180 );
+		root.deltaSkyBoxRotateMatrix.multiplyMatrices(root.deltaSkyBoxRotateMatrix, new THREE.Matrix4().makeRotationAxis( new THREE.Vector3( 0, 1, 0 ), root.deltaSkyBox.y*Math.PI / 180 ));
+		root.deltaSkyBoxRotateMatrix.multiplyMatrices(root.deltaSkyBoxRotateMatrix, new THREE.Matrix4().makeRotationAxis( new THREE.Vector3( 0, 0, 1 ), root.deltaSkyBox.z*Math.PI / 180 ));
+		root.deltaSkyBoxMatrix.copy(root.deltaSkyBoxRotateMatrix);
 		//console.log(root.deltaSkyBoxMatrix);
+		root.updateSkyBoxMatrix();
+	};
+
+	this.updateSkyBoxMatrix = function(){
 		skyBox.applyMatrix(root.deltaSkyBoxMatrix);
 		root.curSkyBoxMatrix.copy(skyBox.matrix);
 	};
