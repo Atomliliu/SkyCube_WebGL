@@ -32,8 +32,13 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 	};*/
 
 	var Out_Size = 1024;
+	this.Out_Size = Out_Size;
+	
 	var Out_Width = 0;
 	var Out_Height = 0;
+
+	var selectedOpacity = 1.0;
+	var unselectOpacity = 0.5;
 
 	var UI_ShaderNames = [
 		"ENV2DP_HUD",
@@ -199,7 +204,7 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 			var boxUIUniforms = THREE.UniformsUtils.clone( boxUIShader.uniforms );
 			boxUIUniforms.tCube.value = cubeMap;
 			boxUIUniforms.nFace.value = boxUIFaceIndex[i];
-			boxUIUniforms.fOpacity.value = 1.0;
+			boxUIUniforms.fOpacity.value = InitOpacity;
 			boxUIMats.push( new THREE.ShaderMaterial({uniforms: boxUIUniforms,
 						vertexShader: boxUIShader.vertexShader,
 						fragmentShader: boxUIShader.fragmentShader,
@@ -240,7 +245,7 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 				UI_Shaders[i] = THREE.ShaderLib[ UI_ShaderNames[i] ];
 				var uniformsUI = THREE.UniformsUtils.clone( UI_Shaders[i].uniforms );
 				uniformsUI.tCube.value = cubeMap;
-				//uniformsUI.fOpacity.value = 0.5;
+				uniformsUI.fOpacity.value = InitOpacity;
 
 				UI_Materials[i] = new THREE.ShaderMaterial({uniforms: uniformsUI,
 							vertexShader: UI_Shaders[i].vertexShader,
@@ -351,6 +356,22 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 		//var pSize = (UI_width>=UI_height)?UI_height:UI_width;
 		if(selected.material.type == "MultiMaterial"){
 			//? 6 pieces
+			var size = updateReviewSize(UI_IconsSizeX[indexShader],UI_IconsSizeY[indexShader]);
+			reviewPlane = new THREE.Mesh( new THREE.PlaneGeometry( size.x,size.y ), new THREE.MeshBasicMaterial( { side:THREE.FrontSide,transparent:true,opacity:0.0} ) );
+			size.multiply(new THREE.Vector2(0.4,0.4));
+
+			var reviewCubePlane = [];
+			for(var n=0;n<6;n++){
+				reviewCubePlane[n] = new THREE.Mesh( new THREE.PlaneGeometry( size.x, size.y ), selected.material.materials[n] );
+				var x = n%3; var y = (n-x)/3;
+				reviewCubePlane[n].position.x = (x-1)*(size.x + iconMinGap);
+				reviewCubePlane[n].position.y = (y-0.5)*(size.y + iconMinGap);
+				reviewCubePlane[n].position.z = -planeDis;
+
+				reviewPlane.add(reviewCubePlane[n]);
+				
+			}
+			root.sceneReview.add( reviewPlane );
 		}
 		else{
 			var size = updateReviewSize(UI_IconsSizeX[indexShader],UI_IconsSizeY[indexShader]);
@@ -568,14 +589,14 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 				}
 				if(intersects[ 0 ].object.material.type == "MultiMaterial"){
 					
-					if ( INTERSECTED ) setupMultiMat(INTERSECTED.material,"fOpacity",1.0);
+					if ( INTERSECTED ) setupMultiMat(INTERSECTED.material,"fOpacity",unselectOpacity);
 
-					setupMultiMat(INTERSECTED.material,"fOpacity",0.5)
+					setupMultiMat(INTERSECTED.material,"fOpacity",selectedOpacity)
 				}
 				else{
-					if ( INTERSECTED ) INTERSECTED.material.uniforms.fOpacity.value = 1.0;
+					if ( INTERSECTED ) INTERSECTED.material.uniforms.fOpacity.value = unselectOpacity;
 
-					INTERSECTED.material.uniforms.fOpacity.value = 0.5;
+					INTERSECTED.material.uniforms.fOpacity.value = selectedOpacity;
 				}
 
 				
@@ -593,10 +614,10 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 			}
 			if ( INTERSECTED ) {
 				if(INTERSECTED.material.type == "MultiMaterial"){
-					setupMultiMat(INTERSECTED.material,"fOpacity",1.0);
+					setupMultiMat(INTERSECTED.material,"fOpacity",unselectOpacity);
 				}
 				else{
-					INTERSECTED.material.uniforms.fOpacity.value = 1.0;
+					INTERSECTED.material.uniforms.fOpacity.value = unselectOpacity;
 				}
 			}
 			
@@ -623,10 +644,10 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 			if ( intersects.length > 0 ) {
 				var picked = intersects[ 0 ].object;
 				if(picked.material.type == "MultiMaterial"){
-					setupMultiMat(picked.material,"fOpacity",1.0)
+					setupMultiMat(picked.material,"fOpacity",selectedOpacity)
 				}
 				else{
-					picked.material.uniforms.fOpacity.value = 1.0;
+					picked.material.uniforms.fOpacity.value = selectedOpacity;
 				}
 				outShaderName = picked.material.name;
 				selected = picked;
