@@ -62,7 +62,7 @@
 	controls.enablePan = false;*/
 
 	///////////////////////////////////////////////////////////////////////////////
-	var type = ".jpg,.png";
+	var type = ".jpg,.png,.tga,.tif";
 	var minWidth = 800;
 	var minHeight = 600;
 	var loader = new SCFL_LoadFiles();
@@ -103,7 +103,6 @@
 
 
 
-	window.addEventListener( 'resize', onWindowResize, false );
 
 	inputPage.activate();
 	dropZone.activate();
@@ -150,36 +149,11 @@
 			//helper.add3DGridPolarSurface(50,16,8,64,0x888888,0xffffff);
 			//helper.add3DAxis(50);
 			//helper.add3DBox(700,700,700,0xffffff);
-			if(renderLoop == undefined){
-				animate();
-			}
-			
+
+			animate();
 
 			cubeMenu = new SCFL_CubeViewportHUD();
 			cubeMenu.initCubeInfo(panaorama.img.width,panaorama.img.height,panaorama.getCubeSize(),panaorama.getPanoramaType());
-			
-			function cleanCubeViewPage(){
-				if (cubeMenu.previewMode){
-					previewCube.PreviewOff();
-					previewCube.dispose();
-				}
-				cubeMenu.dispose();
-				cubeView.dispose();
-				
-
-				cubeMenu = undefined;
-				cubeView = undefined;
-
-			}
-
-			function HelperDisableStatus(status){
-				if(cubeMenu){
-					cubeMenu.uiShowFace.disabled = status;
-					cubeMenu.uiShowGrid.disabled = status;
-					cubeMenu.uiShowOffset.disabled = status;
-				}
-				
-			}
 			cubeMenu.onShowGrid = function(){
 				if(cubeMenu.getShowGrid()){
 					helper.add3DGridSurface(100,10,0xffffff);
@@ -242,39 +216,24 @@
 
 
 
-			var helperPreview;
+
 			cubeMenu.onPreviewMode = function(){
 				if (cubeMenu.previewMode){
-					//renderer.clear();
 					CM=panaorama.updateCube(cubeView.deltaSkyBoxMatrix);
 					previewCube = new THREE.SC_OutHUD(CM, Width, Height, renderer.domElement);
 					previewCube.PreviewOn(cubeMenu.getPreviewModeIndex(),-cubeMenu.menuWidth*0.5);
 					cubeView.disableControls();
-					cubeView.asBackground(0.0);
-					helper.setHideAll();
-					HelperDisableStatus(true);
-					var posPlane = previewCube.getPreviewPlanePos();
-					posPlane.z += 1;
-					helperPreview = new THREE.SC_ViewportHelper(renderer,previewCube.sceneReview,previewCube.cameraHUD);
-					helperPreview.add2DGridPreview(Width*2,Height*2,20,15,0x888888,posPlane);
+					//cubeView.asBackground(0.5);
 				}
 				else{
 					previewCube.PreviewOff();
 					previewCube.dispose();
 					cubeView.enableControls();
-					cubeView.asNormal();
-					helper.setShowAll();
-					HelperDisableStatus(false);
-					if(helperPreview) helperPreview.remove2DGridPreview();
-
-					previewCube = undefined;
-					helperPreview = undefined;
-
 					//renderer.clear();
 				}
 				
 			};
-			//Do export and go to review page select export format
+
 			cubeMenu.onExport = function(){
 				if(previewCube!=undefined && previewCube.enabled){
 					previewCube.PreviewHiden();
@@ -305,16 +264,9 @@
 					outHUD.deactivate();
 					if (cubeMenu.previewMode && previewCube != undefined){
 						previewCube.PreviewShown();
-						cubeView.disableControls();
-						cubeView.asBackground(0.0);
-						helper.setHideAll();
-						HelperDisableStatus(true);
 					}
-					else{
-						cubeView.enableControls();
-						cubeView.asNormal();
-					}
-					
+					cubeView.enableControls();
+					cubeView.asNormal();
 					cubeMenu.show();
 				};
 				
@@ -335,9 +287,11 @@
 				if (!alertBack) {
 				    return;
 				}
+				cubeMenu.dispose();
+				cubeView.dispose();
 
-				cleanCubeViewPage();
-				panaorama.dispose();
+				cubeMenu = undefined;
+				cubeView = undefined;
 				panaorama = undefined;
 				stop();
 
@@ -346,27 +300,13 @@
 			};
 
 			cubeMenu.onChangeCubeLayout = function(){
-				cubeMenu.hide();
-				cubeView.deactivate();
-				if (cubeMenu.previewMode){
-					previewCube.deactivate();
-				}
+				cubeMenu.dispose();
+				cubeView.dispose();
+
+				cubeMenu = undefined;
+				cubeView = undefined;
 				//stop();
 
-				panaorama.layoutOnly = true;
-				//User re-import img
-				panaorama.onImportStart = function(){
-					cleanCubeViewPage();
-					//stop();
-				};
-				//User cancelled layout window
-				panaorama.onBackToView = function(){
-					cubeMenu.show();
-					cubeView.activate();
-					if (cubeMenu.previewMode){
-						previewCube.activate();
-					}
-				};
 				panaorama.activateModal();
 			};
 
@@ -399,7 +339,6 @@
 
 		panaorama.onBackToInput = function(){
 			inputPage.shown();
-			panaorama.dispose();
 			panaorama = undefined;
 			stop();
 		};
@@ -427,14 +366,13 @@
     //height:550px;
 
 
-		
+		window.addEventListener( 'resize', onWindowResize, false );
 	}
 
 	function animate() {
-		
 		renderLoop = requestAnimationFrame( animate );
-			
 		update();
+		
 	}
 
 

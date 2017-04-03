@@ -312,10 +312,6 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 
 	}
 
-	this.getPreviewPlanePos=function(){
-		return previewPlane.position.clone();
-	};
-
 	this.initPreview = initPreview;
 
 	this.PreviewOn = function(index,offsetX,offsetY){

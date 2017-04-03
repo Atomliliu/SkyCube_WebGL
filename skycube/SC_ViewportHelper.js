@@ -7,22 +7,8 @@ THREE.SC_ViewportHelper = function ( renderer, scene, camera ) {
 	this.camHelper = camera;
 	//Init
 	//this.sceneHelper = new THREE.Scene();
-	var grid2dPreview,grid2d,grid3d,gridPolar3d,axis3d,arrow3d,box3d;
+	var grid2d,grid3d,gridPolar3d,axis3d,arrow3d,box3d;
 
-	this.add2DGridPreview = function(sizeX, sizeY, divX, divY, color, pos){
-		if(grid2dPreview == undefined){
-
-			grid2dPreview = new THREE.SC_2DGridHelper(sizeX, sizeY, divX, divY, color, pos);
-			root.sceneHelper.add(grid2dPreview);
-		}
-	};
-	this.remove2DGridPreview = function(){
-		if(grid2dPreview != undefined){
-			
-			root.sceneHelper.remove(grid2dPreview);
-			grid2dPreview = undefined;
-		}
-	};
 
 
 	this.add3DGridSurface = function(size, divisions, color, colorCL){
@@ -104,28 +90,6 @@ THREE.SC_ViewportHelper = function ( renderer, scene, camera ) {
 			root.sceneHelper.remove(box3d);
 			box3d = undefined;
 		}
-	};
-
-
-
-	this.setHideAll=function(){
-		if(grid2dPreview) grid2dPreview.visible = false;
-		if(grid2d) grid2d.visible = false;
-		if(grid3d) grid3d.visible = false;
-		if(gridPolar3d) gridPolar3d.visible = false;
-		if(axis3d) axis3d.visible = false;
-		if(arrow3d) arrow3d.visible = false;
-		if(box3d) box3d.visible = false;
-	};
-
-	this.setShowAll=function(){
-		if(grid2dPreview) grid2dPreview.visible = true;
-		if(grid2d) grid2d.visible = true;
-		if(grid3d) grid3d.visible = true;
-		if(gridPolar3d) gridPolar3d.visible = true;
-		if(axis3d) axis3d.visible = true;
-		if(arrow3d) arrow3d.visible = true;
-		if(box3d) box3d.visible = true;
 	};
 
 	

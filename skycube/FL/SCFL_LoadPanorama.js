@@ -2,12 +2,11 @@
 
 SCFL_LoadPanorama = function ( imgFile, renderer ) {
 	this.img = imgFile;
-	this.enabled = false;
+	this.enabled = true;
 
 	//var imgWidth = this.img.width;
 	//var imgHeight = this.img.height;
 	var divModal = undefined;
-	this.layoutOnly = false;
 
 	var root = this;
 
@@ -166,32 +165,22 @@ SCFL_LoadPanorama = function ( imgFile, renderer ) {
 
 		span.onclick = function() {
 		    disposeModal();
-		    if(root.layoutOnly){
-		    	if(root.onBackToView) root.onBackToView();
-		    }
-		    else{
-		    	if(root.onBackToInput) root.onBackToInput();
-		    }
-		    
+		    root.onBackToInput();
 		};
 
 		buttonDD.onclick = function() {
 			// body...
-			if(root.onImportStart) root.onImportStart(); 
-			clean();
+
 			initRTT();
 
 			updateRTT(root.onRTTUpdated);
 
 			disposeModal();
-
 		};
 	}
 
-	this.onRTTUpdated;
+	this.onRTTUpdated = undefined;
 	this.onBackToInput;
-	this.onBackToView;
-	this.onImportStart;
 	//this.onCubeUpdated = undefined;
 
 
@@ -307,7 +296,6 @@ SCFL_LoadPanorama = function ( imgFile, renderer ) {
 			
 		}
 		camCube.updateCubeMap( renderer, sceneCube );
-		//console.log("dddddddd");
 		return camCube.renderTarget.texture;
 	}
 
@@ -382,16 +370,14 @@ SCFL_LoadPanorama = function ( imgFile, renderer ) {
 		
 		for ( var i = 0; i < 6; i ++ ) {
 
-			materialsCube.push( new THREE.MeshBasicMaterial( { map: RTTtextures[ i ].texture, side:THREE.DoubleSide} ) );
+			materialsCube.push( new THREE.MeshBasicMaterial( { map: RTTtextures[ i ].texture} ) );
 			//materialsCube2.push( new THREE.MeshBasicMaterial( { map: RTTtextures[ i ].texture} ) );
 		}
 
 		skyBoxCube = new THREE.Mesh( new THREE.CubeGeometry( 1000, 1000, 1000 ), new THREE.MeshFaceMaterial( materialsCube ) );
-		//skyBoxCube.applyMatrix( new THREE.Matrix4().makeScale( 1, 1,  -1 ) );
+		skyBoxCube.applyMatrix( new THREE.Matrix4().makeScale( 1, 1,  -1 ) );
 		root.intiSkyCubeMatrix.copy(skyBoxCube.matrix);
 		sceneCube.add( skyBoxCube );
-
-		root.enabled = true;
 
 	}
 	
@@ -413,7 +399,6 @@ SCFL_LoadPanorama = function ( imgFile, renderer ) {
 	}
 
 	function disposeModal() {
-		if(!divModal) return;
 		divModal.style.display = "none";
 		scc.removeCildren(divModal);
 		document.body.removeChild(divModal);
@@ -422,33 +407,17 @@ SCFL_LoadPanorama = function ( imgFile, renderer ) {
 
 	function deactivate() {
 		disposeModal();
-
-	}
-
-	function clean(){
-		if(root.enabled){
-			sceneCube.remove( skyBoxCube );
-			sceneCube.remove( camCube );
-			sceneCube = undefined;
-			skyBoxCube = undefined;
-			camCube = undefined;
-			materialsCube = [];
-			RTTtextures = [];
-
-		}
-		root.enabled = false;
 	}
 
 	function dispose() {
 		deactivate();
-		clean();
 	}
 
 	this.getCubeSize = function(){
 		return RTTSize;
 	};
 
-	this.clean = clean;
+
 	this.updateCube = updateCube;
 	this.activateModal = activateModal;
 	this.disposeModal = disposeModal;

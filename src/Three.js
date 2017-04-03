@@ -157,7 +157,6 @@ export { SceneUtils } from './extras/SceneUtils.js';
 export { SC_CubeMap } from './skycube/SC_CubeMap.js';
 export { SC_OutHUD } from './skycube/SC_OutHUD.js';
 export { SC_CubeCamera } from './skycube/SC_CubeCamera.js';
-export { SC_2DGridHelper } from './skycube/SC_2DGridHelper.js';
 /////////////////////////////////////////////////////
 export * from './constants.js';
 export * from './Three.Legacy.js';
