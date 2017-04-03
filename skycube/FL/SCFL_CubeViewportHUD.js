@@ -169,6 +169,9 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 		root.uiExposureNum = root.console.addNumber(divControllers, {id: "exposure_num",css: "menu_postfixcontent _inlineblock menu_text menu_widthSS", value: 0, min:-16, max:16, callBack: root.uiExposureNum});
 		root.uiExposure.disabled = !root.isHDR;
 		root.uiExposureNum.disabled = !root.isHDR;
+		//if(root.isHDR){ root.uiExposure.style.opacity = "1.0";root.uiExposureNum.style.opacity = "1.0";}
+		//else { root.uiExposure.style.opacity = "0.5";root.uiExposureNum.style.opacity = "0.5";}
+
 		root.console.addSpace(divControllers,1);
 		root.console.addBreak(divControllers);
 		
@@ -457,10 +460,12 @@ SCFL_CubeViewportHUD = function ( width, height, imgFile, renderer ) {
 
 	var cubeInfo;
 	this.initCubeInfo = function(imgW,imgH,cubeSize,typeName){
+		var hdrinfo = " - LDR";
+		if(root.isHDR){hdrinfo = " - HDR";}
 		cubeInfo = document.createElement("p");
 		cubeInfo.setAttribute("class","_lefttop _topall hudinfo");
-		cubeInfo.innerHTML = ("Imported Panorama Type: " + typeName.toString() +"<br>");
-		cubeInfo.innerHTML += ("Imported Panorama Size: " + imgW.toString() + " x " + imgH.toString()+"<br>");
+		cubeInfo.innerHTML = ("Panorama Type: " + typeName.toString() +hdrinfo+"<br>");
+		cubeInfo.innerHTML += ("Panorama Size: " + imgW.toString() + " x " + imgH.toString()+"<br>");
 		cubeInfo.innerHTML += ("CubeMap Size: " + cubeSize.toString()+ " x " + cubeSize.toString());
 		document.body.appendChild(cubeInfo);
 
