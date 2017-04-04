@@ -5,17 +5,21 @@ SCFL_OutReviewHUD = function ( width, height, imgFile, renderer ) {
 	this.enabled = false;
 	this.console = undefined;
 
-	this.uiFileFormat;
-	this.uiFileNameLabel;
-	this.uiFileName;
-	this.uiExport;
+	this.files;
 
-	var UI_FileNames = [
+	this.uiFileFormat;
+	this.uiFileName;
+	this.uiFileButton;
+	this.uiSave;
+
+	var UI_FileType = [
 		"PNG",
-		"JPG",
-		"TGA",
-		"TIFF",
-		"HDR"
+		"JPG"
+	];
+
+	var extNames = [
+		".png",
+		".jpg"
 	];
 
 	//var imgWidth = this.img.width;
@@ -77,11 +81,13 @@ SCFL_OutReviewHUD = function ( width, height, imgFile, renderer ) {
 		
 	}
 
-	function setupBlock(css){
+	function setupBlock(css,parent){
 		var divBlock = document.createElement("div");
 		
 		if(css) divBlock.setAttribute("class", css);
-		divMenu.appendChild(divBlock);
+
+		if(parent) parent.appendChild(divBlock);
+		else divMenu.appendChild(divBlock);
 		return divBlock;
 	}
 
@@ -96,27 +102,39 @@ SCFL_OutReviewHUD = function ( width, height, imgFile, renderer ) {
 		//Menu
 		root.console = new THREE.SC_Controller(divMenu, "menu_console");
 
-
-		root.uiFileFormat = root.console.addList(divMenu,{id: "filetype", css: "menu_content _inline menu_list", texts:UI_FileNames, values: UI_FileNames});
+		root.console.addLabel(divMenu,"menu_content _inline _fontSS", "filetype", "File Format: " );
+		root.uiFileFormat = root.console.addList(divMenu,{id: "filetype", css: "menu_postfixcontent _inlineblock menu_list", texts:UI_FileType, values: UI_FileType});
 		root.console.addSpace(divMenu,1);
+		root.console.addBreak(divMenu);
+		//root.console.addSpace(divMenu,1);
 
-		root.uiFileNameLabel = root.console.addLabel(divMenu,"menu_content _inline _fontSS", "filename", "File Name" );
-		root.uiFileName = root.console.addText(divMenu, {id: "filename",css: "menu_content _inline menu_text menu_widthL", value: "x", callBack: root.onFileName});
-		root.console.addSpace(divMenu,1);
+		root.console.addLabel(divMenu,"menu_content _inline _fontSS", "filename", "File Name:" );
+		root.uiFileName = root.console.addText(divMenu, {id: "filename",css: "menu_content _inlineblock menu_text menu_widthL", value: "", callBack: root.onFileName});
+		//root.uiFileButton = root.console.addButton(divMenu, {css: "menu_content _block buttonLoad menu_button", value: "Select a file", callBack: root.onFileNameSel});
+		root.console.addSpace(divMenu,2);
 
 		
 		//root.uiExposureLabel = root.console.addLabel(divMenu,"menu_content", "exposure", "Exposure" );
 		//root.uiExposure = root.console.addRange(divMenu, {id: "exposure",css: "menu_content _inline", value: 0, min:-16, max:16, callBack: function(){console.log(root.uiExposure.value);}});
-
 		
-		root.uiExport = root.console.addButton(setupBlock("_buttom"), {css: "menu_content _block button buttonLoad menu_button _fontM", value: "Save", callBack: root.onExport});
+		root.uiSave = root.console.addButton(setupBlock("_buttom"), {css: "menu_content _block button buttonLoad menu_button _fontM", value: "Save", callBack: root.onSave});
 
+
+		//Setup file input
+		/*var input = document.createElement("input");
+		input.type=type;
+		input.id="file";
+		input.required = true;
+		root.uiFileButton.appendChild(input);
+		label.addEventListener('change', onFileSelect, false );*/
 	}
 
 	//Over writeable callback functions
 	this.onBackToSelection;
-	this.onChangeCubeLayout;
-	this.onExport;
+	this.onFileNameSel=function(){
+
+	};
+	this.onSave;
 
 	this.onFileName = function(){
 		return root.uiRotateU.value;
@@ -125,6 +143,8 @@ SCFL_OutReviewHUD = function ( width, height, imgFile, renderer ) {
 
 	var initWidth = "auto";
 	var initHeight = "auto";
+
+	
 
 
 	function visibleMenu(vis){

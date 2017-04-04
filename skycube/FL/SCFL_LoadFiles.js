@@ -177,6 +177,7 @@ SCFL_LoadFiles = function() {
 
 				reader.readAsDataURL( f );*/
 				NativeImgReader(f);
+				//console.log(f.name);
 				//console.log(root.rImgWidth[0]+'+'+root.rImgHeight[0]);
 				return true;
 			}
