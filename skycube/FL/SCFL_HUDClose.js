@@ -1,15 +1,17 @@
 //
 
-SCFL_HUDClose = function ( idname ) {
+SCFL_HUDClose = function ( idname, size, symbol ) {
 
 	this.enabled = false;
 
+	//if(size === undefined) size = 32;
 	var root = this;
 	var scc = new THREE.SC_Common();
 	var div;
 
 	this.onClick;
 
+	if (symbol === undefined) symbol = '\xD7';
 
 	function setupCloseIcon() {
 		var body;
@@ -25,7 +27,8 @@ SCFL_HUDClose = function ( idname ) {
 
 		var span = document.createElement("span");
 		span.setAttribute("class", "close");
-		var closeIcon = document.createTextNode("\xD7");
+		if(size !== undefined) span.setAttribute("style", 'font-size:' + size.toString()+'px');
+		var closeIcon = document.createTextNode(symbol);
 		span.appendChild(closeIcon);
 
 		div.appendChild(span);
