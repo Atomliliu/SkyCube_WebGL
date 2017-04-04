@@ -8,6 +8,7 @@ SCFL_OutReviewHUD = function ( width, height, imgFile, renderer ) {
 	this.files;
 
 	this.uiFileFormat;
+	this.uiFileSize;
 	this.uiFileName;
 	this.uiFileButton;
 	this.uiSave;
@@ -15,6 +16,16 @@ SCFL_OutReviewHUD = function ( width, height, imgFile, renderer ) {
 	var UI_FileType = [
 		"PNG",
 		"JPG"
+	];
+
+
+	var UI_FileSize = [
+		128,
+		256,
+		512,
+		1024,
+		2048,
+		4096
 	];
 
 	var extNames = [
@@ -103,7 +114,11 @@ SCFL_OutReviewHUD = function ( width, height, imgFile, renderer ) {
 		root.console = new THREE.SC_Controller(divMenu, "menu_console");
 
 		root.console.addLabel(divMenu,"menu_content _inline _fontSS", "filetype", "File Format: " );
-		root.uiFileFormat = root.console.addList(divMenu,{id: "filetype", css: "menu_postfixcontent _inlineblock menu_list", texts:UI_FileType, values: UI_FileType});
+		root.uiFileFormat = root.console.addList(divMenu,{id: "filetype", css: "menu_postfixcontent _inlineblock menu_list", texts:UI_FileType, values: extNames, callBack: root.onFileType});
+		root.console.addSpace(divMenu,1);
+
+		root.console.addLabel(divMenu,"menu_content _inline _fontSS", "filesize", "File Size:   " );
+		root.uiFileSize = root.console.addList(divMenu,{id: "filesize", css: "menu_postfixcontent _inlineblock menu_list", texts:UI_FileSize, values: UI_FileSize, callBack: root.onFileSize});
 		root.console.addSpace(divMenu,1);
 		root.console.addBreak(divMenu);
 		//root.console.addSpace(divMenu,1);
@@ -131,13 +146,28 @@ SCFL_OutReviewHUD = function ( width, height, imgFile, renderer ) {
 
 	//Over writeable callback functions
 	this.onBackToSelection;
-	this.onFileNameSel=function(){
+	this.onFileType=function(){
+
+	};
+	this.onFileSize=function(){
+
+	};
+	this.onFileName=function(){
 
 	};
 	this.onSave;
 
-	this.onFileName = function(){
-		return root.uiRotateU.value;
+	this.getFileName = function(){
+		return root.uiFileName.value;
+	};
+
+
+	this.getFileType = function(){
+		return root.uiFileFormat[root.uiFileFormat.selectedIndex].value;
+	};
+
+	this.getFileSize = function(){
+		return root.uiFileSize[root.uiFileSize.selectedIndex].value;
 	};
 
 

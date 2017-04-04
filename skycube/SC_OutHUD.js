@@ -713,8 +713,9 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 
 
 
-	function onExport(){
+	function onFileExport(fileName,fileType,Size){
 		//Do export here
+		Out_Size = Size;
 		if(outShaderName != ""){
 			Out_Shaders = THREE.ShaderLib[ outShaderName ];
 			var uniformsOut = THREE.UniformsUtils.clone( Out_Shaders.uniforms );
@@ -736,7 +737,7 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 				var rtt = new THREE.SC_Raster(renderer,Out_Width,Out_Height);
 				rtt.RTT(Out_Mat);
 				
-				Out.OutputRT2PNG(renderer,rtt.rtRTT);
+				Out.OutputRT2PNG(renderer,rtt.rtRTT,fileName,fileType);
 				hudSnackbarExport();
 				console.log("Export!");
 			}
@@ -749,7 +750,7 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 
 	//var scc = new THREE.SC_Common();
 	//scc.loadjscssfile("js/skycube/CSS/SC_ExportPage.css","css");
-
+	this.onFileExport = onFileExport;
 
 	this.setupHUD = function(){
 		initHUD();
@@ -761,7 +762,7 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 	function hudSnackbarExport(){
 		var div = document.createElement("div");
 		div.id = "snackbar";
-		div.innerHTML = "Test";
+		div.innerHTML = "Saving...";
     	div.className = "show";
     	document.body.appendChild(div);
     	setTimeout(function(){ div.className = div.className.replace("show", ""); }, 3000);

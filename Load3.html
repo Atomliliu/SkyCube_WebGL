@@ -3,6 +3,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<title>SkyCube</title>
 <link rel="stylesheet" type="text/css" href="js/skycube/CSS/SC_Default.css">
 </head>
 <body>
@@ -294,6 +295,13 @@
 						exportHUD = undefined;
 						outHUD.ReviewBackToHUD();
 						//console.log("back");
+					};
+
+					//Save file to disk
+					exportHUD.onSave = function(){
+						//console.log(exportHUD.getFileType());
+						outHUD.onFileExport(exportHUD.getFileName(),exportHUD.getFileType(),exportHUD.getFileSize());
+
 					};
 
 					exportHUD.activate();
