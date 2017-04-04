@@ -18,6 +18,7 @@
 
 
 <script src="../build/three.js"></script>
+<script src="../jszip/jszip.min.js"></script>
 <script src="js/skycube/SC_Common.js"></script>
 <script src="js/controls/OrbitControls.js"></script>
 <script src="js/skycube/SC_CubeViewport.js"></script>
@@ -308,7 +309,7 @@
 				};
 				outHUD.activate();
 
-				var outHUDClose = new SCFL_HUDClose();
+				var outHUDClose = new SCFL_HUDClose("",58,"\xAB");
 				outHUDClose.onClick = function(){
 					outHUD.deactivate();
 					if (cubeMenu.previewMode && previewCube != undefined){
