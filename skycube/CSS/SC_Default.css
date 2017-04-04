@@ -471,7 +471,7 @@ hr {
     color: #aaaaaa;
     float: right;
     font-size: 32px;
-    font-weight: bold;
+    font-weight: normal;
 }
 
 .close:hover,
