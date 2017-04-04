@@ -627,10 +627,17 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 
 	}
 
+	var mie = (navigator.appName == "Microsoft Internet Explorer") ? true : false; //?
+	var left, right;
+	left = mie ? 1 : 0;
+	right = 2;
+
 
 	function onDocumentMouseDown( event ) {
 		if(!enabledController) return;
 		event.preventDefault();
+
+		if(event.button !== left){ return }
 
 		if(root.reviewMode){
 			panStart.set( event.clientX, event.clientY );
@@ -667,6 +674,8 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 	function onDocumentMouseUp( event ) {
 		if(!enabledController) return;
 		event.preventDefault();
+
+		if(event.button !== left){ return }
 
 		if(root.reviewMode){
 			
@@ -729,9 +738,15 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 			Out_Mat.transparent = false;
 
 			var whRatio = getSelOutSize();
-			if (whRatio.x != 0.0 && whRatio.y!=0.0){
-				Out_Width = Math.round(whRatio.x * Out_Size * whRatio.z);
-				Out_Height = Math.round(whRatio.y * Out_Size * whRatio.z);
+			if (whRatio.x == 0.0 && whRatio.y==0.0){console.log("Size is wrong!");}
+			Out_Width = Math.round(whRatio.x * Out_Size * whRatio.z);
+			Out_Height = Math.round(whRatio.y * Out_Size * whRatio.z);
+
+			if(selected.material.type == "MultiMaterial"){
+				
+			}
+
+			else{
 
 				var Out = new THREE.SC_OutputImg(renderer,Out_Width,Out_Height);
 				var rtt = new THREE.SC_Raster(renderer,Out_Width,Out_Height);
@@ -740,10 +755,9 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 				Out.OutputRT2PNG(renderer,rtt.rtRTT,fileName,fileType);
 				hudSnackbarExport();
 				console.log("Export!");
+
 			}
-			else{
-				console.log("Size is wrong!");
-			}
+
 		}
 
 	}
