@@ -118,3 +118,24 @@ function setupSlider(selector, options) {
       </div>
     `;
     var fn = options.slide;
+    
+    
+    
+    
+    
+    
+    
+    
+2017 04 05
+
+Ignore mouse interaction on overlay image
+
+It might be too late for this, but the best solution I've found is with CSS Styling:
+
+#reflection_overlay {
+    background-image:url(../img/reflection.png);
+    background-repeat:no-repeat;
+    width: 195px;
+    pointer-events:none;
+}
+"pointer-events" attribute works pretty good and simple.
