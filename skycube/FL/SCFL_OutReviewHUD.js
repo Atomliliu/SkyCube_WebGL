@@ -114,17 +114,17 @@ SCFL_OutReviewHUD = function ( width, height, imgFile, renderer ) {
 		root.console = new THREE.SC_Controller(divMenu, "menu_console");
 
 		root.console.addLabel(divMenu,"menu_content _inline _fontSS", "filetype", "File Format: " );
-		root.uiFileFormat = root.console.addList(divMenu,{id: "filetype", css: "menu_postfixcontent _inlineblock menu_list", texts:UI_FileType, values: extNames, callBack: root.onFileType});
+		root.uiFileFormat = root.console.addList(divMenu,{id: "filetype", css: "menu_postfixcontent _inlineblock menu_list", texts:UI_FileType, values: extNames, callBack: root.updateFileType});
 		root.console.addSpace(divMenu,1);
 
 		root.console.addLabel(divMenu,"menu_content _inline _fontSS", "filesize", "File Size:   " );
-		root.uiFileSize = root.console.addList(divMenu,{id: "filesize", css: "menu_postfixcontent _inlineblock menu_list", texts:UI_FileSize, values: UI_FileSize, callBack: root.onFileSize});
+		root.uiFileSize = root.console.addList(divMenu,{id: "filesize", css: "menu_postfixcontent _inlineblock menu_list", texts:UI_FileSize, values: UI_FileSize, callBack: root.updateFileSize});
 		root.console.addSpace(divMenu,1);
 		root.console.addBreak(divMenu);
 		//root.console.addSpace(divMenu,1);
 
 		root.console.addLabel(divMenu,"menu_content _inline _fontSS", "filename", "File Name:" );
-		root.uiFileName = root.console.addText(divMenu, {id: "filename",css: "menu_content _inlineblock menu_text menu_widthL", value: "", callBack: root.onFileName});
+		root.uiFileName = root.console.addText(divMenu, {id: "filename",css: "menu_content _inlineblock menu_text menu_widthL", value: "", callBack: root.updateFileName});
 		//root.uiFileButton = root.console.addButton(divMenu, {css: "menu_content _block buttonLoad menu_button", value: "Select a file", callBack: root.onFileNameSel});
 		root.console.addSpace(divMenu,2);
 
@@ -132,7 +132,7 @@ SCFL_OutReviewHUD = function ( width, height, imgFile, renderer ) {
 		//root.uiExposureLabel = root.console.addLabel(divMenu,"menu_content", "exposure", "Exposure" );
 		//root.uiExposure = root.console.addRange(divMenu, {id: "exposure",css: "menu_content _inline", value: 0, min:-16, max:16, callBack: function(){console.log(root.uiExposure.value);}});
 		
-		root.uiSave = root.console.addButton(setupBlock("_buttom"), {css: "menu_content _block button buttonLoad menu_button _fontM", value: "Save", callBack: root.onSave});
+		root.uiSave = root.console.addButton(setupBlock("_buttom"), {css: "menu_content _block button buttonLoad menu_button _fontM", value: "Save", callBack: root.updateSave});
 
 
 		//Setup file input
@@ -146,21 +146,32 @@ SCFL_OutReviewHUD = function ( width, height, imgFile, renderer ) {
 
 	//Over writeable callback functions
 	this.onBackToSelection;
-	this.onFileType=function(){
-
-	};
-	this.onFileSize=function(){
-
-	};
-	this.onFileName=function(){
-
-	};
+	this.onFileType;
+	this.onFileSize;
+	this.onFileName;
 	this.onSave;
+
+
+	this.updateFileType=function(){
+		if(root.onFileType) root.onFileType();
+	};
+	this.updateFileSize=function(){
+		if(root.onFileSize) root.onFileSize();
+	};
+	this.updateFileName=function(){
+		if(root.onFileName) root.onFileName();
+	};
+	this.updateSave=function(){
+		if(root.onSave) root.onSave();
+	};
 
 	this.getFileName = function(){
 		return root.uiFileName.value;
 	};
 
+	this.getUIFileType = function(){
+		return UI_FileType[root.uiFileFormat.selectedIndex];
+	};
 
 	this.getFileType = function(){
 		return root.uiFileFormat[root.uiFileFormat.selectedIndex].value;
@@ -222,7 +233,31 @@ SCFL_OutReviewHUD = function ( width, height, imgFile, renderer ) {
 
 	//this.onRTTUpdated = undefined;
 
+	var outInfo;
+	this.initCubeInfo = function(imgW,imgH,typeName,fileName,format,subNames){
+		//var hdrinfo = " - LDR";
+		//if(root.isHDR){hdrinfo = " - HDR";}
+		if(outInfo===undefined){
+			outInfo = document.createElement("p");
+			outInfo.setAttribute("class","_lefttop _topall hudinfo");
+			document.body.appendChild(outInfo);
+		}
+		
+		
+		outInfo.innerHTML = ("Panorama Type: " + typeName.toString()+"<br>");
+		outInfo.innerHTML += ("File Format: " + format.toString()+"<br>");
+		outInfo.innerHTML += ("File Size: " + imgW.toString() + " x " + imgH.toString()+"<br>");
+		outInfo.innerHTML += ("File Name: " + fileName.toString()+"<br>");
+		if(subNames!==undefined && subNames.length > 0){
+			var space = '&nbsp&nbsp&nbsp&nbsp';
+			outInfo.innerHTML += ("Package Files: "+"<br>");
+			for(var n = 0; n< subNames.length; n++){
+				outInfo.innerHTML += space + subNames[n].toString() + "<br>";
+			}
+		}
+		
 
+	};
 
 
 	function activate() {
@@ -255,6 +290,7 @@ SCFL_OutReviewHUD = function ( width, height, imgFile, renderer ) {
 		//hide();
 		scc.removeCildren(divMenu);
 		document.body.removeChild(divMenu);
+		document.body.removeChild(outInfo);
 		this.enabled = false;
 	}
 

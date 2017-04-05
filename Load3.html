@@ -18,7 +18,7 @@
 
 
 <script src="../build/three.js"></script>
-<script src="../jszip/jszip.min.js"></script>
+<script src="js/jszip/jszip.min.js"></script>
 <script src="js/skycube/SC_Common.js"></script>
 <script src="js/controls/OrbitControls.js"></script>
 <script src="js/skycube/SC_CubeViewport.js"></script>
@@ -290,13 +290,36 @@
 				outHUD.shownHUD = function(){outHUDClose.shown();};
 				outHUD.onReviewMode = function(){
 					exportHUD = new SCFL_OutReviewHUD();
-					
+					//? function order
 					exportHUD.onBackToSelection = function(){
 						exportHUD.dispose();
 						exportHUD = undefined;
 						outHUD.ReviewBackToHUD();
 						//console.log("back");
 					};
+					//? function order
+					exportHUD.activate();
+
+					//Show save info
+
+					function updateInfo(){
+						var ResWH = outHUD.getFileSize(exportHUD.getFileSize());
+						var extMain = exportHUD.getUIFileType();
+						if(outHUD.isPackage) extMain = ".zip";
+						
+						console.log(exportHUD.getFileName());
+						exportHUD.initCubeInfo(ResWH.x,
+							ResWH.y,
+							outHUD.getTypeName(),
+							outHUD.getFileName(exportHUD.getFileName()) + exportHUD.getFileType(),
+							extMain,
+							outHUD.getSubName(exportHUD.getFileName(),exportHUD.getFileType()));
+					}
+
+					updateInfo();
+					
+					
+					
 
 					//Save file to disk
 					exportHUD.onSave = function(){
@@ -305,7 +328,19 @@
 
 					};
 
-					exportHUD.activate();
+					exportHUD.onFileType = function(){
+						updateInfo();
+					};
+
+					exportHUD.onFileSize = function(){
+						updateInfo();
+					};
+
+					exportHUD.onFileName = function(){
+						updateInfo();
+					};
+
+					
 				};
 				outHUD.activate();
 

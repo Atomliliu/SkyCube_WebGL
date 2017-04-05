@@ -51,6 +51,21 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 		"ENV2VCC_HUD",
 		"ENV2VCUBE_HUD"
 	 ];
+
+
+
+	 var UI_TypeNames = [
+		"Dual-Paraboloid (Hemispheres)",
+		"Horizon Cross CubeMap",
+		"LatLong (Latitude/Longitude)",
+		"Spherical Mirrored Probe (Matcap)",
+		"Split CubeMap (6 Faces)",
+		"Light Probe (Angular)",
+		"Horizon Linear CubeMap",
+		"Vertical Cross CubeMap",
+		"Vertical Linear CubeMap"
+	 ];
+
 	var Out_ShaderNames = [
 		"ENV2DP",
 		"ENV2HCC",
@@ -61,6 +76,15 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 		"ENV2HCUBE",
 		"ENV2VCC",
 		"ENV2VCUBE"
+	 ];
+
+	 var Out_CubeFacePostfix = [
+	 	"_PX",
+	 	"_NX",
+	 	"_PY",
+	 	"_NY",
+	 	"_PZ",
+	 	"_NZ"
 	 ];
 
 	//
@@ -152,7 +176,7 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 	var maxZoom = 4.0;
 	var curZoom = 1.0;
 	var exportSelected = false;
-
+	this.isPackage = false;
 
 	// Create the camera and set the viewport to match the screen dimensions.
 	root.cameraHUD = new THREE.OrthographicCamera(-UI_width/2, UI_width/2, UI_height/2, -UI_height/2, 0, UI_height/2 );//?
@@ -652,9 +676,11 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 				var picked = intersects[ 0 ].object;
 				if(picked.material.type == "MultiMaterial"){
 					setupMultiMat(picked.material,"fOpacity",selectedOpacity)
+					root.isPackage = true;
 				}
 				else{
 					picked.material.uniforms.fOpacity.value = selectedOpacity;
+					root.isPackage = false;
 				}
 				outShaderName = picked.material.name;
 				selected = picked;
@@ -720,6 +746,73 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 		}
 	}
 
+	//Move to THREE
+	function saveAsBlob(blob,fileName,callBack){
+		var url = URL.createObjectURL(blob);
+			
+
+		var anchor = document.createElement( 'a' );
+		anchor.href = url;
+		anchor.setAttribute("download", fileName);
+		anchor.className = "download-js-link";
+		anchor.innerHTML = "downloading...";
+		anchor.style.display = "none";
+		document.body.appendChild(anchor);
+		setTimeout(function() {
+			anchor.click();
+			document.body.removeChild(anchor);
+		}, 1 );
+
+		if(root.callBack) root.callBack();
+	}
+
+	function saveAsUrl(dataUrl,fileName,callBack){
+		var url = dataUrl;
+
+		var anchor = document.createElement( 'a' );
+		anchor.href = url;
+		anchor.setAttribute("download", fileName);
+		anchor.className = "download-js-link";
+		anchor.innerHTML = "downloading...";
+		anchor.style.display = "none";
+		document.body.appendChild(anchor);
+		setTimeout(function() {
+			anchor.click();
+			document.body.removeChild(anchor);
+		}, 1 );
+
+		if(root.callBack) root.callBack();
+	}
+	this.getFileName = function(name){
+		if(name === undefined || name == "") {name = 'cubemap-' + document.title + '-' + Date.now();}
+		return name;
+	};
+
+	this.getTypeName = function(){
+		return UI_TypeNames[Out_ShaderNames.indexOf(outShaderName)];
+	};
+
+	this.getFileSize = function(size){
+		if(size===undefined) {size = Out_Size};
+		var whRatio = getSelOutSize();
+		//console.log(size);
+		//if (whRatio.x == 0.0 && whRatio.y==0.0){console.log("Size is wrong!");}
+		return new THREE.Vector2(Math.round(whRatio.x * size * whRatio.z), Math.round(whRatio.y * size * whRatio.z));
+	};
+
+	this.splitCubeNames = [];
+
+	this.getSubName = function(nameMain,typeSub){
+		if(selected.material.type == "MultiMaterial"){
+			for(var n=0; n<selected.material.materials.length ;n++){
+				root.splitCubeNames[n] = (root.getFileName(nameMain) + Out_CubeFacePostfix[n] + typeSub);
+			}
+		}
+		return root.splitCubeNames;
+
+	};
+
+	
 
 
 	function onFileExport(fileName,fileType,Size){
@@ -742,20 +835,53 @@ THREE.SC_OutHUD = function ( cubeMap, width, height, domElement ) {
 			Out_Width = Math.round(whRatio.x * Out_Size * whRatio.z);
 			Out_Height = Math.round(whRatio.y * Out_Size * whRatio.z);
 
+			
+
+			
+
 			if(selected.material.type == "MultiMaterial"){
+				
+				if(outShaderName != "ENV2CUBEFACE") {console.log("Shader not support!"); return;}
+				var Out = [];
+
+				var rtt = new THREE.SC_Raster(renderer,Out_Width,Out_Height);
+				if(fileName === undefined || fileName == "") {fileName = 'cubemap-' + document.title + '-' + Date.now();}
+				//else {fileName = fileName;}
+
+				var zip = new JSZip();
+				var zipName = fileName + '.zip';
+				
+				//var imgdata = [];
+				for(var n=0; n<selected.material.materials.length ;n++){
+					Out[n] = new THREE.SC_OutputImg(renderer,Out_Width,Out_Height);
+					Out_Mat.uniforms.nFace.value = n;
+					rtt.RTT(Out_Mat);
+
+					//root.splitCubeNames[n] = (fileName + Out_CubeFacePostfix[n] + fileType);
+
+					Out[n].OutputRT2PNGJPGData(renderer,rtt.rtRTT,fileName + Out_CubeFacePostfix[n],fileType);
+					Out[n].toDataFinished = function(name,blob){
+						zip.file(name, blob, {base64: false});
+						if(name.substring(name.lastIndexOf('_'), name.lastIndexOf('.')) == Out_CubeFacePostfix[5] ) {
+							zip.generateAsync({type:"blob"}).then(function (blob) {
+								//saveAs(blob, zipName);
+								saveAsBlob(blob,zipName);
+							});
+						}
+					}
+				}
+				
+				//var cubeZip = zip.folder("cubemap faces");
 				
 			}
 
 			else{
-
 				var Out = new THREE.SC_OutputImg(renderer,Out_Width,Out_Height);
 				var rtt = new THREE.SC_Raster(renderer,Out_Width,Out_Height);
 				rtt.RTT(Out_Mat);
-				
-				Out.OutputRT2PNG(renderer,rtt.rtRTT,fileName,fileType);
+				Out.OutputRT2PNGJPGFile(renderer,rtt.rtRTT,fileName,fileType);
 				hudSnackbarExport();
 				console.log("Export!");
-
 			}
 
 		}
