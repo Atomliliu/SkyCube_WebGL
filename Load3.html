@@ -17,7 +17,7 @@
 <p id="version" class="_leftbottom _topall hudinfo">Alpha v0.10</p>
 
 
-<script src="../build/three.js"></script>
+<script src="../build/three.min.js"></script>
 <script src="js/jszip/jszip.min.js"></script>
 <script src="js/skycube/SC_Common.js"></script>
 <script src="js/controls/OrbitControls.js"></script>
@@ -281,6 +281,10 @@
 				if(previewCube!=undefined && previewCube.enabled){
 					previewCube.PreviewHiden();
 				}
+				else{
+					helper.setHideAll();
+				}
+				
 					
 				CM=panaorama.updateCube(cubeView.deltaSkyBoxMatrix);
 				//CM = cubeMap;
@@ -357,6 +361,7 @@
 					else{
 						cubeView.enableControls();
 						cubeView.asNormal();
+						helper.setShowAll();
 					}
 					
 					cubeMenu.show();
