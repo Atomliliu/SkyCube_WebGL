@@ -17,7 +17,7 @@
 <p id="version" class="_leftbottom _topall hudinfo">Alpha v0.10</p>
 
 
-<script src="../build/three.min.js"></script>
+<script src="../build/three.js"></script>
 <script src="js/jszip/jszip.min.js"></script>
 <script src="js/skycube/SC_Common.js"></script>
 <script src="js/controls/OrbitControls.js"></script>
@@ -64,6 +64,17 @@
 	controls.enablePan = false;*/
 
 	///////////////////////////////////////////////////////////////////////////////
+	//Check device
+	if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+    	// is mobile..
+    	console.log("Mobile");
+	}
+	if( screen.width <= 480 ) {     
+	    // is mobile.. 
+	    console.log("Reslotion is low");
+	}
+	//
+
 	var type = ".jpg,.png";
 	var minWidth = 800;
 	var minHeight = 600;
@@ -281,10 +292,6 @@
 				if(previewCube!=undefined && previewCube.enabled){
 					previewCube.PreviewHiden();
 				}
-				else{
-					helper.setHideAll();
-				}
-				
 					
 				CM=panaorama.updateCube(cubeView.deltaSkyBoxMatrix);
 				//CM = cubeMap;
@@ -361,7 +368,6 @@
 					else{
 						cubeView.enableControls();
 						cubeView.asNormal();
-						helper.setShowAll();
 					}
 					
 					cubeMenu.show();
